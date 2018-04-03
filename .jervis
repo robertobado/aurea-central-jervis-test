@@ -1,0 +1,16 @@
+#######################
+# Aurea Central Jervis
+#######################
+# User guide and documentation can be found at: https://github.com/trilogy-group/central-jervis
+# This project is based on https://github.com/samrocketman/jervis
+
+language: shell
+
+env:
+  global:
+    - JERVIS_SERVER_IMAGE_BASE_URL=registry2.swarm.devfactory.com/aurea/central/jervis/server
+    - DOCKER_HOST=tcp://dlb1.aureacentral.com:2375
+
+script: 
+  - echo "Hello World."
+  - echo docker build -t ${JERVIS_SERVER_IMAGE_BASE_URL}:${GIT_COMMIT} .jervis_files/docker

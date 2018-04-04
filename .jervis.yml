@@ -14,3 +14,11 @@ env:
 script: 
   - echo "Hello World."
   - echo docker build -t ${JERVIS_SERVER_IMAGE_BASE_URL}:${GIT_COMMIT} .jervis_files/docker
+
+branches:
+  only:
+  - master
+  - develop
+  - release
+  - hotfix
+  - /^feature\/.*$/

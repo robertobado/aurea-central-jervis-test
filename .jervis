@@ -14,3 +14,6 @@ env:
 script: 
   - echo "Hello World."
   - echo docker build -t ${JERVIS_SERVER_IMAGE_BASE_URL}:${GIT_COMMIT} .jervis_files/docker
+
+jenkins:
+  pipeline_jenkinsfile: aurea-central-jervis/pipelines/SaaS

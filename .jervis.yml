@@ -17,3 +17,12 @@ script:
 
 jenkins:
   pipeline_jenkinsfile: aurea-central-jervis/pipelines/SaaS
+  collect: []
+  
+branches:
+  only:
+  - master
+  - develop
+  - release
+  - hotfix
+  - /^feature\/.*$/

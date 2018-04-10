@@ -1,0 +1,29 @@
+- name: "Searching Jervis Configuration"
+  include_vars:
+    file: "{{ possible_jervis_filename }}"
+    name: jervis
+  with_first_found:
+    - "{{ lookup('env', 'WORKSPACE') }}/.jervis.yml"
+    - "{{ lookup('env', 'WORKSPACE') }}/.jervis.yaml"
+    - "{{ lookup('env', 'WORKSPACE') }}/.travis.yml"
+    - "{{ lookup('env', 'WORKSPACE') }}/.travis.yaml"
+    - ".jervis.yml"
+    - ".jervis.yaml"
+    - ".travis.yml"
+    - ".travis.yaml"
+  loop_control:
+    loop_var: possible_jervis_filename
+- name: "Selecting target environment"
+  set_fact:
+    environment_name: "{{
+      {
+        'master': 'prod',
+        'release': 'qa',
+        'develop': 'regression',
+        'feature': 'dev'
+      }[(lookup('env','GIT_BRANCH') | default('feature', true)).split('/') | first]
+    }}"
+  delegate_to: "{{ inventory_instance }}"
+  loop: "{{ groups['all'] }}"
+  loop_control:
+    loop_var: inventory_instance

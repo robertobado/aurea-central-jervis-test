@@ -1,0 +1,34 @@
+---
+- name: Aurea Central Jervis Preflight
+  hosts: 
+    - localhost
+  gather_facts: no
+  roles:
+    - agent-preflight
+
+- name: Aurea Central Jervis EC2 Hosts
+  serial: 100%
+  hosts: 
+    - ec2
+  vars:
+    dynamic_inventory: []
+  gather_facts: no
+  roles:
+    - ec2-instance
+
+- name: Aurea Central Jervis Build Inventory
+  hosts: 
+    - localhost
+  gather_facts: no
+  roles:
+    - agent-build-inventory
+
+- name: Aurea Central Jervis EC2 Services
+  strategy: free
+  hosts: 
+    - ec2-service
+  vars:    
+    - jervis: "{{ hostvars['localhost'].jervis }}"
+  gather_facts: yes
+  roles:
+    - ec2-service-deploy

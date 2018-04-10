@@ -1,0 +1,15 @@
+- name: "Adding dynamic instances to inventory"
+  add_host:
+    name: "{{ dynamic_instance.name }}"
+    ansible_connection: "{{ dynamic_instance.ansible_connection }}"
+    ansible_winrm_server_cert_validation: "{{ dynamic_instance.ansible_winrm_server_cert_validation | default(omit) }}"
+    ansible_host: "{{ dynamic_instance.ansible_host }}"
+    ansible_user: "{{ dynamic_instance.ansible_user }}"
+    ansible_password: "{{ dynamic_instance.ansible_password }}"
+    service: "{{ dynamic_instance.service }}"
+    groups: "{{ dynamic_instance.groups }}"
+  loop: "{{ hostvars.values() | selectattr('dynamic_inventory','defined') | map(attribute='dynamic_inventory') | flatten }}"
+  loop_control:
+    loop_var: dynamic_instance
+    label: "{{ dynamic_instance.name }}"
+  changed_when: false

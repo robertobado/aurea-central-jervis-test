@@ -20,7 +20,7 @@
   serial: 100%
   hosts: 
     - docker-host
-  connection: local
+  delegate_to: localhost
   vars:
     dynamic_inventory: []
     jervis: "{{ hostvars['localhost'].jervis }}"

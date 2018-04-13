@@ -22,8 +22,8 @@
     - docker-host
   delegate_to: localhost
   vars:
-    dynamic_inventory: []
-    jervis: "{{ hostvars['localhost'].jervis }}"
+    - dynamic_inventory: []
+    - jervis: "{{ hostvars['localhost'].jervis }}"
   gather_facts: no
   roles:
     - docker-host

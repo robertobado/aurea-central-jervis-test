@@ -1,0 +1,20 @@
+- name: Log into private registry
+  docker_login:
+    registry: "{{ ('https://' ~ (service.docker_login.registry | default('registry2.swarm.devfactory.com')) ) | urlsplit('hostname')  }}"
+    username: "{{ service.docker_login.username }}"
+    password: "{{ service.docker_login.password }}"
+  delegate_to: localhost
+
+- name: Building docker image
+  docker_image:
+     path: "../../{{ docker_image_entry.path }}"
+     name: "{{ docker_image_entry.name }}:{{ lookup('env','GIT_COMMIT') }}"
+     push: "{{ docker_image_entry.push | default('yes')}}"
+     docker_host: "tcp://dlb1.aureacentral.con:2375"
+  loop: 
+    - "{{ service.docker_image }}"
+  loop_control: 
+    loop_var: docker_image_entry
+    label: "{{ docker_image_entry.name }}:{{ lookup('env','GIT_COMMIT') }}"
+  delegate_to: localhost
+  delegate_facts: true

@@ -16,6 +16,16 @@
   roles:
     - ec2-instance
 
+- name: Aurea Central Jervis Docker Hosts
+  serial: 100%
+  hosts: 
+    - docker-host
+  vars:
+    dynamic_inventory: []
+  gather_facts: no
+  roles:
+    - docker-host
+    
 - name: Aurea Central Jervis Build Inventory
   hosts: 
     - localhost
@@ -32,3 +42,23 @@
   gather_facts: yes
   roles:
     - ec2-service-deploy
+  
+- name: Aurea Central Jervis Docker Images
+  strategy: free
+  hosts: 
+    - docker-service
+  vars:    
+    - jervis: "{{ hostvars['localhost'].jervis }}"
+  gather_facts: yes
+  roles:
+    - docker-image-build
+  
+- name: Aurea Central Jervis Docker Services
+  strategy: free
+  hosts: 
+    - docker-service
+  vars:    
+    - jervis: "{{ hostvars['localhost'].jervis }}"
+  gather_facts: yes
+  roles:
+    - docker-service-deploy

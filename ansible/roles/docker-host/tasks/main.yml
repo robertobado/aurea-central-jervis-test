@@ -13,3 +13,4 @@
   loop_control:
     loop_var: service
     label: "{{ service.name }}"
+  connection: local

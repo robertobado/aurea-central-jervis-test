@@ -98,4 +98,4 @@
     - install
     - post-install
     - start
-  when: jervis.services[service.name] is defined and jervis.services[service.name][step_name] is defined
+  when: jervis.services[inventory_hostname.split('@') | first][step_name] | default([])

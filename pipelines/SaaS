@@ -1,7 +1,7 @@
 #!groovy
 pipeline {
     agent {
-        label 'stable&&docker&&linux&&ansible'
+        label 'stable && docker && linux && ansible'
     }
     stages {
         stage('Build Docker Image') {

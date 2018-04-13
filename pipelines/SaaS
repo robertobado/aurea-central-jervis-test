@@ -4,14 +4,9 @@ pipeline {
         label 'stable && docker && linux && ansible'
     }
     stages {
-        stage('Build Docker Image') {
+        stage('Build Docker Images') {
             steps {
-                sh 'env | LC_ALL=C sort'
-                unstash 'artifacts'
-                unstash 'junit'
-                sh 'find . -type f'
-                sh 'pwd'
-                sh 'tree'
+                sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i inventories/staging -vvvv -e environment_name=qa'
             }
         }
     }

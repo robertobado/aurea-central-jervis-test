@@ -1,16 +1,17 @@
 #!groovy
 pipeline {
     agent {
-        label 'ubuntu1604'
+        label 'stable&&docker&&linux&&ansible'
     }
     stages {
-        stage('Simulated deploy') {
-            when { branch 'jervis_simple' }
+        stage('Build Docker Image') {
             steps {
                 sh 'env | LC_ALL=C sort'
                 unstash 'artifacts'
                 unstash 'junit'
                 sh 'find . -type f'
+                sh 'pwd'
+                sh 'tree'
             }
         }
     }

@@ -18,9 +18,9 @@
 
 - name: Aurea Central Jervis Docker Hosts
   serial: 100%
+  connection: local
   hosts: 
     - docker-host
-  delegate_to: localhost
   vars:
     - dynamic_inventory: []
     - jervis: "{{ hostvars['localhost'].jervis }}"

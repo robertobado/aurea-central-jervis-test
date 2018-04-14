@@ -8,7 +8,7 @@ pipeline {
             steps {
 		unstash 'artifacts'
 		sh 'ls -la'
-		SH 'ls -la target'
+		sh 'ls -la target'
                 sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i inventories/staging -vvvv -e environment_name=qa'
             }
         }

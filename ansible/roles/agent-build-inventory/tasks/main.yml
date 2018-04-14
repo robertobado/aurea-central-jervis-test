@@ -1,7 +1,7 @@
 - name: "Adding dynamic instances to inventory"
   add_host:
     name: "{{ dynamic_instance.name }}"
-    ansible_connection: "{{ dynamic_instance.ansible_connection }}"
+    ansible_connection: "{{ dynamic_instance.ansible_connection | default(omit) }}"
     ansible_winrm_server_cert_validation: "{{ dynamic_instance.ansible_winrm_server_cert_validation | default(omit) }}"
     ansible_host: "{{ dynamic_instance.ansible_host | default(omit) }}"
     ansible_user: "{{ dynamic_instance.ansible_user | default(omit) }}"

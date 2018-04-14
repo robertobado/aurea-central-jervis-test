@@ -1,12 +1,3 @@
-- name: Log into private registry
-  docker_login:
-    registry: "{{ ('https://' ~ (service.docker_login.registry | default('registry2.swarm.devfactory.com')) ) | urlsplit('hostname')  }}"
-    username: "{{ service.docker_login.username }}"
-    password: "{{ service.docker_login.password }}"
-    docker_host: "tcp://dlb1.aureacentral.com:2375"
-  when: service.docker_login is defined and service.docker_login.username is defined
-  tags: docker-image-build
-
 - name: Building docker image
   docker_image:
      path: "../../{{ docker_image_entry.path }}"

@@ -5,7 +5,8 @@
                           | combine({
                                       'name': service.name ~ '@'  ~ inventory_hostname,
                                       'service': jervis.services[service.name],
-                                      'groups': group_names + ['docker-service'] 
+                                      'groups': group_names + ['docker-service'],
+                                      'ansible_connection': 'docker'
                                     }) 
                           ] 
                         }}"

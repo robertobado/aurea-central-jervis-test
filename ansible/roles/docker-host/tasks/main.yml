@@ -15,3 +15,6 @@
     loop_var: service
     label: "{{ service.name }}"
   connection: local
+  tags: 
+    - docker-image-build
+    - docker-service-deploy

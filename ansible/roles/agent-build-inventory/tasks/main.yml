@@ -13,3 +13,4 @@
     loop_var: dynamic_instance
     label: "{{ dynamic_instance.name }}"
   changed_when: false
+  tags: always

@@ -5,20 +5,21 @@ pipeline {
     }
     stages {
         stage('Build Docker Images') {
+            environment { 
+                ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+            }
             steps {
                 unstash 'artifacts'
-                withCredentials([usernameColonPassword(credentialsId: 'ansible-vault-password', passwordVariable: 'ANSIBLE_VAULT_PASSWORD')]) {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                }
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                 sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-image-build --vault-password-file=.ansible-vault-password'
             }
         }
         stage('Docker Service Deploy') {
+            environment { 
+                ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+            }
             steps {
-                unstash 'artifacts'
-                withCredentials([usernameColonPassword(credentialsId: 'ansible-vault-password', passwordVariable: 'ANSIBLE_VAULT_PASSWORD')]) {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                }
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                 sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-service-deploy --vault-password-file=.ansible-vault-password'
             }
         }

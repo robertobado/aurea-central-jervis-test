@@ -21,9 +21,9 @@
         'master': 'prod',
         'release': 'qa',
         'develop': 'regression',
+        'pull-request': 'staging',
         'feature': 'dev'
-      }[(lookup('env','GIT_BRANCH') | default('feature', true)).split('/') | first]
-    }}"
+      }[('PR-' in lookup('env','GIT_BRANCH') )  | ternary('pull-request', lookup('env','GIT_BRANCH') ) ] }}"
   delegate_to: "{{ inventory_instance }}"
   loop: "{{ groups['all'] }}"
   loop_control:

@@ -22,11 +22,9 @@
   serial: 100%
   hosts: 
     - docker-host
+  gather_facts: no
   vars:
     dynamic_inventory: []
-  tags:
-    - docker-image-build
-    - docker-service-deploy
   gather_facts: no
   roles:
     - docker-host

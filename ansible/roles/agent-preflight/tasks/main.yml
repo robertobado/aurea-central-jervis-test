@@ -13,6 +13,7 @@
     - ".travis.yaml"
   loop_control:
     loop_var: possible_jervis_filename
+  connection: local
 - name: "Selecting target environment"
   set_fact:
     environment_name: "{{
@@ -23,5 +24,8 @@
         'feature': 'dev'
       }[(lookup('env','GIT_BRANCH') | default('feature', true)).split('/') | first]
     }}"
+  delegate_to: "{{ inventory_instance }}"
+  loop: "{{ groups['all'] }}"
+  loop_control:
+    loop_var: inventory_instance
   connection: local
-  tags: always

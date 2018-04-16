@@ -2,10 +2,10 @@
   tempfile: 
   register: task_tempfile_result
   delegate_to: localhost
-
+  
 - name: "{{ step_name }} : Writing tasks to file"
   copy:
-    content: "{{ jervis.services[inventory_hostname.split('@') | first][step_name] | default([]) | to_nice_yaml }}"
+    content: "{{ hostvars[inventory_hostname].jervis.services[inventory_hostname.split('@') | first][step_name] | default([]) | to_nice_yaml }}"
     dest: "{{ task_tempfile_result.path | default(task_tempfile_result.path) }}"
   delegate_to: localhost
 

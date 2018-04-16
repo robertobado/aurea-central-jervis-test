@@ -8,6 +8,7 @@
   delegate_facts: true
   when: docker_registry_username is defined and docker_registry_password is defined
   tags: docker-image-build
+  retries: 3
 
 - name: Building docker image
   docker_image:

@@ -28,4 +28,5 @@
   loop: "{{ groups['all'] }}"
   loop_control:
     loop_var: inventory_instance
+    label: "{{ inventory_instance }} --> {{ environment_name }}"
   connection: local

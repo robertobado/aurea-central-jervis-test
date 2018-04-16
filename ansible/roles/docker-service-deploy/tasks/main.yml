@@ -91,11 +91,4 @@
     - start
   loop_control:
     loop_var: step_name
-  tags: 
-    - stop
-    - uninstall
-    - pre-install
-    - install
-    - post-install
-    - start
-  when: jervis.services[inventory_hostname.split('@') | first][step_name] | default([])
+  when: hostvars[inventory_hostname].jervis.services[inventory_hostname.split('@') | first][step_name] | default([])

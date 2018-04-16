@@ -9,7 +9,7 @@ pipeline {
 		unstash 'artifacts'
 		sh 'ls -la'
 		sh 'ls -la target'
-                sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i inventories/staging --tags docker-image-build '
+                sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-image-build --vault-password-file=.ansible-vault-password'
             }
         }
         stage('Docker Service Deploy') {
@@ -17,7 +17,7 @@ pipeline {
 		unstash 'artifacts'
 		sh 'ls -la'
 		sh 'ls -la target'
-                sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i inventories/staging --tags docker-service-deploy '
+                sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-service-deploy --vault-password-file=.ansible-vault-password'
             }
         }
     }

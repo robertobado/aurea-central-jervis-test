@@ -5,7 +5,8 @@
                             combine({
                                       'name': service.name ~ '@'  ~ inventory_hostname,
                                       'service': service,
-                                      'groups': group_names + ['ec2-service'] 
+                                      'groups': group_names + ['ec2-service'], 
+                                      'jervis': {}
                                     }) 
                           ] 
                         }}"

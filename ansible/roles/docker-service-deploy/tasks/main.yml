@@ -79,6 +79,7 @@
     volumes_from: "{{ volumes_from | default(omit) }}"
     working_dir: "{{ working_dir | default(omit) }}"
   delegate_to: localhost
+  retries: 3
 
 - name: "Running deployment lifecycle steps"
   include_tasks: load_step_tasks.yml

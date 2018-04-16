@@ -26,8 +26,6 @@
   tags:
     - docker-image-build
     - docker-service-deploy
-  vars:
-    - dynamic_inventory: []
   gather_facts: no
   roles:
     - docker-host

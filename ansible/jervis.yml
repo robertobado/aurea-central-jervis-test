@@ -11,6 +11,7 @@
   serial: 100%
   hosts: 
     - ec2
+  tags: ec2-instance
   vars:
     dynamic_inventory: []
   gather_facts: no
@@ -42,6 +43,7 @@
   strategy: free
   hosts: 
     - ec2-service
+  tags: ec2-service-deploy
   vars:    
     - jervis: "{{ hostvars['localhost'].jervis }}"
   gather_facts: no

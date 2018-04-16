@@ -20,7 +20,7 @@ pipeline {
             }
             steps {
                 sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-service-deploy,ec2-service-deploy --vault-password-file=.ansible-vault-password'
+                sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-service-deploy,ec2-instance,ec2-service-deploy --vault-password-file=.ansible-vault-password'
             }
         }
     }

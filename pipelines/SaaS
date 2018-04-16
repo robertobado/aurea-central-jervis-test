@@ -6,17 +6,15 @@ pipeline {
     stages {
         stage('Build Docker Images') {
             steps {
-		unstash 'artifacts'
-		sh 'ls -la'
-		sh 'ls -la target'
+                unstash 'artifacts'
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                 sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-image-build --vault-password-file=.ansible-vault-password'
             }
         }
         stage('Docker Service Deploy') {
             steps {
-		unstash 'artifacts'
-		sh 'ls -la'
-		sh 'ls -la target'
+                unstash 'artifacts'
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                 sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-service-deploy --vault-password-file=.ansible-vault-password'
             }
         }

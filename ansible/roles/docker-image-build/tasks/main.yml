@@ -1,0 +1,26 @@
+- name: Log into private registry
+  docker_login:
+    registry: "{{ docker_registry_url }}"
+    username: "{{ docker_registry_username }}"
+    password: "{{ docker_registry_password }}"
+    docker_host: "tcp://dlb1.aureacentral.com:2375"
+  delegate_to: localhost
+  delegate_facts: true
+  when: docker_registry_username is defined and docker_registry_password is defined
+  tags: docker-image-build
+  retries: 3
+
+- name: Building docker image
+  docker_image:
+     path: "../../{{ docker_image_entry.path }}"
+     name: "{{ docker_image_entry.name }}:{{ lookup('env','GIT_COMMIT') }}"
+     push: "{{ docker_image_entry.push | default('yes')}}"
+     docker_host: "tcp://dlb1.aureacentral.com:2375"
+  loop: 
+    - "{{ service.docker_image }}"
+  loop_control: 
+    loop_var: docker_image_entry
+    label: "{{ docker_image_entry.name }}:{{ lookup('env','GIT_COMMIT') }}"
+  delegate_to: localhost
+  delegate_facts: true
+  tags: docker-image-build

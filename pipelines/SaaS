@@ -1,16 +1,26 @@
 #!groovy
 pipeline {
     agent {
-        label 'ubuntu1604'
+        label 'stable && docker && linux && ansible'
     }
     stages {
-        stage('Simulated deploy') {
-            when { branch 'jervis_simple' }
+        stage('Build Docker Images') {
+            environment { 
+                ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+            }
             steps {
-                sh 'env | LC_ALL=C sort'
                 unstash 'artifacts'
-                unstash 'junit'
-                sh 'find . -type f'
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+                sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-image-build --vault-password-file=.ansible-vault-password'
+            }
+        }
+        stage('Service Deploy') {
+            environment { 
+                ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+            }
+            steps {
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+                sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-service-deploy,ec2-instance,ec2-service-deploy --vault-password-file=.ansible-vault-password'
             }
         }
     }

@@ -1,0 +1,71 @@
+---
+- name: Aurea Central Jervis Preflight
+  hosts: 
+    - all
+  tags: always
+  gather_facts: no
+  roles:
+    - agent-preflight
+    
+- name: Aurea Central Jervis EC2 Hosts
+  serial: 100%
+  hosts: 
+    - ec2
+  tags: ec2-instance
+  vars:
+    dynamic_inventory: []
+  gather_facts: no
+  roles:
+    - ec2-instance
+
+- name: Aurea Central Jervis Docker Hosts
+  serial: 100%
+  hosts: 
+    - docker-host
+  gather_facts: no
+  vars:
+    dynamic_inventory: []
+  gather_facts: no
+  roles:
+    - docker-host
+    
+- name: Aurea Central Jervis Build Inventory
+  hosts: 
+    - localhost
+  tags: always
+  gather_facts: no
+  roles:
+    - agent-build-inventory
+
+- name: Aurea Central Jervis EC2 Services
+  strategy: free
+  hosts: 
+    - ec2-service
+  tags: ec2-service-deploy
+  vars:    
+    - jervis: "{{ hostvars['localhost'].jervis }}"
+  gather_facts: no
+  roles:
+    - ec2-service-deploy
+  
+- name: Aurea Central Jervis Docker Images
+  strategy: free
+  hosts: 
+    - docker-service
+  tags: docker-image-build
+  vars:    
+    - jervis: "{{ hostvars['localhost'].jervis }}"
+  gather_facts: no
+  roles:
+    - docker-image-build
+  
+- name: Aurea Central Jervis Docker Services
+  strategy: free
+  hosts: 
+    - docker-service
+  tags: docker-service-deploy
+  vars:    
+    - jervis: "{{ hostvars['localhost'].jervis }}"
+  gather_facts: no
+  roles:
+    - docker-service-deploy

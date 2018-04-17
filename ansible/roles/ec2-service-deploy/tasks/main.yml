@@ -1,0 +1,19 @@
+- name: "Running deployment lifecycle steps"
+  include_tasks: load_step_tasks.yml
+  loop: 
+    - stop
+    - uninstall
+    - pre-install
+    - install
+    - post-install
+    - start
+  loop_control:
+    loop_var: step_name
+  tags: 
+    - stop
+    - uninstall
+    - pre-install
+    - install
+    - post-install
+    - start
+  when: jervis.services[service.name] is defined and jervis.services[service.name][step_name] is defined

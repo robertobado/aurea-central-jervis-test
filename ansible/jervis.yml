@@ -1,5 +1,17 @@
 ---
 - name: Aurea Central Jervis Preflight
+  vars:
+    branch_environment_map:
+      feature: 
+        feature: dev
+        develop: dev
+      develop:
+        develop: regression
+        release: qa
+      release:
+        release: qa
+        master: staging
+      master: prod
   hosts: 
     - all
   tags: always
@@ -22,7 +34,6 @@
   serial: 100%
   hosts: 
     - docker-host
-  gather_facts: no
   vars:
     dynamic_inventory: []
   gather_facts: no

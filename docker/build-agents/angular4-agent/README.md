@@ -43,7 +43,7 @@ ng serve --host=0.0.0.0 --disable-host-check
 ## Setting Up in the Jervis:
 
 - Read the documentation at: https://confluence.devfactory.com/display/DE/Central+Jervis+Build+Agent+Library
-- Use the platforms.json and toolchains-debianJesse-stable.json as a reference to setup your Jervis environment
+- Use the `platforms.json` and `toolchains-debianJesse-stable.json` files as a reference to setup your Jervis environment
 
 
 

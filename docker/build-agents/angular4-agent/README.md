@@ -15,7 +15,7 @@
 ## Build
 
 ```
-docker build -t . -f Dockerfile
+./build.sh
 ```
 
 ## Using as Dev Environment

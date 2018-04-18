@@ -1,0 +1,15 @@
+{
+    "supported_platforms": {
+        "docker": {
+            "debianJesse": {
+                "language": [
+                    "angular4"
+                ],
+                "toolchain": [
+                    "env"
+                ]
+            }
+        }
+    },
+    "restrictions": {}
+}

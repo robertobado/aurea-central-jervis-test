@@ -1,12 +1,40 @@
-#docker build -t registry2.swarm.devfactory.com/jmagalhaes/angular4:1.0.0 . -f Dockerfile.angular4 
+FROM jenkins/slave:3.19-1
 
-FROM node:9.6
+USER root
 
-USER node
-RUN mkdir /home/node/.npm-global
-ENV PATH=/home/node/.npm-global/bin:$PATH
-ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
+# Set debconf to run non-interactively
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+# Install base dependencies
+RUN apt-get update && apt-get install -y -q --no-install-recommends \
+        apt-transport-https \
+        build-essential \
+        ca-certificates \
+        curl \
+        git \
+        libssl-dev \
+        wget \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV NVM_DIR /usr/local/nvm
+ENV NODE_VERSION 9.11.1
+
+RUN mkdir -p $NVM_DIR && chown jenkins:jenkins -R $NVM_DIR
+
+USER jenkins
+
+# Install nvm with node and npm
+RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash \
+    && . $NVM_DIR/nvm.sh \
+    && nvm install $NODE_VERSION \
+    && nvm alias default $NODE_VERSION \
+    && nvm use default
+
+
+ENV NODE_PATH $NVM_DIR/versions/node/v$NODE_VERSION/lib/node_modules
+ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+
+# Install Angular 4
 RUN npm install -g @angular/cli gulp-cli
 
-EXPOSE 4200
 

@@ -1,25 +1,10 @@
-FROM openjdk:8-jdk
+FROM jenkinsci/slave
 
-RUN apt-get update&& \
-  apt-get install -y vim nano net-tools htop dnsutils git curl netcat && \
+USER root
+
+#Instal essentials
+RUN apt-get update && \
+  apt-get install -y apt-utils dnsutils git curl netcat maven vim nano net-tools htop unzip && \
   apt-get upgrade -y
 
-ENV HOME /home/jenkins
-RUN groupadd -g 10000 jenkins
-RUN useradd -c "Jenkins user" -d $HOME -u 10000 -g 10000 -m jenkins
-LABEL Description="This is a base image, which provides the Jenkins agent executable (slave.jar)" Vendor="Jenkins project" Version="3.19"
-
-ARG VERSION=3.19
-ARG AGENT_WORKDIR=/home/jenkins/agent
-
-RUN curl --create-dirs -sSLo /usr/share/jenkins/slave.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${VERSION}/remoting-${VERSION}.jar \
-  && chmod 755 /usr/share/jenkins \
-  && chmod 644 /usr/share/jenkins/slave.jar
-
-USER jenkins
-ENV AGENT_WORKDIR=${AGENT_WORKDIR}
-RUN mkdir /home/jenkins/.jenkins && mkdir -p ${AGENT_WORKDIR}
-
-VOLUME /home/jenkins/.jenkins
-VOLUME ${AGENT_WORKDIR}
-WORKDIR /home/jenkins
+ADD .mavenrc /home/jenkins/

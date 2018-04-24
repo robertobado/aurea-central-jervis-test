@@ -7,9 +7,12 @@
         develop: dev
       develop:
         develop: regression
+        qa: qa
+      qa:
+        qa: qa
         release: qa
       release:
-        release: qa
+        release: staging
         master: staging
       master: prod
   hosts: 

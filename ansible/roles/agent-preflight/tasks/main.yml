@@ -20,7 +20,7 @@
     prompt: "Ansible detected you are not running in a CICD environment like Jenkins. While it's possible to run Jervis Ansible outside CICD, 
     you must mimic it's environment and provide general use environment variables: GIT_COMMIT CHANGE_TARGE BRANCH_NAME, IS_PR_BUILD. 
     We will default to dev and random values and resume your deploy in a couple of seconds. To dismiss this message, setup your environment properly | comment"
-  when: lookup('env','BRANCH_NAME') == '' or lookup('env','CHANGE_TARGET') == ''  or lookup('env','GIT_COMMIT') == '' 
+  when: lookup('env','BRANCH_NAME') == ''
   register: agent_check_result
 - name: "Defaulting parameters"
   set_fact:

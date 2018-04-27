@@ -149,3 +149,25 @@
   gather_facts: no
   roles:
     - run-security-tests    
+
+- name: Aurea Central Jervis Promote Package
+  strategy: free
+  hosts: 
+    - docker-host
+  tags: promote-packages
+  vars:    
+    - jervis: "{{ hostvars['localhost'].jervis }}"
+  gather_facts: no
+  roles:
+    - promote-packages    
+
+- name: Aurea Central Jervis Send Notification
+  strategy: free
+  hosts: 
+    - docker-host
+  tags: send-notifications
+  vars:    
+    - jervis: "{{ hostvars['localhost'].jervis }}"
+  gather_facts: no
+  roles:
+    - send-notifications    

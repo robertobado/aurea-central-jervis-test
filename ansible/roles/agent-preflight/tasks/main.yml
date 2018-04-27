@@ -31,7 +31,7 @@
   when: agent_check_result is defined and agent_check_result is success
 - name: "Selecting target environment"
   set_fact:
-    environment_name: "{{ branch_environment_map[lookup('env','BRANCH_NAME') | default('feature') | lower][lookup('env','BRANCH_NAME') | default('feature') | lower] }}"
+    environment_name: "{{ branch_environment_map[lookup('env','BRANCH_NAME') | lower] is defined | ternary(branch_environment_map[lookup('env','BRANCH_NAME') | lower][lookup('env','BRANCH_NAME') | lower],'dev') }}"
   delegate_to: "{{ inventory_instance }}"
   loop: "{{ groups['all'] }}"
   loop_control:

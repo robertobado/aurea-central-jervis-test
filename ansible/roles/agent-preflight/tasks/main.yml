@@ -31,10 +31,19 @@
   when: agent_check_result is defined and agent_check_result is success
 - name: "Selecting target environment"
   set_fact:
-    environment_name: "{{ branch_environment_map[lookup('env','BRANCH_NAME') | default('feature') | lower][ lookup('env',(lookup('env','IS_PR_BUILD') | ternary('CHANGE_TARGET','BRANCH_NAME')))]}}"
+    environment_name: "{{ branch_environment_map[lookup('env','BRANCH_NAME') | default('feature') | lower][lookup('env','BRANCH_NAME') | default('feature') | lower] }}"
   delegate_to: "{{ inventory_instance }}"
   loop: "{{ groups['all'] }}"
   loop_control:
     loop_var: inventory_instance
     label: "{{ inventory_instance }}"
   when: agent_check_result is defined and agent_check_result is skipped
+- name: "Evaluating if trigger is Pull Request"
+  set_fact:
+    environment_name: "{{ branch_environment_map[ environment_name ][lookup('env','CHANGE_TARGET') | default(environment_name, true) | lower] }}"
+  delegate_to: "{{ inventory_instance }}"
+  loop: "{{ groups['all'] }}"
+  loop_control:
+    loop_var: inventory_instance
+    label: "{{ inventory_instance }}"
+  when: lookup('env','IS_PR_BUILD') != '' and lookup('env','IS_PR_BUILD') | bool

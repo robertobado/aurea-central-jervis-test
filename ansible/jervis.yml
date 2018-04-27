@@ -14,7 +14,8 @@
       release:
         release: staging
         master: staging
-      master: prod
+      master: 
+        master: prod
   hosts: 
     - all
   tags: always

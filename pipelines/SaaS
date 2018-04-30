@@ -8,7 +8,7 @@ pipeline {
             steps {
                 checkout scm
                 withCredentials([usernamePassword(credentialsId: 'github-user-and-token', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
-                    sh 'git submodule add -b feature/CFOT-1 https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git'
+                    sh 'git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git'
                     sh 'git submodule update --init'
                 }
             }

@@ -10,6 +10,7 @@ pipeline {
     environment {
 			GIT_BRANCH = 'origin/' + sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
 			JERVIS_PLAYBOOK = aurea-central-jervis/ansible/jervis.yml
+			CHECKOUT_SCM = "Checkout scm"
 			DOCKER_IMAGE_BUILD_TAG = docker-image-build
 			SERVICE_DEPLOY_TAG = docker-service-deploy,ec2-instance,ec2-service-deploy
 			HEALTH_CHECK_TAG = run-health-checks
@@ -25,6 +26,15 @@ pipeline {
         label 'stable && docker && linux && ansible'
     }
     stages {
+        stage('$CHECKOUT_SCM') {
+            steps {
+                checkout scm
+                withCredentials([usernamePassword(credentialsId: 'github-user-and-token', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
+                    sh 'git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git'
+                    sh 'git submodule update --init'
+                }
+            }
+        }		
 		stage('$DOCKER_IMAGE_BUILD_TAG') {
 			node {
 				/* Do not build when branch is master or release */

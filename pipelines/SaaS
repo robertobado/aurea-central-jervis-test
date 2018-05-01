@@ -34,172 +34,172 @@ pipeline {
                     sh 'git submodule update --init'
                 }
             }
-        }		
-		stage('$DOCKER_IMAGE_BUILD_TAG') {
-			node {
-				/* Do not build when branch is master or release */
-				when {
-					expression { 
-						return !(GIT_BRANCH == 'origin/master' || GIT_BRANCH == 'origin/release')
-					}
-				}
-				environment { 
-					ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
-				}
-				steps {
-					unstash 'artifacts'
-					sh 'echo "Starting Stage: $DOCKER_IMAGE_BUILD_TAG"'
-					sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-					sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $DOCKER_IMAGE_BUILD_TAG --vault-password-file=.ansible-vault-password'
-				}
-			}
-		}
+        }
+        stage('$DOCKER_IMAGE_BUILD_TAG') {
+          node {
+            /* Do not build when branch is master or release */
+            when {
+              expression { 
+                return !(GIT_BRANCH == 'origin/master' || GIT_BRANCH == 'origin/release')
+              }
+            }
+            environment { 
+              ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+            }
+            steps {
+              unstash 'artifacts'
+              sh 'echo "Starting Stage: $DOCKER_IMAGE_BUILD_TAG"'
+              sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $DOCKER_IMAGE_BUILD_TAG --vault-password-file=.ansible-vault-password'
+            }
+          }
+        }
         stage('Service Deploy') {
-			node {
-			/* Deploy is done for all branches */
-				environment { 
-					ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
-				}
-				steps {
-					sh 'echo "Starting Stage: Service Deploy"'
-					sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-					sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $SERVICE_DEPLOY_TAG --vault-password-file=.ansible-vault-password'
-				}
-			}
-		}	
+          node {
+          /* Deploy is done for all branches */
+            environment { 
+              ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+            }
+            steps {
+              sh 'echo "Starting Stage: Service Deploy"'
+              sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $SERVICE_DEPLOY_TAG --vault-password-file=.ansible-vault-password'
+            }
+          }
+        }	
         stage('$HEALTH_CHECK_TAG') {
-			node {
-				/* Health Checks are run for all branches */
-				environment { 
-					ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
-				}
-				steps {
-					sh 'echo "Starting Stage: $HEALTH_CHECK_TAG"'
-					sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-					sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $HEALTH_CHECK_TAG --vault-password-file=.ansible-vault-password'
-				}
-			}
+          node {
+            /* Health Checks are run for all branches */
+            environment { 
+              ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+            }
+            steps {
+              sh 'echo "Starting Stage: $HEALTH_CHECK_TAG"'
+              sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $HEALTH_CHECK_TAG --vault-password-file=.ansible-vault-password'
+            }
+          }
         }
         stage('$SMOKE_TEST_TAG') {
-			node {
-				/* Smoke test only runs when branch is qa */
-				when {
-					expression { 
-						return (GIT_BRANCH == 'origin/qa')
-					}
-				}
-				environment { 
-					ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
-				}
-				steps {
-					sh 'echo "Starting Stage: $SMOKE_TEST_TAG"'
-					sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-					sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $SMOKE_TEST_TAG --vault-password-file=.ansible-vault-password'
-				}
-			}
-		}
+          node {
+            /* Smoke test only runs when branch is qa */
+            when {
+              expression { 
+                return (GIT_BRANCH == 'origin/qa')
+              }
+            }
+            environment { 
+              ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+            }
+            steps {
+              sh 'echo "Starting Stage: $SMOKE_TEST_TAG"'
+              sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $SMOKE_TEST_TAG --vault-password-file=.ansible-vault-password'
+            }
+          }
+        }
         stage('$REGRESSION_TEST_TAG') {
-			node {
-				/* Regression test only runs when branch is qa */
-				when {
-					expression { 
-						return (GIT_BRANCH == 'origin/qa')
-					}
-				}
-				environment { 
-					ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
-				}
-				steps {
-					sh 'echo "Starting Stage: $REGRESSION_TEST_TAG"'
-					sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-					sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $REGRESSION_TEST_TAG --vault-password-file=.ansible-vault-password'
-				}
-			}
-		}
+          node {
+            /* Regression test only runs when branch is qa */
+            when {
+              expression { 
+                return (GIT_BRANCH == 'origin/qa')
+              }
+            }
+            environment { 
+              ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+            }
+            steps {
+              sh 'echo "Starting Stage: $REGRESSION_TEST_TAG"'
+              sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $REGRESSION_TEST_TAG --vault-password-file=.ansible-vault-password'
+            }
+          }
+        }
         stage('$PERFORMANCE_TEST_TAG') {
-			node {
-				/* Performance test only runs when branch is qa */
-				when {
-					expression { 
-						return (GIT_BRANCH == 'origin/qa')
-					}
-				}
-				environment { 
-					ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
-				}
-				steps {
-					sh 'echo "Starting Stage: $PERFORMANCE_TEST_TAG"'
-					sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-					sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $PERFORMANCE_TEST_TAG --vault-password-file=.ansible-vault-password'
-				}
-			}
-		}
+          node {
+            /* Performance test only runs when branch is qa */
+            when {
+              expression { 
+                return (GIT_BRANCH == 'origin/qa')
+              }
+            }
+            environment { 
+              ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+            }
+            steps {
+              sh 'echo "Starting Stage: $PERFORMANCE_TEST_TAG"'
+              sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $PERFORMANCE_TEST_TAG --vault-password-file=.ansible-vault-password'
+            }
+          }
+        }
         stage('$LOAD_TEST_TAG') {
-			node {
-				/* Load test only runs when branch is qa */
-				when {
-					expression { 
-						return (GIT_BRANCH == 'origin/qa')
-					}
-				}
-				environment { 
-					ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
-				}
-				steps {
-					sh 'echo "Starting Stage: $LOAD_TEST_TAG"'
-					sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-					sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $LOAD_TEST_TAG --vault-password-file=.ansible-vault-password'
-				}
-			}
-		}
+          node {
+            /* Load test only runs when branch is qa */
+            when {
+              expression { 
+                return (GIT_BRANCH == 'origin/qa')
+              }
+            }
+            environment { 
+              ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+            }
+            steps {
+              sh 'echo "Starting Stage: $LOAD_TEST_TAG"'
+              sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $LOAD_TEST_TAG --vault-password-file=.ansible-vault-password'
+            }
+          }
+        }
         stage('$SECURITY_TEST_TAG') {
-			node {
-				/* Security test only runs when branch is qa */
-				when {
-					expression { 
-						return (GIT_BRANCH == 'origin/qa')
-					}
-				}
-				environment { 
-					ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
-				}
-				steps {
-					sh 'echo "Starting Stage: $SECURITY_TEST_TAG"'
-					sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-					sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $SECURITY_TEST_TAG --vault-password-file=.ansible-vault-password'
-				}
-			}
-		}
+          node {
+            /* Security test only runs when branch is qa */
+            when {
+              expression { 
+                return (GIT_BRANCH == 'origin/qa')
+              }
+            }
+            environment { 
+              ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+            }
+            steps {
+              sh 'echo "Starting Stage: $SECURITY_TEST_TAG"'
+              sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $SECURITY_TEST_TAG --vault-password-file=.ansible-vault-password'
+            }
+          }
+        }
         stage('$PROMOTE_PACAKGE_TAG') {
-			node {
-				/* Promote Packages only runs when branch is release */
-				when {
-					expression { 
-						return (GIT_BRANCH == 'origin/release')
-					}
-				}
-				environment { 
-					ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
-				}
-				steps {
-					sh 'echo "Starting Stage: $PROMOTE_PACAKGE_TAG"'
-					sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-					sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $PROMOTE_PACAKGE_TAG --vault-password-file=.ansible-vault-password'
-				}
-			}
-		}
+          node {
+            /* Promote Packages only runs when branch is release */
+            when {
+              expression { 
+                return (GIT_BRANCH == 'origin/release')
+              }
+            }
+            environment { 
+              ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+            }
+            steps {
+              sh 'echo "Starting Stage: $PROMOTE_PACAKGE_TAG"'
+              sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $PROMOTE_PACAKGE_TAG --vault-password-file=.ansible-vault-password'
+            }
+          }
+        }
         stage('$SEND_NOTIFICATION_TAG') {
-			node {
-				/* Notifications are sent for all branches */
-				environment { 
-					ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
-				}
-				steps {
-					sh 'echo "Starting Stage: $SEND_NOTIFICATION_TAG"'
-					sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-					sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $SEND_NOTIFICATION_TAG --vault-password-file=.ansible-vault-password'
-				}
-			}
-		}
+          node {
+            /* Notifications are sent for all branches */
+            environment { 
+              ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+            }
+            steps {
+              sh 'echo "Starting Stage: $SEND_NOTIFICATION_TAG"'
+              sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $SEND_NOTIFICATION_TAG --vault-password-file=.ansible-vault-password'
+            }
+          }
+        }
     }
 }

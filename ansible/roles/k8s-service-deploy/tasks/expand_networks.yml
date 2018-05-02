@@ -1,0 +1,8 @@
+---
+
+- name: Combining networks lists...
+  set_fact:
+    published_networks: "{{ (global_networks | default([])) + (service_group_networks | default([])) + (service_networks | default([])) }}"
+    key_list: []
+    template_value_list: []
+

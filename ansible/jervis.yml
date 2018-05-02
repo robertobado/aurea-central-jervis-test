@@ -172,3 +172,15 @@
   gather_facts: no
   roles:
     - send-notification    
+
+- name: Aurea Central Jervis K8s Service Deploy
+  strategy: free
+  hosts:
+    - k8s-service
+  tags:
+    - k8s-service-deploy
+  vars:
+    - jervis: "{{ hostvars['localhost'].jervis }}"
+  gather_facts: no
+  roles:
+    - k8s-service-deploy

@@ -21,6 +21,7 @@ pipeline {
             SECURITY_TEST_TAG = run-security-tests
             PROMOTE_PACKAGE_TAG = promote-packages
             SEND_NOTIFICATION_TAG = send-notification
+            K8S_SERVICE_DEPLOY_TAG = k8s-service-deploy
     }
     agent {
         label 'stable && docker && linux && ansible'
@@ -67,8 +68,20 @@ pipeline {
               sh 'ansible-playbook "$JERVIS_PLAYBOOK" -i .inventory --tags "$SERVICE_DEPLOY_TAG" --vault-password-file=.ansible-vault-password'
             }
           }
-        }   
-        stage("$HEALTH_CHECK_TAG") {
+        }
+        stage('K8s Service Deploy') {
+            node {
+                environment {
+                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
+                }
+                steps {
+                    sh 'echo "Starting Stage: K8s Service Deploy"'
+                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i .k8s_inventory --tags $K8S_SERVICE_DEPLOY_TAG --vault-password-file=.ansible-vault-password'
+                }
+            }
+        }
+        stage('$HEALTH_CHECK_TAG') {
           node {
             /* Health Checks are run for all branches */
             environment { 

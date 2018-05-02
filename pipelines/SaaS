@@ -8,19 +8,19 @@ TODO:
 
 pipeline {
     environment {
-			GIT_BRANCH = 'origin/' + sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
-			JERVIS_PLAYBOOK = aurea-central-jervis/ansible/jervis.yml
-			CHECKOUT_SCM = "Checkout scm"
-			DOCKER_IMAGE_BUILD_TAG = docker-image-build
-			SERVICE_DEPLOY_TAG = docker-service-deploy,ec2-instance,ec2-service-deploy
-			HEALTH_CHECK_TAG = run-health-checks
-			SMOKE_TEST_TAG = run-smoke-tests
-			REGRESSION_TEST_TAG = run-regression-tests
-			PERFORMANCE_TEST_TAG = run-performance-tests
-			LOAD_TEST_TAG = run-performance-tests
-			SECURITY_TEST_TAG = run-security-tests
-			PROMOTE_PACAKGE_TAG = promote-packages
-			SEND_NOTIFICATION_TAG = send-notifications
+            GIT_BRANCH = 'origin/' + sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
+            JERVIS_PLAYBOOK = aurea-central-jervis/ansible/jervis.yml
+            CHECKOUT_SCM = "Checkout scm"
+            DOCKER_IMAGE_BUILD_TAG = docker-image-build
+            SERVICE_DEPLOY_TAG = docker-service-deploy,ec2-instance,ec2-service-deploy
+            HEALTH_CHECK_TAG = run-health-checks
+            SMOKE_TEST_TAG = run-smoke-tests
+            REGRESSION_TEST_TAG = run-regression-tests
+            PERFORMANCE_TEST_TAG = run-performance-tests
+            LOAD_TEST_TAG = run-performance-tests
+            SECURITY_TEST_TAG = run-security-tests
+            PROMOTE_PACKAGE_TAG = promote-packages
+            SEND_NOTIFICATION_TAG = send-notification
     }
     agent {
         label 'stable && docker && linux && ansible'
@@ -28,6 +28,7 @@ pipeline {
     stages {
         stage('$CHECKOUT_SCM') {
             steps {
+                sh 'echo "Starting Stage: $CHECKOUT_SCM"' 
                 checkout scm
                 withCredentials([usernamePassword(credentialsId: 'github-user-and-token', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
                     sh 'git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git'
@@ -66,7 +67,7 @@ pipeline {
               sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $SERVICE_DEPLOY_TAG --vault-password-file=.ansible-vault-password'
             }
           }
-        }	
+        }   
         stage('$HEALTH_CHECK_TAG') {
           node {
             /* Health Checks are run for all branches */
@@ -170,7 +171,7 @@ pipeline {
             }
           }
         }
-        stage('$PROMOTE_PACAKGE_TAG') {
+        stage('$PROMOTE_PACKAGE_TAG') {
           node {
             /* Promote Packages only runs when branch is release */
             when {
@@ -182,9 +183,9 @@ pipeline {
               ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
             }
             steps {
-              sh 'echo "Starting Stage: $PROMOTE_PACAKGE_TAG"'
+              sh 'echo "Starting Stage: $PROMOTE_PACKAGE_TAG"'
               sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $PROMOTE_PACAKGE_TAG --vault-password-file=.ansible-vault-password'
+              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $PROMOTE_PACKAGE_TAG --vault-password-file=.ansible-vault-password'
             }
           }
         }

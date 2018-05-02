@@ -151,7 +151,7 @@
   roles:
     - run-security-tests    
 
-- name: Aurea Central Jervis Promote Package
+- name: Aurea Central Jervis Promote Packages
   strategy: free
   hosts: 
     - docker-host
@@ -166,9 +166,9 @@
   strategy: free
   hosts: 
     - docker-host
-  tags: send-notifications
+  tags: send-notification
   vars:    
     - jervis: "{{ hostvars['localhost'].jervis }}"
   gather_facts: no
   roles:
-    - send-notifications    
+    - send-notification    

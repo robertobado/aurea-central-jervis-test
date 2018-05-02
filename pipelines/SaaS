@@ -26,7 +26,7 @@ pipeline {
         label 'stable && docker && linux && ansible'
     }
     stages {
-        stage('$CHECKOUT_SCM') {
+        stage("$CHECKOUT_SCM") {
             steps {
                 sh 'echo "Starting Stage: $CHECKOUT_SCM"' 
                 checkout scm
@@ -36,7 +36,7 @@ pipeline {
                 }
             }
         }
-        stage('$DOCKER_IMAGE_BUILD_TAG') {
+        stage("$DOCKER_IMAGE_BUILD_TAG") {
           node {
             /* Do not build when branch is master or release */
             when {
@@ -68,7 +68,7 @@ pipeline {
             }
           }
         }   
-        stage('$HEALTH_CHECK_TAG') {
+        stage("$HEALTH_CHECK_TAG") {
           node {
             /* Health Checks are run for all branches */
             environment { 
@@ -81,7 +81,7 @@ pipeline {
             }
           }
         }
-        stage('$SMOKE_TEST_TAG') {
+        stage("$SMOKE_TEST_TAG") {
           node {
             /* Smoke test only runs when branch is qa */
             when {
@@ -99,7 +99,7 @@ pipeline {
             }
           }
         }
-        stage('$REGRESSION_TEST_TAG') {
+        stage("$REGRESSION_TEST_TAG") {
           node {
             /* Regression test only runs when branch is qa */
             when {
@@ -117,7 +117,7 @@ pipeline {
             }
           }
         }
-        stage('$PERFORMANCE_TEST_TAG') {
+        stage("$PERFORMANCE_TEST_TAG") {
           node {
             /* Performance test only runs when branch is qa */
             when {
@@ -135,7 +135,7 @@ pipeline {
             }
           }
         }
-        stage('$LOAD_TEST_TAG') {
+        stage("$LOAD_TEST_TAG") {
           node {
             /* Load test only runs when branch is qa */
             when {
@@ -153,7 +153,7 @@ pipeline {
             }
           }
         }
-        stage('$SECURITY_TEST_TAG') {
+        stage("$SECURITY_TEST_TAG") {
           node {
             /* Security test only runs when branch is qa */
             when {
@@ -171,7 +171,7 @@ pipeline {
             }
           }
         }
-        stage('$PROMOTE_PACKAGE_TAG') {
+        stage("$PROMOTE_PACKAGE_TAG") {
           node {
             /* Promote Packages only runs when branch is release */
             when {
@@ -189,7 +189,7 @@ pipeline {
             }
           }
         }
-        stage('$SEND_NOTIFICATION_TAG') {
+        stage("$SEND_NOTIFICATION_TAG") {
           node {
             /* Notifications are sent for all branches */
             environment { 

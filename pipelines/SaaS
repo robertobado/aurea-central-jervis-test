@@ -41,7 +41,7 @@ pipeline {
             /* Do not build when branch is master or release */
             when {
               expression { 
-                return !(GIT_BRANCH == 'origin/master' || GIT_BRANCH == 'origin/release')
+                return !("$GIT_BRANCH" == 'origin/master' || "$GIT_BRANCH" == 'origin/release')
               }
             }
             environment { 
@@ -51,7 +51,7 @@ pipeline {
               unstash 'artifacts'
               sh 'echo "Starting Stage: $DOCKER_IMAGE_BUILD_TAG"'
               sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $DOCKER_IMAGE_BUILD_TAG --vault-password-file=.ansible-vault-password'
+              sh 'ansible-playbook "$JERVIS_PLAYBOOK" -i .inventory --tags "$DOCKER_IMAGE_BUILD_TAG" --vault-password-file=.ansible-vault-password'
             }
           }
         }
@@ -64,7 +64,7 @@ pipeline {
             steps {
               sh 'echo "Starting Stage: Service Deploy"'
               sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $SERVICE_DEPLOY_TAG --vault-password-file=.ansible-vault-password'
+              sh 'ansible-playbook "$JERVIS_PLAYBOOK" -i .inventory --tags "$SERVICE_DEPLOY_TAG" --vault-password-file=.ansible-vault-password'
             }
           }
         }   
@@ -77,7 +77,7 @@ pipeline {
             steps {
               sh 'echo "Starting Stage: $HEALTH_CHECK_TAG"'
               sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $HEALTH_CHECK_TAG --vault-password-file=.ansible-vault-password'
+              sh 'ansible-playbook "$JERVIS_PLAYBOOK" -i .inventory --tags "$HEALTH_CHECK_TAG" --vault-password-file=.ansible-vault-password'
             }
           }
         }
@@ -86,7 +86,7 @@ pipeline {
             /* Smoke test only runs when branch is qa */
             when {
               expression { 
-                return (GIT_BRANCH == 'origin/qa')
+                return ("$GIT_BRANCH" == 'origin/qa')
               }
             }
             environment { 
@@ -95,7 +95,7 @@ pipeline {
             steps {
               sh 'echo "Starting Stage: $SMOKE_TEST_TAG"'
               sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $SMOKE_TEST_TAG --vault-password-file=.ansible-vault-password'
+              sh 'ansible-playbook "$JERVIS_PLAYBOOK" -i .inventory --tags "$SMOKE_TEST_TAG" --vault-password-file=.ansible-vault-password'
             }
           }
         }
@@ -104,7 +104,7 @@ pipeline {
             /* Regression test only runs when branch is qa */
             when {
               expression { 
-                return (GIT_BRANCH == 'origin/qa')
+                return ("$GIT_BRANCH" == 'origin/qa')
               }
             }
             environment { 
@@ -113,7 +113,7 @@ pipeline {
             steps {
               sh 'echo "Starting Stage: $REGRESSION_TEST_TAG"'
               sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $REGRESSION_TEST_TAG --vault-password-file=.ansible-vault-password'
+              sh 'ansible-playbook "$JERVIS_PLAYBOOK" -i .inventory --tags "$REGRESSION_TEST_TAG" --vault-password-file=.ansible-vault-password'
             }
           }
         }
@@ -122,7 +122,7 @@ pipeline {
             /* Performance test only runs when branch is qa */
             when {
               expression { 
-                return (GIT_BRANCH == 'origin/qa')
+                return ("$GIT_BRANCH" == 'origin/qa')
               }
             }
             environment { 
@@ -131,7 +131,7 @@ pipeline {
             steps {
               sh 'echo "Starting Stage: $PERFORMANCE_TEST_TAG"'
               sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $PERFORMANCE_TEST_TAG --vault-password-file=.ansible-vault-password'
+              sh 'ansible-playbook "$JERVIS_PLAYBOOK" -i .inventory --tags "$PERFORMANCE_TEST_TAG" --vault-password-file=.ansible-vault-password'
             }
           }
         }
@@ -140,7 +140,7 @@ pipeline {
             /* Load test only runs when branch is qa */
             when {
               expression { 
-                return (GIT_BRANCH == 'origin/qa')
+                return ("$GIT_BRANCH" == 'origin/qa')
               }
             }
             environment { 
@@ -149,7 +149,7 @@ pipeline {
             steps {
               sh 'echo "Starting Stage: $LOAD_TEST_TAG"'
               sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $LOAD_TEST_TAG --vault-password-file=.ansible-vault-password'
+              sh 'ansible-playbook "$JERVIS_PLAYBOOK" -i .inventory --tags "$LOAD_TEST_TAG" --vault-password-file=.ansible-vault-password'
             }
           }
         }
@@ -158,7 +158,7 @@ pipeline {
             /* Security test only runs when branch is qa */
             when {
               expression { 
-                return (GIT_BRANCH == 'origin/qa')
+                return ("$GIT_BRANCH" == 'origin/qa')
               }
             }
             environment { 
@@ -167,7 +167,7 @@ pipeline {
             steps {
               sh 'echo "Starting Stage: $SECURITY_TEST_TAG"'
               sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $SECURITY_TEST_TAG --vault-password-file=.ansible-vault-password'
+              sh 'ansible-playbook "$JERVIS_PLAYBOOK" -i .inventory --tags "$SECURITY_TEST_TAG" --vault-password-file=.ansible-vault-password'
             }
           }
         }
@@ -176,7 +176,7 @@ pipeline {
             /* Promote Packages only runs when branch is release */
             when {
               expression { 
-                return (GIT_BRANCH == 'origin/release')
+                return ("$GIT_BRANCH" == 'origin/release')
               }
             }
             environment { 
@@ -185,7 +185,7 @@ pipeline {
             steps {
               sh 'echo "Starting Stage: $PROMOTE_PACKAGE_TAG"'
               sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $PROMOTE_PACKAGE_TAG --vault-password-file=.ansible-vault-password'
+              sh 'ansible-playbook "$JERVIS_PLAYBOOK" -i .inventory --tags "$PROMOTE_PACKAGE_TAG" --vault-password-file=.ansible-vault-password'
             }
           }
         }
@@ -198,7 +198,7 @@ pipeline {
             steps {
               sh 'echo "Starting Stage: $SEND_NOTIFICATION_TAG"'
               sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-              sh 'ansible-playbook $JERVIS_PLAYBOOK -i .inventory --tags $SEND_NOTIFICATION_TAG --vault-password-file=.ansible-vault-password'
+              sh 'ansible-playbook "$JERVIS_PLAYBOOK" -i .inventory --tags "$SEND_NOTIFICATION_TAG" --vault-password-file=.ansible-vault-password'
             }
           }
         }

@@ -31,6 +31,8 @@ install:
 
 env:
  - Test1="test"
+ # target environment to deploy (docker, ec2, k8s)
+ - DEPLOYMENT_TARGET=docker
 
 before_script:
   - echo "this is before script section"

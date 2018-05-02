@@ -22,6 +22,8 @@ pipeline {
             PROMOTE_PACKAGE_TAG = promote-packages
             SEND_NOTIFICATION_TAG = send-notification
             K8S_SERVICE_DEPLOY_TAG = k8s-service-deploy
+            // deployment target environment
+            DEPLOYMENT_TARGET = env.DEPLOYMENT_TARGET ?: 'docker'
     }
     agent {
         label 'stable && docker && linux && ansible'
@@ -71,6 +73,11 @@ pipeline {
         }
         stage('K8s Service Deploy') {
             node {
+                when {
+                    expression {
+                        return ("$DEPLOYMENT_TARGET" == 'k8s')
+                    }
+                }
                 environment {
                     ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
                 }
@@ -98,7 +105,7 @@ pipeline {
           node {
             /* Smoke test only runs when branch is qa */
             when {
-              expression { 
+              expression {
                 return ("$GIT_BRANCH" == 'origin/qa')
               }
             }

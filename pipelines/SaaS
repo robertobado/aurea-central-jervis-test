@@ -90,7 +90,7 @@ pipeline {
                 }
             }
         }
-        stage('Health Checks") {
+        stage('Health Checks') {
             node {
                 /* Health Checks are run for all branches */
                 environment { 

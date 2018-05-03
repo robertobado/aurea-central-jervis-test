@@ -23,6 +23,7 @@
     etc_hosts: "{{ hostvars[inventory_hostname.split('@') | last].etc_hosts | default(omit) }}"
     exposed_ports: "{{ hostvars[inventory_hostname.split('@') | last].exposed_ports | default(omit) }}"
     force_kill: "{{ hostvars[inventory_hostname.split('@') | last].force_kill | default(omit) }}"
+    ports: "{{ hostvars[inventory_hostname.split('@') | last].ports | default(omit) }}"
     groups: "{{ hostvars[inventory_hostname.split('@') | last].container_groups | default(omit) }}"
     hostname: "{{ hostvars[inventory_hostname.split('@') | last].hostname | default(omit) }}"
     ignore_image: "{{ hostvars[inventory_hostname.split('@') | last].ignore_image | default(omit) }}"

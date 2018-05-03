@@ -1,0 +1,66 @@
+---
+- name: Selecting next service...
+  set_fact:
+    container_id: "{{ containers[index|int-1] }}"
+
+- debug:
+    msg: "Selected service: {{ container_id }}"
+
+- name: Fetching configuration for container (native K8S)...
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files: "{{ mode }}/k8s/{{ current_service_group.name }}/{{ container_id }}.yml"
+      skip: true
+
+- name: Fetching configuration for container (legacy CDH) ...
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files: "{{ mode }}/docker/{{ current_service_group.name }}/{{ container_id }}.yml"
+      skip: true
+
+- name: Defining container name...
+  set_fact:
+    container_name: "{{ stage }}_{{ project }}_{{ container_id }}"
+
+- name: Removing existing Ingress object...
+  shell: kubectl delete -f "{{ output_config_dir }}/{{ container_name }}-ingress.yml"
+  ignore_errors: yes
+  when: k8s_mode == 'cli' and k8s_ingress_hosts is defined 
+
+- name: Removing existing Service object...
+  shell: kubectl delete -f "{{ output_config_dir }}/{{ container_name }}-svc.yml"
+  ignore_errors: yes
+  when: k8s_mode == 'cli'
+
+- name: Removing existing Pod object...
+  shell: kubectl delete -f "{{ output_config_dir }}/{{ container_name }}-pod.yml"
+  ignore_errors: yes
+  when: k8s_mode == 'cli' 
+
+- name: Removing K8S ingress using API...
+  kubernetes:
+      certificate_authority_data: "{{ k8s_certificate_authority_data }}"
+      api_endpoint: "{{ k8s_api_endpoint }}"
+      service_token: "{{ k8s_service_token }}"
+      file_reference: "{{ output_config_dir }}/{{ container_name }}-ingress.yml"
+      state: absent
+  when: k8s_mode == 'api' and k8s_ingress_hosts is defined
+
+- name: Removing K8S Service using API...
+  kubernetes:
+      certificate_authority_data: "{{ k8s_certificate_authority_data }}"
+      api_endpoint: "{{ k8s_api_endpoint }}"
+      service_token: "{{ k8s_service_token }}"
+      file_reference: "{{ output_config_dir }}/{{ container_name }}-svc.yml"
+      state: absent
+  when: k8s_mode == 'api'
+
+- name: Removing K8S Pod using API...
+  kubernetes:
+      certificate_authority_data: "{{ k8s_certificate_authority_data }}"
+      api_endpoint: "{{ k8s_api_endpoint }}"
+      service_token: "{{ k8s_service_token }}"
+      file_reference: "{{ output_config_dir }}/{{ container_name }}-pod.yml"
+      state: absent
+  when: k8s_mode == 'api'
+

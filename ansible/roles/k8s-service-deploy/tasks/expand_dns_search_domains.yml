@@ -1,0 +1,51 @@
+---
+
+- name: Cleaning dns_search_domain list...
+  set_fact:
+    published_dns_search_domains: []
+    key_list: []
+    template_value_list: []
+
+- name: Crating temporary expansion template file...
+  tempfile:
+    state: file
+    suffix: temp
+  register: tempfile_template
+  check_mode: no
+
+- name: Crating temporary expansion result file...
+  tempfile:
+    state: file
+    suffix: temp
+  register: tempfile_result
+  check_mode: no
+
+- name: Converting list into template...
+  lineinfile:
+    path: "{{ tempfile_template.path }}"
+    line: "{{ item }}"
+    regexp: ^$
+  with_items: "{{ (global_dns_search_domains | default([])) + (service_group_dns_search_domains | default([])) + (service_dns_search_domains | default([])) }}"
+  check_mode: no
+  no_log: true
+
+- name: Processing list parameters...
+  template:
+    src: "{{ tempfile_template.path }}"
+    dest: "{{ tempfile_result.path }}"
+  check_mode: no
+
+- name: Expanding dns_search_domain list...
+  set_fact:
+   published_dns_search_domains : "{{ (item | length > 0) | ternary(item.split('\n'),[])  }}"
+  with_file: "{{ tempfile_result.path }}" 
+  no_log: true
+
+- name: Removing temporary expansion files...
+  file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+    - "{{ tempfile_template.path }}"
+    - "{{ tempfile_result.path }}"
+  check_mode: no

@@ -1,0 +1,57 @@
+---
+- name: Checking if we are going to deploy...
+  set_fact:
+    perform_deploy: true
+  tags: deploy
+
+- name: Checking if we are going to test...
+  set_fact:
+    perform_test: true
+  tags: test
+
+- name: Checking if we are going to destroy...
+  set_fact:
+    perform_destroy: true
+  tags: destroy
+
+- name: Checking if we are going to tag release...
+  set_fact:
+    perform_tag_release: true
+  tags: tag-release
+
+- name: Checking if there is service_group override...
+  set_fact:
+    docker: "{{ docker | selectattr('name', 'search', service_group) | list}}"
+  when: service_group is defined
+  tags: always
+
+- name: Fail if the service-group doesn't exist
+  fail:
+    msg: "Service_group {{ service_group }} is not defined. Exiting."
+  tags: always
+  when: not docker
+
+- name: "Defaulting stage and mode to {{ inventory_dir | replace(playbook_dir ~'/','') }}"
+  set_fact:
+    mode: "{{ inventory_dir | replace(playbook_dir ~'/','') }}"
+    stage: "{{ inventory_dir | replace(playbook_dir ~'/','') }}"
+  when: mode is undefined and stage is undefined
+  tags: always
+- name: Set output configuration directory for EF Agent run...
+  set_fact:
+    output_config_dir: "/data/electriccloud/configs/"
+  tags: always
+  when: playbook_dir | search("electriccloud")
+- name: Set output configuration directory for local run...
+  set_fact:
+    output_config_dir: "{{ inventory_dir }}"
+  tags: always
+  when: not inventory_dir | search("electriccloud")
+
+- name: Starting service groups deployment...
+  include_tasks: service_group.yml
+  with_items: "{{ docker }}"
+  loop_control:
+    loop_var: current_service_group
+  when: service in current_service_group.services
+  tags: always

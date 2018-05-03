@@ -1,0 +1,62 @@
+---
+- name: Selecting next service...
+  set_fact:
+    container_id: "{{ containers[index|int-1] }}"
+
+- debug:
+    msg: "Selected service: {{ container_id }}"
+
+- name: 
+  set_fact:
+    yml_file: "{{ mode }}/raw/{{ current_service_group.name }}/{{ container_id }}.yml"
+
+- name: removing existing object(s)...
+  shell: kubectl delete -f "{{ yml_file }}" --namespace={{ k8s_namespace }}
+  when: k8s_mode == 'cli' and k8s_update_strategy == 'replace'
+  ignore_errors: yes
+
+- name: "removing existing object(s) using api. Reference: {{ yml_file }} ..."
+  kubernetes:
+      certificate_authority_data: "{{ k8s_certificate_authority_data }}"
+      api_endpoint: "{{ k8s_api_endpoint }}"
+      service_token: "{{ k8s_service_token }}"
+      file_reference: "{{ yml_file }}"
+      state: absent
+  when: k8s_mode == 'api' and k8s_update_strategy == 'replace'
+
+# Wait 15 secs because docker takes a while to remove resources (especially pods)
+#- name: Pausing for 15 seconds to allow resources to be deleted
+#  pause:
+#   prompt: "Waiting for resources to be deleted"
+#   seconds: 15
+#  when: k8s_update_strategy == 'replace'
+
+- name: creating object(s)...
+  shell: kubectl create -f "{{ yml_file }}" --namespace={{ k8s_namespace }}
+  when: k8s_mode == 'cli' and k8s_update_strategy == 'replace'
+  ignore_errors: yes
+
+- name: Creating object(s) using api...
+  kubernetes:
+      certificate_authority_data: "{{ k8s_certificate_authority_data }}"
+      api_endpoint: "{{ k8s_api_endpoint }}"
+      service_token: "{{ k8s_service_token }}"
+      file_reference: "{{ yml_file }}"
+      state: present
+  when: k8s_mode == 'api' and k8s_update_strategy == 'replace'
+
+- name: Updating object(s) using api...
+  kubernetes:
+      certificate_authority_data: "{{ k8s_certificate_authority_data }}"
+      api_endpoint: "{{ k8s_api_endpoint }}"
+      service_token: "{{ k8s_service_token }}"
+      file_reference: "{{ yml_file }}"
+      state: update
+  when: k8s_mode == 'api' and k8s_update_strategy == 'merge'
+
+- name: Apply changes to existing object(s)...
+  shell: kubectl apply -f "{{ yml_file }}" --namespace={{ k8s_namespace }}
+  when: k8s_mode == 'cli' and k8s_update_strategy == 'merge'
+  ignore_errors: yes
+
+

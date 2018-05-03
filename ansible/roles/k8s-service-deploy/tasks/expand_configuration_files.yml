@@ -1,0 +1,68 @@
+---
+
+- name: Cleaning variable list...
+  set_fact:
+    published_configuration_files: {}
+    key_list: []
+    template_value_list: []
+
+- name: Crating temporary expansion template file...
+  tempfile:
+    state: file
+    suffix: temp
+  register: tempfile_template
+  check_mode: no
+
+- name: Crating temporary expansion result file...
+  tempfile:
+    state: file
+    suffix: temp
+  register: tempfile_result
+  check_mode: no
+
+- name: Spliting configuration files map into keys and values...
+  set_fact:
+    key_list: "{{ key_list + [item.key] }}"
+    template_value_list: "{{ template_value_list + [item.value] }}"
+  with_dict: "{{ (global_configuration_files | default({})) | combine (service_group_configuration_files | default({})) | combine (service_configuration_files | default({})) }}"
+  no_log: true
+
+- name: Converting list into template...
+  lineinfile:
+    path: "{{ tempfile_template.path }}"
+    line: "{{ item }}"
+    regexp: ^$
+  with_items: "{{ template_value_list }}"
+  check_mode: no
+  no_log: true
+
+- name: Processing list parameters...
+  template:
+    src: "{{ tempfile_template.path }}"
+    dest: "{{ tempfile_result.path }}"
+  check_mode: no
+
+- name: Expanding variables list...
+  set_fact:
+    parsed_value_list :  "{{ (item | length > 0) | ternary(item.split('\n'),[])  }}"
+  with_file: "{{ tempfile_result.path }}"
+  no_log: true
+
+- name: "Preparing final list with {{ item[0] }} template to be injected into {{ item[1] }}"
+  set_fact:
+    published_configuration_files: '{{ published_configuration_files|combine({item[0]: item[1]}) }}'
+  with_together:
+    - "{{ key_list }}"
+    - "{{ parsed_value_list }}"
+  no_log: true
+
+- name: Removing temporary expansion files...
+  file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+    - "{{ tempfile_template.path }}"
+    - "{{ tempfile_result.path }}"
+  check_mode: no
+
+

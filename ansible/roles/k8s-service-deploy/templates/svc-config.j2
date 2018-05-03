@@ -1,0 +1,18 @@
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: "{{ k8s_namespace }}"
+  name: "{{ container_name | regex_replace('_','-') }}"
+  labels:
+    service_group: "{{ service_group | regex_replace('_','-') | default('none') }}"
+    app_name: "{{ container_name | regex_replace('_','-') }}"
+spec:
+  type: ClusterIP
+  selector:
+    app: "{{ container_name | regex_replace('_','-') }}"
+  ports:
+{% for port in published_ports %}
+  - name: port-{{ port[1:] }}-tcp
+    protocol: TCP
+    port: {{ port[1:] }}
+{% endfor %}

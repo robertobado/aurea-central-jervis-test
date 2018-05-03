@@ -1,0 +1,66 @@
+#######################
+# Aurea Central Jervis
+#######################
+#
+#              _
+#             | |
+#  _ __   ___ | |_ ___
+# | '_ \ / _ \| __/ _ \
+# | | | | (_) | ||  __/
+# |_| |_|\___/ \__\___|
+#
+#
+# This is the .jervis-yml fallback in case there is no .jervis.yml
+# in the root project
+#
+#########################
+# User guide and documentation can be found at: https://github.com/trilogy-group/central-jervis
+# This project is based on https://github.com/samrocketman/jervis
+
+language: java
+
+jdk:
+  - openjdk9
+
+before_install:
+  - sudo apt update
+  - sudo DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends vim
+
+install:
+  - echo "this is installation part"
+
+env:
+ - Test1="test"
+ # target environment to deploy (docker, ec2, k8s)
+ - DEPLOYMENT_TARGET=docker
+
+before_script:
+  - echo "this is before script section"
+
+script:
+  - echo "Hello World."
+  - echo "Hello World." > test.log
+
+after_success:
+  - echo "yaaaaaay succeeded .. everything is working fine now "
+
+after_failure:
+  - echo "Sorry the job is failed .. please check the reason"
+
+after_script:
+  - echo "after script section"
+
+branches:
+  only:
+    - develop
+    - master
+
+jenkins:
+  platform: docker
+#  # lifecycles_standard_stable.json
+#  os: standard
+#  stability: stable
+  sudo: sudo
+  pipeline_jenkinsfile: SaaS
+  collect:
+    artifacts: *.log

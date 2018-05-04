@@ -8,7 +8,6 @@ TODO:
 
 pipeline {
     environment {
-            /* GIT_BRANCH = 'origin/' + sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim() */
             DEPLOYMENT_TARGET = env.DEPLOYMENT_TARGET ?: 'docker'       
     }
     agent {
@@ -29,7 +28,7 @@ pipeline {
                 /* Do not build when branch is master or release */
                 when {
                   expression { 
-                    return !(env.GIT_BRANCH == 'origin/master' || env.GIT_BRANCH == 'origin/release')
+                    return !("${GIT_BRANCH}" == 'master' || "${GIT_BRANCH}" == 'release')
                     }
                 }
                 environment { 
@@ -107,7 +106,7 @@ pipeline {
                 /* Smoke test only runs when branch is qa */
                 when {
                     expression { 
-                        return (env.GIT_BRANCH == 'origin/qa')
+                        return ("${GIT_BRANCH}" == 'qa')
                     }
                 }
                 environment { 
@@ -124,7 +123,7 @@ pipeline {
                 /* Regression test only runs when branch is qa */
                 when {
                     expression { 
-                        return (env.GIT_BRANCH == 'origin/qa')
+                        return ("${GIT_BRANCH}" == 'qa')
                     }
                 }
                 environment { 
@@ -141,7 +140,7 @@ pipeline {
                 /* Performance test only runs when branch is qa */
                 when {
                     expression { 
-                        return (env.GIT_BRANCH == 'origin/qa')
+                        return ("${GIT_BRANCH}" == 'qa')
                     }
                 }
                 environment { 
@@ -158,7 +157,7 @@ pipeline {
                 /* Load test only runs when branch is qa */
                 when {
                     expression { 
-                        return (env.GIT_BRANCH == 'origin/qa')
+                        return ("${GIT_BRANCH}" == 'qa')
                     }
                 }
                 environment { 
@@ -175,7 +174,7 @@ pipeline {
                 /* Security test only runs when branch is qa */
                 when {
                     expression { 
-                        return (env.GIT_BRANCH == 'origin/qa')
+                        return ("${GIT_BRANCH}" == 'qa')
                     }
                 }
                 environment { 
@@ -192,7 +191,7 @@ pipeline {
                 /* Promote Packages only runs when branch is release */
                 when {
                     expression { 
-                        return (env.GIT_BRANCH == 'origin/release')
+                        return ("${GIT_BRANCH}" == 'release')
                     }
                 }
                 environment { 

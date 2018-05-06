@@ -6,9 +6,11 @@ TODO:
 2. Investigate why ANSIBLE_VAULT_PASSWORD is per stage and not global
 */
 
+def getDeploymentTargetEnv() { env.DEPLOYMENT_TARGET ?: 'docker' }
+
 pipeline {
     environment {
-            DEPLOYMENT_TARGET = env.DEPLOYMENT_TARGET ?: 'docker'       
+            DEPLOYMENT_TARGET = getDeploymentTargetEnv()
     }
     agent {
         label 'stable && docker && linux && ansible'
@@ -24,41 +26,36 @@ pipeline {
             }
         }
         stage('Build Docker Image') {
-            node {
                 /* Do not build when branch is master or release */
                 when {
-                  expression { 
+                  expression {
                     return !("${GIT_BRANCH}" == 'master' || "${GIT_BRANCH}" == 'release')
                     }
                 }
-                environment { 
-                  ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+                environment {
+                  ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
                 }
                 steps {
                   unstash 'artifacts'
                   sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                   sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-image-build --vault-password-file=.ansible-vault-password'
                 }
-            }
         }
         stage('CDH Service Deploy') {
-            node {
                 when {
                     expression {
                         return ("$DEPLOYMENT_TARGET" == 'docker')
                     }
                 }
-                environment { 
-                  ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+                environment {
+                  ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
                 }
                 steps {
                   sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                   sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-service-deploy --vault-password-file=.ansible-vault-password'
                 }
-            }
-        }   
+        }
         stage('EC2 Service Deploy') {
-            node {
                 when {
                     expression {
                         return ("$DEPLOYMENT_TARGET" == 'ec2')
@@ -71,10 +68,8 @@ pipeline {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags ec2-instance,ec2-service-deploy --vault-password-file=.ansible-vault-password'
                 }
-            }
         }
         stage('K8s Service Deploy') {
-            node {
                 when {
                     expression {
                         return ("$DEPLOYMENT_TARGET" == 'k8s')
@@ -87,133 +82,116 @@ pipeline {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .k8s_inventory --tags k8s-service-deploy --vault-password-file=.ansible-vault-password'
                 }
-            }
         }
         stage('Health Checks') {
-            node {
                 /* Health Checks are run for all branches */
-                environment { 
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+                environment {
+                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags run-health-checks --vault-password-file=.ansible-vault-password'
                 }
-            }
         }
         stage('Smoke Tests') {
-            node {
                 /* Smoke test only runs when branch is qa */
                 when {
-                    expression { 
+                    expression {
                         return ("${GIT_BRANCH}" == 'qa')
                     }
                 }
-                environment { 
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+                environment {
+                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags run-smoke-tests --vault-password-file=.ansible-vault-password'
                 }
-            }
         }
         stage('Regression Tests') {
-            node {
                 /* Regression test only runs when branch is qa */
                 when {
-                    expression { 
+                    expression {
                         return ("${GIT_BRANCH}" == 'qa')
                     }
                 }
-                environment { 
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+                environment {
+                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags run-regression-tests --vault-password-file=.ansible-vault-password'
                 }
-            }
         }
         stage('Performance Tests') {
-            node {
                 /* Performance test only runs when branch is qa */
                 when {
-                    expression { 
+                    expression {
                         return ("${GIT_BRANCH}" == 'qa')
                     }
                 }
-                environment { 
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+                environment {
+                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
                 }
                 steps {
                 sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                 sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags run-performance-tests --vault-password-file=.ansible-vault-password'
                 }
-            }
         }
         stage('Load Tests') {
-            node {
                 /* Load test only runs when branch is qa */
                 when {
-                    expression { 
+                    expression {
                         return ("${GIT_BRANCH}" == 'qa')
                     }
                 }
-                environment { 
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+                environment {
+                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags run-load-tests --vault-password-file=.ansible-vault-password'
                 }
-            }
         }
         stage('Security Tests') {
-            node {
                 /* Security test only runs when branch is qa */
                 when {
-                    expression { 
+                    expression {
                         return ("${GIT_BRANCH}" == 'qa')
                     }
                 }
-                environment { 
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+                environment {
+                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags run-security-tests --vault-password-file=.ansible-vault-password'
                 }
-            }
         }
         stage('Promote Packages') {
-            node {
                 /* Promote Packages only runs when branch is release */
                 when {
-                    expression { 
+                    expression {
                         return ("${GIT_BRANCH}" == 'release')
                     }
                 }
-                environment { 
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+                environment {
+                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags promote-packages --vault-password-file=.ansible-vault-password'
                 }
-            }
         }
         stage('Send Notification') {
-            node {
                 /* Notifications are sent for all branches */
-                environment { 
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password') 
+                environment {
+                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags send-notification --vault-password-file=.ansible-vault-password'
                 }
-            }
         }
     }
 }

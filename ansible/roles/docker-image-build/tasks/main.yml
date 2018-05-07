@@ -15,7 +15,7 @@
      path: "../../{{ docker_image_entry.path }}"
      name: "{{ docker_image_entry.name }}:{{ lookup('env','GIT_COMMIT') }}"
      push: "{{ docker_image_entry.push | default('yes')}}"
-     docker_host: "tcp://dlb1.aureacentral.com:2375"
+     docker_host: "{{ docker_image_entry.docker_host | default('tcp://dlb1.aureacentral.com:2375')}}"
   loop: 
     - "{{ service.docker_image }}"
   loop_control: 

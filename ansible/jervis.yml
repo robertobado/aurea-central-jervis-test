@@ -88,7 +88,8 @@
 - name: Aurea Central Jervis Health Checks
   strategy: free
   hosts: 
-    - docker-host
+    - docker-service
+    - ec2-service
   tags: run-health-checks
   vars:    
     - jervis: "{{ hostvars['localhost'].jervis }}"
@@ -99,7 +100,8 @@
 - name: Aurea Central Jervis Smoke Tests
   strategy: free
   hosts: 
-    - docker-host
+    - docker-service
+    - ec2-service
   tags: run-smoke-tests
   vars:    
     - jervis: "{{ hostvars['localhost'].jervis }}"
@@ -110,7 +112,8 @@
 - name: Aurea Central Jervis Regression Tests
   strategy: free
   hosts: 
-    - docker-host
+    - docker-service
+    - ec2-service
   tags: run-regression-tests
   vars:    
     - jervis: "{{ hostvars['localhost'].jervis }}"
@@ -121,7 +124,8 @@
 - name: Aurea Central Jervis Performance Tests
   strategy: free
   hosts: 
-    - docker-host
+    - docker-service
+    - ec2-service
   tags: run-performance-tests
   vars:    
     - jervis: "{{ hostvars['localhost'].jervis }}"
@@ -132,7 +136,8 @@
 - name: Aurea Central Jervis Load Tests
   strategy: free
   hosts: 
-    - docker-host
+    - docker-service
+    - ec2-service
   tags: run-load-tests
   vars:    
     - jervis: "{{ hostvars['localhost'].jervis }}"
@@ -143,7 +148,8 @@
 - name: Aurea Central Jervis Security Tests
   strategy: free
   hosts: 
-    - docker-host
+    - docker-service
+    - ec2-service
   tags: run-security-tests
   vars:    
     - jervis: "{{ hostvars['localhost'].jervis }}"
@@ -154,7 +160,8 @@
 - name: Aurea Central Jervis Promote Packages
   strategy: free
   hosts: 
-    - docker-host
+    - docker-service
+    - ec2-service
   tags: promote-packages
   vars:    
     - jervis: "{{ hostvars['localhost'].jervis }}"
@@ -165,7 +172,8 @@
 - name: Aurea Central Jervis Send Notification
   strategy: free
   hosts: 
-    - docker-host
+    - docker-service
+    - ec2-service
   tags: send-notification
   vars:    
     - jervis: "{{ hostvars['localhost'].jervis }}"

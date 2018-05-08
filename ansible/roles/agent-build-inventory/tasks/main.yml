@@ -6,9 +6,7 @@
     ansible_host: "{{ dynamic_instance.ansible_host | default(omit) }}"
     ansible_user: "{{ dynamic_instance.ansible_user | default(omit) }}"
     ansible_password: "{{ dynamic_instance.ansible_password | default(omit) }}"
-    service: "{{ dynamic_instance.service }}"
     groups: "{{ dynamic_instance.groups }}"
-    jervis: "{{ dynamic_instance.jervis }}"
     environment_name: "{{ dynamic_instance.environment_name }}"
   loop: "{{ hostvars.values() | selectattr('dynamic_inventory','defined') | map(attribute='dynamic_inventory') | flatten }}"
   loop_control:

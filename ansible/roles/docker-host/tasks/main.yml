@@ -1,19 +1,18 @@
 - name: "Mapping Docker Host services"
   set_fact:
     dynamic_inventory: "{{ dynamic_inventory + 
-                          ([ hostvars[inventory_hostname] 
-                          | combine({
+                          [ hostvars[inventory_hostname] | 
+                            combine({
                                       'name': service.name ~ '@'  ~ inventory_hostname,
-                                      'service': jervis.services[service.name],
+                                      'service_name': service.name,
                                       'groups': group_names + ['docker-service'],
-                                      'ansible_connection': 'docker'
-                                    }) 
-                          ] | list)
+                                      'ansible_connection': 'docker',
+                                      'jervis': {}
+                                    })
+                                    ]
                         }}"
   loop: "{{ services }}"
   loop_control:
     loop_var: service
     label: "{{ service.name }}"
   connection: local
-  tags: 
-    - always

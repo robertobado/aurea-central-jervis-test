@@ -10,17 +10,13 @@
   tags: docker-image-build
   retries: 3
 
-- name: Building docker image
+- name: Building docker images
   docker_image:
-     path: "../../{{ docker_image_entry.path }}"
-     name: "{{ docker_image_entry.name }}:{{ lookup('env','GIT_COMMIT') }}"
-     push: "{{ docker_image_entry.push | default('yes')}}"
+     path: "../../{{ hostvars[inventory_hostname.split('@') | last].jervis[inventory_hostname.split('@') | first].docker_image.path }}"
+     name: "{{ hostvars[inventory_hostname.split('@') | last].jervis[inventory_hostname.split('@') | first].docker_image.name }}:{{ lookup('env','GIT_COMMIT') }}"
+     push: "{{ hostvars[inventory_hostname.split('@') | last].jervis[inventory_hostname.split('@') | first].docker_image.push | default('yes')}}"
      docker_host: "{{ docker_image_entry.docker_host | default('tcp://dlb1.aureacentral.com:2375')}}"
-  loop: 
-    - "{{ service.docker_image }}"
-  loop_control: 
-    loop_var: docker_image_entry
-    label: "{{ docker_image_entry.name }}:{{ lookup('env','GIT_COMMIT') }}"
   delegate_to: localhost
   delegate_facts: true
+  when: hostvars[inventory_hostname.split('@') | last].jervis[inventory_hostname.split('@') | first] is defined and hostvars[inventory_hostname.split('@') | last].jervis[inventory_hostname.split('@') | first].docker_image is defined
   tags: docker-image-build

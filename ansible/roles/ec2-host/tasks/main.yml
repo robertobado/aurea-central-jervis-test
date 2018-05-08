@@ -1,14 +1,14 @@
 - name: "Mapping EC2 instance services"
   set_fact:
-    dynamic_inventory: "{{ dynamic_inventory + 
-                          [ hostvars[inventory_hostname] | 
+    dynamic_inventory: "{{ dynamic_inventory | union( [
+                           hostvars[inventory_hostname] | 
                             combine({
                                       'name': service.name ~ '@'  ~ inventory_hostname,
-                                      'service': service,
-                                      'groups': group_names + ['ec2-service'], 
+                                      'service_name': service.name,
+                                      'groups': group_names + ['ec2-service'],
                                       'jervis': {}
                                     }) 
-                          ] 
+                           ])
                         }}"
   loop: "{{ services }}"
   loop_control:

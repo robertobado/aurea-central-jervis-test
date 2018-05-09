@@ -6,6 +6,11 @@
 
 language: shell
 
+# variables are accessible from pipeline
+variables:
+  - MY_VAR=xyz
+  - DEPLOYMENT_TARGET=docker
+
 env:
   global:
     - JERVIS_SERVER_IMAGE_BASE_URL=registry2.swarm.devfactory.com/aurea/central/jervis/server

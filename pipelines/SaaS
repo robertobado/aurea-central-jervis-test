@@ -1,4 +1,5 @@
 #!groovy
+import org.yaml.snakeyaml.Yaml
 
 /* 
 TODO: 
@@ -6,11 +7,9 @@ TODO:
 2. Investigate why ANSIBLE_VAULT_PASSWORD is per stage and not global
 */
 
-def getDeploymentTargetEnv() { env.DEPLOYMENT_TARGET ?: 'docker' }
-
 pipeline {
     environment {
-            DEPLOYMENT_TARGET = getDeploymentTargetEnv()
+        DEPLOYMENT_TARGET = getVariable('DEPLOYMENT_TARGET', 'docker')
     }
     agent {
         label 'stable && docker && linux && ansible'
@@ -194,4 +193,33 @@ pipeline {
                 }
         }
     }
+}
+
+class State {
+    static Boolean loaded = false
+    static Map<String, String> variables = [:]
+}
+
+/**
+ * If Jenkins shows errors like
+ * "Scripts not permitted to use new org.yaml.snakeyaml.Yaml"
+ * Then you need to approve signatures on this page for local installation:
+ * http://localhost:8080/scriptApproval/
+ *
+ * or for sandbox
+ * http://jervis-sandbox2.devfactory.com/scriptApproval/
+ */
+def getVariable(String name, String defaultValue = '') {
+    if (! State.loaded) {
+        def rawYml = readFile file: '.jervis.yml', encoding: 'UTF-8'
+        def parser = new Yaml()
+        def list = parser.load(rawYml)
+        def vars = list['variables'] ?: [:]
+        vars.each{ variable ->
+            def (key, value) = variable.tokenize('=')
+            State.variables[key] = value
+        }
+        State.loaded = true
+    }
+    return State.variables[name] ?: defaultValue
 }

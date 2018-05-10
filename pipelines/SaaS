@@ -89,14 +89,14 @@ pipeline {
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags run-health-checks --vault-password-file=.ansible-vault-password'
+                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags health-check --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Smoke Tests') {
-                /* Smoke test only runs when branch is qa */
+                /* Smoke test only runs when branch is qa or regression*/
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'qa')
+                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
                     }
                 }
                 environment {
@@ -104,14 +104,14 @@ pipeline {
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags run-smoke-tests --vault-password-file=.ansible-vault-password'
+                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags smoke-test --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Regression Tests') {
-                /* Regression test only runs when branch is qa */
+                /* Regression test only runs when branch is qa or regression*/
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'qa')
+                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
                     }
                 }
                 environment {
@@ -119,14 +119,14 @@ pipeline {
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags run-regression-tests --vault-password-file=.ansible-vault-password'
+                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags regression-test --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Performance Tests') {
-                /* Performance test only runs when branch is qa */
+                /* Performance test only runs when branch is qa or regression*/
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'qa')
+                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
                     }
                 }
                 environment {
@@ -134,14 +134,14 @@ pipeline {
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'export COMPOSE_FORCE_WINDOWS_HOST=1 && ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-service-deploy,ec2-instance,ec2-service-deploy --vault-password-file=.ansible-vault-password'
+                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags performance-test --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Load Tests') {
-                /* Load test only runs when branch is qa */
+                /* Load test only runs when branch is qa or regression*/
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'qa')
+                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
                     }
                 }
                 environment {
@@ -149,14 +149,14 @@ pipeline {
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags run-load-tests --vault-password-file=.ansible-vault-password'
+                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags load-test --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Security Tests') {
-                /* Security test only runs when branch is qa */
+                /* Security test only runs when branch is qa or regression*/
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'qa')
+                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
                     }
                 }
                 environment {
@@ -164,7 +164,7 @@ pipeline {
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags run-security-tests --vault-password-file=.ansible-vault-password'
+                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags security-test --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Promote Packages') {

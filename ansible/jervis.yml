@@ -7,7 +7,7 @@
         develop: dev
       develop:
         develop: regression
-        qa: qa
+        qa: regression
       qa:
         qa: qa
         release: qa
@@ -83,78 +83,77 @@
   roles:
     - service-deploy
 
-
 - name: Aurea Central Jervis Health Checks
   strategy: free
   hosts: 
     - docker-service
     - ec2-service
-  tags: run-health-checks
+  tags: health-check
   vars:    
-    - jervis: "{{ hostvars['localhost'].jervis }}"
+    step_name: health-check
   gather_facts: no
   roles:
-    - run-health-checks
+    - dynamic-task
 
 - name: Aurea Central Jervis Smoke Tests
   strategy: free
   hosts: 
     - docker-service
     - ec2-service
-  tags: run-smoke-tests
+  tags: smoke-test
   vars:    
-    - jervis: "{{ hostvars['localhost'].jervis }}"
+    step_name: smoke-test
   gather_facts: no
   roles:
-    - run-smoke-tests
+    - dynamic-task
 
 - name: Aurea Central Jervis Regression Tests
   strategy: free
   hosts: 
     - docker-service
     - ec2-service
-  tags: run-regression-tests
+  tags: regression-test
   vars:    
-    - jervis: "{{ hostvars['localhost'].jervis }}"
+    step_name: regression-test
   gather_facts: no
   roles:
-    - run-regression-tests    
+    - dynamic-task
 
 - name: Aurea Central Jervis Performance Tests
   strategy: free
   hosts: 
     - docker-service
     - ec2-service
-  tags: run-performance-tests
+  tags: performance-test
   vars:    
-    - jervis: "{{ hostvars['localhost'].jervis }}"
+    step_name: performance-test
   gather_facts: no
   roles:
-    - run-performance-tests
-    
+    - dynamic-task
+
 - name: Aurea Central Jervis Load Tests
   strategy: free
   hosts: 
     - docker-service
     - ec2-service
-  tags: run-load-tests
+  tags: load-test
   vars:    
-    - jervis: "{{ hostvars['localhost'].jervis }}"
+    step_name: load-test
   gather_facts: no
   roles:
-    - run-load-tests    
+    - dynamic-task
 
 - name: Aurea Central Jervis Security Tests
   strategy: free
   hosts: 
     - docker-service
     - ec2-service
-  tags: run-security-tests
+  tags: security-test
   vars:    
-    - jervis: "{{ hostvars['localhost'].jervis }}"
+    step_name: security-test
   gather_facts: no
   roles:
-    - run-security-tests    
+    - dynamic-task 
 
 - name: Aurea Central Jervis Promote Packages
   strategy: free

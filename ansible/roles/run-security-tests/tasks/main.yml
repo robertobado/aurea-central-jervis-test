@@ -1,2 +1,0 @@
-- name: "Running Security Tests"
-  shell: "{{ hostvars[inventory_hostname.split('@') | last].security_tests_command | default(omit) }}"

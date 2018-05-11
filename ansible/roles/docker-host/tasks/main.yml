@@ -7,6 +7,8 @@
                                       'service_name': service.name,
                                       'groups': group_names + ['docker-service'],
                                       'ansible_connection': 'docker',
+                                      'ansible_docker_extra_args': '-H ' ~ ansible_host,
+                                      'ansible_host': environment_name ~ '_' ~ product ~ '_' ~ (inventory_hostname.split('@') | last),
                                       'jervis': {}
                                     })
                                     ]

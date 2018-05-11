@@ -33,7 +33,7 @@ pipeline {
                 script {
                   devfactoryOptions = getDevFactoryOptions()
 
-                  if (devfactoryOptions['product']) {
+                  if (devfactoryOptions['product'] && devfactoryOptions['types']) {
                     devfactory (devfactoryOptions) {
                       // Build the project inside devfactory scope
                       def jervisYaml = getJervisYaml()
@@ -261,19 +261,17 @@ def Map getDevFactoryOptions() {
    */
   def devfactoryOptions = [
     portfolio: 'TestPFAurea',
-    types: jervisYaml['language'].capitalize(),
     processTests: true
   ]
 
   // Override aLine defaults from .jervis.yml
   def alineOptions = jervisYaml['aline']
   if (alineOptions) {
+    devfactoryOptions.product = alineOptions['product']
+    devfactoryOptions.types = alineOptions['language']
+
     if (alineOptions['portfolio']) {
       devfactoryOptions.portfolio = alineOptions['portfolio']
-    }
-
-    if (alineOptions['product']) {
-      devfactoryOptions.product = alineOptions['product']
     }
 
     if (alineOptions['product_version']) {

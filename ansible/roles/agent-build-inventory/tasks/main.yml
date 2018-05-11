@@ -3,6 +3,7 @@
     name: "{{ dynamic_instance.name }}"
     ansible_connection: "{{ dynamic_instance.ansible_connection | default(omit) }}"
     ansible_winrm_server_cert_validation: "{{ dynamic_instance.ansible_winrm_server_cert_validation | default(omit) }}"
+    ansible_docker_extra_args: "{{ dynamic_instance.ansible_docker_extra_args | default(omit) }}"
     ansible_host: "{{ dynamic_instance.ansible_host | default(omit) }}"
     ansible_user: "{{ dynamic_instance.ansible_user | default(omit) }}"
     ansible_password: "{{ dynamic_instance.ansible_password | default(omit) }}"

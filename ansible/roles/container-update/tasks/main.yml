@@ -103,7 +103,7 @@
           volumes_driver: "{{ hostvars[inventory_hostname.split('@') | last].volumes_driver | default(omit) }}"
           volumes_from: "{{ hostvars[inventory_hostname.split('@') | last].volumes_from | default(omit) }}"
           working_dir: "{{ hostvars[inventory_hostname.split('@') | last].working_dir | default(omit) }}"
-    docker_host: "tcp://{{ ansible_host | default(omit) }}:2375"
+    docker_host: "{{ docker_host | default(omit) }}"
     timeout: 120
   delegate_to: localhost
   retries: 3
@@ -126,7 +126,7 @@
     devices: "{{ hostvars[inventory_hostname.split('@') | last].devices | default(omit) }}"
     dns_search_domains: "{{ hostvars[inventory_hostname.split('@') | last].dns_search_domains | default(omit) }}"
     dns_servers: "{{ hostvars[inventory_hostname.split('@') | last].dns_servers | default(omit) }}"
-    docker_host: "tcp://{{ ansible_host | default(omit) }}:2375"
+    docker_host: "{{ docker_host | default(omit) }}"
     domainname: "{{ hostvars[inventory_hostname.split('@') | last].domainname | default(omit) }}"
     entrypoint: "{{ hostvars[inventory_hostname.split('@') | last].entrypoint | default(omit) }}"
     env: "{{ hostvars[inventory_hostname.split('@') | last].env | default(omit) }}"

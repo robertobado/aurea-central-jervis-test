@@ -1,19 +1,20 @@
 - name: "Mapping Docker Host services"
   set_fact:
-    dynamic_inventory: "{{ dynamic_inventory + 
-                          [ hostvars[inventory_hostname] | 
-                            combine({
-                                      'name': service.name ~ '@'  ~ inventory_hostname,
-                                      'service_name': service.name,
-                                      'groups': group_names + ['docker-service'],
-                                      'ansible_connection': 'docker',
-                                      'ansible_docker_extra_args': '-H ' ~ ansible_host,
-                                      'docker_host': 'tcp://' ~ ansible_host ~ ':2375',
-                                      'ansible_host': environment_name ~ '_' ~ product ~ '_' ~ (inventory_hostname.split('@') | last),
-                                      'jervis': {}
-                                    })
-                                    ]
-                        }}"
+    dynamic_inventory: >
+      {{ dynamic_inventory +
+        [ hostvars[inventory_hostname] |
+          combine({
+            'name': service.name + '@'  + inventory_hostname,
+            'service_name': service.name,
+            'groups': group_names + ['docker-service'],
+            'ansible_connection': 'docker',
+            'ansible_docker_extra_args': '-H ' + ansible_host,
+            'docker_host': 'tcp://' + ansible_host + ':2375',
+            'ansible_host': environment_name + '_' + product + '_' + (inventory_hostname.split('@') | last),
+            'jervis': {}
+          })
+        ]
+      }}
   loop: "{{ services }}"
   loop_control:
     loop_var: service

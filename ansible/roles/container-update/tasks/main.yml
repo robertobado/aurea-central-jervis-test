@@ -9,6 +9,14 @@
   check_mode: no
   delegate_to: localhost
 
+- name: "Waiting dependencies dependencies"
+  wait_for_connection:
+  delegate_to: "{{ wait_entry.split(':') | first }}"
+  loop: "{{ hostvars[inventory_hostname.split('@') | last].wait_for | default({}) | list }}"
+  loop_control:
+    loop_var: wait_entry
+  when: hostvars[inventory_hostname.split('@') | last].wait_for is defined
+
 - name: "Updating docker using service module"
   docker_service: 
     project_name: "{{ environment_name }}_{{ product }}_{{ inventory_hostname.split('@') | last }}"

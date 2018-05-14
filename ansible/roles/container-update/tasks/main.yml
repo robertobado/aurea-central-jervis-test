@@ -91,6 +91,7 @@
           platform: "{{ hostvars[inventory_hostname.split('@') | last].platform | default(omit) }}"
           ports: "{{ hostvars[inventory_hostname.split('@') | last].ports | default(omit) }}"
           privileged: "{{ hostvars[inventory_hostname.split('@') | last].privileged | default(omit) }}"
+          published_ports: "{{ hostvars[inventory_hostname.split('@') | last].published_ports | default(omit) }}"
           read_only: "{{ hostvars[inventory_hostname.split('@') | last].read_only | default(omit) }}"
           restart: "{{ hostvars[inventory_hostname.split('@') | last].restart | default(omit) }}"
           runtime: "{{ hostvars[inventory_hostname.split('@') | last].runtime | default(omit) }}"
@@ -110,7 +111,7 @@
           volumes_driver: "{{ hostvars[inventory_hostname.split('@') | last].volumes_driver | default(omit) }}"
           volumes_from: "{{ hostvars[inventory_hostname.split('@') | last].volumes_from | default(omit) }}"
           working_dir: "{{ hostvars[inventory_hostname.split('@') | last].working_dir | default(omit) }}"
-    docker_host: "tcp://{{ ansible_host | default(omit) }}:2375"
+    docker_host: "{{ docker_host | default(omit) }}"
     timeout: 120
   delegate_to: localhost
   retries: 3
@@ -133,7 +134,7 @@
     devices: "{{ hostvars[inventory_hostname.split('@') | last].devices | default(omit) }}"
     dns_search_domains: "{{ hostvars[inventory_hostname.split('@') | last].dns_search_domains | default(omit) }}"
     dns_servers: "{{ hostvars[inventory_hostname.split('@') | last].dns_servers | default(omit) }}"
-    docker_host: "tcp://{{ ansible_host | default(omit) }}:2375"
+    docker_host: "{{ docker_host | default(omit) }}"
     domainname: "{{ hostvars[inventory_hostname.split('@') | last].domainname | default(omit) }}"
     entrypoint: "{{ hostvars[inventory_hostname.split('@') | last].entrypoint | default(omit) }}"
     env: "{{ hostvars[inventory_hostname.split('@') | last].env | default(omit) }}"
@@ -174,7 +175,9 @@
     oom_score_adj: "{{ hostvars[inventory_hostname.split('@') | last].oom_score_adj | default(omit) }}"
     paused: "{{ hostvars[inventory_hostname.split('@') | last].paused | default(omit) }}"
     pid_mode: "{{ hostvars[inventory_hostname.split('@') | last].pid_mode | default(omit) }}"
+    ports: "{{ hostvars[inventory_hostname.split('@') | last].ports | default(omit) }}"
     privileged: "{{ hostvars[inventory_hostname.split('@') | last].privileged | default(omit) }}"
+    published_ports: "{{ hostvars[inventory_hostname.split('@') | last].published_ports | default(omit) }}"
     pull: "{{ hostvars[inventory_hostname.split('@') | last].pull | default(omit) }}"
     purge_networks: "{{ hostvars[inventory_hostname.split('@') | last].purge_networks | default(omit) }}"
     read_only: "{{ hostvars[inventory_hostname.split('@') | last].read_only | default(omit) }}"

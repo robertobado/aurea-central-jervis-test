@@ -8,9 +8,6 @@ TODO:
 */
 
 pipeline {
-    environment {
-        DEPLOYMENT_TARGET = getVariable('DEPLOYMENT_TARGET', 'docker')
-    }
     agent {
         label 'stable && docker && linux && ansible'
     }
@@ -59,46 +56,13 @@ pipeline {
                   sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-image-build --vault-password-file=.ansible-vault-password'
                 }
         }
-        stage('CDH Service Deploy') {
-                when {
-                    expression {
-                        return ("$DEPLOYMENT_TARGET" == 'docker')
-                    }
-                }
+        stage('Service Deploy') {
                 environment {
                   ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
                 }
                 steps {
                   sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                  sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-service-deploy --vault-password-file=.ansible-vault-password'
-                }
-        }
-        stage('EC2 Service Deploy') {
-                when {
-                    expression {
-                        return ("$DEPLOYMENT_TARGET" == 'ec2')
-                    }
-                }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
-                steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags ec2-instance,ec2-service-deploy --vault-password-file=.ansible-vault-password'
-                }
-        }
-        stage('K8s Service Deploy') {
-                when {
-                    expression {
-                        return ("$DEPLOYMENT_TARGET" == 'k8s')
-                    }
-                }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
-                steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .k8s_inventory --tags k8s-service-deploy --vault-password-file=.ansible-vault-password'
+                  sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-service-deploy,ec2-instance,ec2-service-deploy,k8s-service-deploy --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Health Checks') {

@@ -1,2 +1,0 @@
-- name: "Running Smoke Tests"
-  shell: "{{ hostvars[inventory_hostname.split('@') | last].smoke_tests_command | default(omit) }}"

@@ -1,2 +1,0 @@
-- name: "Running Load Tests"
-  shell: "{{ hostvars[inventory_hostname.split('@') | last].load_tests_command | default(omit) }}"

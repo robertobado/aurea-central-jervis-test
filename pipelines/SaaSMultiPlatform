@@ -25,21 +25,6 @@ pipeline {
                 }
             }
         }
-        stage('aLine') {
-            steps {
-                script {
-                  devfactoryOptions = getDevFactoryOptions()
-
-                  if (devfactoryOptions['product'] && devfactoryOptions['types']) {
-                    devfactory (devfactoryOptions) {
-                      // Build the project inside devfactory scope
-                      def jervisYaml = getJervisYaml()
-                      sh "${jervisYaml['script']}"
-                    }
-                  }
-                }
-            }
-        }
         stage('Build Docker Image') {
                 /* Do not build when branch is master or release */
                 when {
@@ -215,38 +200,4 @@ def Map getJervisYaml() {
   jervisYaml = yaml.load(rawYaml)
 
   return jervisYaml
-}
-
-// Get final aLine options
-def Map getDevFactoryOptions() {
-  def jervisYaml = getJervisYaml()
-  /**
-   * Default aLine configurations
-   * TODO: Set default product as Github repo name
-   */
-  def devfactoryOptions = [
-    portfolio: 'TestPFAurea',
-    processTests: true
-  ]
-
-  // Override aLine defaults from .jervis.yml
-  def alineOptions = jervisYaml['aline']
-  if (alineOptions) {
-    devfactoryOptions.product = alineOptions['product']
-    devfactoryOptions.types = alineOptions['language']
-
-    if (alineOptions['portfolio']) {
-      devfactoryOptions.portfolio = alineOptions['portfolio']
-    }
-
-    if (alineOptions['product_version']) {
-      devfactoryOptions.productVersion = alineOptions['product_version']
-    }
-
-    if (alineOptions.containsKey('process_tests')) {
-      devfactoryOptions.processTests = alineOptions['process_tests']
-    }
-  }
-
-  return devfactoryOptions
 }

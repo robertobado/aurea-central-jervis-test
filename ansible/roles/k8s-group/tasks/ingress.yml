@@ -1,0 +1,8 @@
+---
+- name: Create kubernetes ingress
+  include_tasks: create_primitive.yml
+  vars:
+    type: 'ingress'
+    service_name: "{{ item.key }}"
+    definition: "{{ item.value.definition }}"
+  with_dict: "{{ definitions }}"

@@ -179,14 +179,24 @@
   roles:
     - send-notification    
 
+- name: Checking if we are going to destroy...
+  tasks:
+    - name: Set perform_destroy...
+      set_fact:
+        perform_destroy: true
+  hosts:
+    - k8s-group
+  tags:
+    - destroy
+
 - name: Aurea Central Jervis K8s Service Deploy
   strategy: free
   hosts:
-    - k8s-service
+    - k8s-group
   tags:
-    - k8s-service-deploy
+    - k8s-deploy
   vars:
     - jervis: "{{ hostvars['localhost'].jervis }}"
   gather_facts: no
   roles:
-    - k8s-service-deploy
+    - k8s-group

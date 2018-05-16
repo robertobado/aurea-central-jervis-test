@@ -98,7 +98,7 @@ pipeline {
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .k8s_inventory --tags k8s-service-deploy --vault-password-file=.ansible-vault-password'
+                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags k8s-deploy --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Health Checks') {

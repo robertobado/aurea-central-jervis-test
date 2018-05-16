@@ -1,0 +1,74 @@
+all:
+  vars:
+    environment_name: dev
+    project: app
+
+k8s-group:
+  vars:
+    ansible_connection: local
+    # how to get api_key see here
+    # https://github.com/trilogy-group/aurea-eng-ansible-generic/tree/master/examples/api-setup
+    api_key: ''
+    api_host: 'k8s.aureacentral.com:6443'
+    deployment_strategy: replace
+    namespace: "{{ project }}-{{ environment_name }}"
+    k8s_hostname: k8s-st-node-1
+    restart_policy: Always
+
+    # imagePullPolcy for k8s (Always, Never, IfNotPresent)
+    image_pull_policy: Always
+
+    resources_limits_cpu: 1
+    resources_limits_memory: "2Gi"
+    resources_requests_cpu: 0.25
+    resources_requests_memory: "1Gi"
+
+    container_base_image: "registry2.swarm.devfactory.com/aurea/central/test"
+    container_image_tag: "latest"
+
+  children:
+    k8s-deployment-group:
+    k8s-service-group:
+    k8s-ingress-group:
+
+k8s-deployment-group:
+  hosts:
+    k8s-deployment-host:
+      definitions:
+        service1:
+          definition:
+            spec:
+              template:
+                spec:
+
+
+k8s-service-group:
+  hosts:
+    k8s-service-host:
+      definitions:
+        service1:
+          definition:
+            spec:
+              ports:
+              - name: port-80-tcp
+                protocol: TCP
+                port: 80
+
+k8s-ingress-group:
+  hosts:
+    k8s-ingress-host:
+      definitions:
+        service1:
+          definition:
+            metadata:
+              annotations:
+                ingress.kubernates.io/rewrite-target: /
+            spec:
+              rules:
+              - host: PROJECT_HOST.aureacentral.com
+                http:
+                  paths:
+                  - path: /
+                    backend:
+                      serviceName: "{{ environment_name }}-{{ project }}-service1"
+                      servicePort: 80

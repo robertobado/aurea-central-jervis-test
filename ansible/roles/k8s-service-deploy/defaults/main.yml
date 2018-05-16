@@ -1,2 +1,0 @@
-k8s_pod_type: naked
-k8s_deployment_strategy: recreate

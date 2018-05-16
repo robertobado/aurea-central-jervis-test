@@ -1,0 +1,13 @@
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  namespace: "{{ namespace }}"
+  name: "{{ container_hostname }}"
+  labels:
+    app_name: "{{ container_hostname }}"
+  annotations:
+#    nginx.ingress.kubernates.io/rewrite-target: /
+#    ingress.kubernates.io/rewrite-target: /
+#    nginx.ingress.kubernates.io/ssl-redirect: "false"
+    kubernetes.io/ingress.class: "nonprod-public"
+spec:

@@ -1,0 +1,36 @@
+---
+- name: Defining container hostname (stage-project-container_id)
+  set_fact:
+    container_name: "{{ environment_name }}-{{ project }}-{{ service_name }}"
+  when: container_name is not defined
+
+- name: Defining container hostname (stage-project-container_id)
+  set_fact:
+    container_hostname: "{{ container_name | regex_replace('_', '-') }}"
+  when: container_hostname is not defined
+
+- name: Include default deployment definition
+  include_vars:
+    # load vars from (deployment|service|ingress).yml
+    file: "vars/{{ type }}.yml"
+    name: deploymentDefinition
+
+- name: Create definition
+  set_fact:
+    rawDefinition: "{{ deploymentDefinition | combine({} if definition == '' else definition, recursive=True) }}"
+
+- debug: var=rawDefinition
+- copy:
+    content: "{{ rawDefinition | to_nice_yaml }}"
+    dest: "/tmp/raw_definition_{{ type }}.yml"
+
+- name: Create kubernetes primitive from an inline definition "{{ type }}"
+  kubernetes:
+    api_endpoint: "{{ api_host }}"
+    state: "{{ 'absent' if (perform_destroy is defined and perform_destroy) else 'present' }}"
+    service_token: "{{ api_key }}"
+    inline_data: "{{ rawDefinition }}"
+  register: k8s_result
+
+- name: Show result
+  debug: var=k8s_result

@@ -1,0 +1,12 @@
+---
+- name: Run k8s services tasks
+  include_tasks: service.yml
+  when: inventory_hostname == 'k8s-service-host'
+
+- name: Run k8s ingress tasks
+  include_tasks: ingress.yml
+  when: inventory_hostname == 'k8s-ingress-host'
+
+- name: Run k8s deployments tasks
+  include_tasks: deployment.yml
+  when: inventory_hostname == 'k8s-deployment-host'

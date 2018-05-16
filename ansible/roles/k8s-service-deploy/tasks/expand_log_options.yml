@@ -1,7 +1,0 @@
----
-
-- name: Combining log options lists...
-  set_fact:
-    published_log_options: "{{ (global_log_options | default({})) | combine (service_group_log_options | default({})) | combine (service_log_options | default({})) }}"
-    key_list: []
-    template_value_list: []

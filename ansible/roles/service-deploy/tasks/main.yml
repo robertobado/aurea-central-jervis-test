@@ -1,6 +1,35 @@
-- name: "Running deployment lifecycle steps"
+- name: "Running deployment lifecycle STOP steps"
   include_tasks: load_step_tasks.yml
-  loop: "{{ ['stop','uninstall','pre-install','install','post-instal','start'] | intersect(hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].keys()) }}"
-  loop_control:
-    loop_var: step_name
+  vars:
+    step_name: stop
+  when: hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first] is defined
+
+- name: "Running deployment lifecycle UNINSTALL steps"
+  include_tasks: load_step_tasks.yml
+  vars:
+    step_name: uninstall
+  when: hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first] is defined
+
+- name: "Running deployment lifecycle PRE-INSTALL steps"
+  include_tasks: load_step_tasks.yml
+  vars:
+    step_name: pre-install
+  when: hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first] is defined
+
+- name: "Running deployment lifecycle INSTALL steps"
+  include_tasks: load_step_tasks.yml
+  vars:
+    step_name: install
+  when: hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first] is defined
+
+- name: "Running deployment lifecycle POST-INSTALL steps"
+  include_tasks: load_step_tasks.yml
+  vars:
+    step_name: post-install
+  when: hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first] is defined
+
+- name: "Running deployment lifecycle START steps"
+  include_tasks: load_step_tasks.yml
+  vars:
+    step_name: start
   when: hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first] is defined

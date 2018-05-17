@@ -10,25 +10,7 @@ pipeline {
         SolutionList = getVariable('SolutionList', 'default.sln')
     }
     stages {
-        stage('Checkout SCM') {
-            agent {
-                node{
-                    label 'stable && windows && vs2017 && ec2'
-                    customWorkspace "C:/jk/${JOB_NAME}/b${BUILD_NUMBER}"
-                }
-            }
-            steps {
-                // Default Git checkout done by Jervis is not compatible with aLine.
-                // Please refer: https://jira.devfactory.com/browse/FIRE-14613
-                checkout([$class: 'GitSCM', branches: [[name: env.BRANCH_NAME]], doGenerateSubmoduleConfigurations: false,
-                extensions: [[$class: 'LocalBranch', localBranch: env.BRANCH_NAME]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-user-and-token', url: env.GIT_URL]]])
-
-                withCredentials([usernamePassword(credentialsId: 'github-user-and-token', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
-                    powershell 'git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git'
-                    powershell 'git submodule update --init'
-                }
-            }
-        }
+        
         stage('Setup environment'){
             agent {
                 node{

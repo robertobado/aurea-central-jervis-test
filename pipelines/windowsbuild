@@ -20,7 +20,7 @@ pipeline {
             }
             steps{
                 checkout scm
-                powershell '.\\BuildScripts\\setup-environment.ps1'
+                powershell '.\\aurea-central-jervis\\WindowsBuildScripts\\setup-environment.ps1'
             }
         }
         stage('Nuget Restore') {
@@ -31,7 +31,7 @@ pipeline {
                 }
             }
             steps{
-                powershell '.\\BuildScripts\\restore_nuget.ps1'
+                powershell '.\\aurea-central-jervis\\WindowsBuildScripts\\restore_nuget.ps1'
             }
         }
         stage('Build .Net Solution') {
@@ -45,7 +45,7 @@ pipeline {
                 echo "Workspace dir is ${pwd()}"
                 echo "Workspace dir is ${BUILD_NUMBER}"
                 echo "Workspace dir is ${env.SolutionList}"
-                powershell '.\\BuildScripts\\build_ci.ps1'
+                powershell '.\\aurea-central-jervis\\WindowsBuildScripts\\build_ci.ps1'
                 archiveArtifacts artifacts: 'JenkinsBuildOutput/*.zip'
             }
         }
@@ -57,7 +57,7 @@ pipeline {
                 }
             }
             steps {
-                powershell '.\\BuildScripts\\execute-unittest.ps1'
+                powershell '.\\aurea-central-jervis\\WindowsBuildScripts\\execute-unittest.ps1'
                 junit '/JenkinsTestOutput/**/*.test.xml'
                 archive '/JenkinsTestOutput/**/*.trx'
             }

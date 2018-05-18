@@ -28,8 +28,13 @@ $VSConfig=$configJson.VisualStudioVersions | Where-Object -FilterScript ({ $env:
 $msbuild=$VSConfig.MSBuild
 Write-Host "+++++++++++++++++++++++++++++++++++++ $msbuild +++++++++++++++++++++++++++++++++++++++++++++++"
 $configJson | Format-List
+Write-Host "111-------------------------------"
 $VSConfig | Format-List 
+Write-Host "222-------------------------------"
+$configJson.VisualStudioVersions  | Format-List 
+Write-Host "333-------------------------------"
 Write-Host "vsconfig msbuild: $($VSConfig.MSBuild)"
+Write-Host "444-------------------------------"
 
 #####################################Functions################################################################################################
 function Get-OutputhPath {

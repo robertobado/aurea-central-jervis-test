@@ -32,6 +32,7 @@ Write-Host "111-------------------------------"
 $VSConfig | Format-List 
 Write-Host "222-------------------------------"
 $configJson.VisualStudioVersions  | Format-List 
+($configJson.VisualStudioVersions).GetType()
 Write-Host "333-------------------------------"
 Write-Host "vsconfig msbuild: $($VSConfig.MSBuild)"
 Write-Host "444-------------------------------"

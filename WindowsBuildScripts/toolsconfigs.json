@@ -9,9 +9,7 @@
 			"Name":"VS2017",
 			"MSBuild":"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\MSBuild\\15.0\\Bin\\MSBuild.exe",
 			"VSTest":"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe"
-		},
-		{},
-		{},
+		}
 	],
 	"XSLTTool":"C:\\ProgramData\\chocolatey\\bin\\SaxonHE\\bin\\Transform.exe"
 }

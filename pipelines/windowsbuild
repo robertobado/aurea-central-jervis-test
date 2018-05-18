@@ -8,6 +8,7 @@ pipeline {
         BuildConfiguration = getVariable('BuildConfiguration', 'debug')
         AdditionalMsBuildParameter = getVariable('AdditionalMsBuildParameter', ' /m')
         SolutionList = getVariable('SolutionList', 'default.sln')
+        VisualStudio = getVariable('VisualStudio', 'VS2017')
     }
     stages {
         

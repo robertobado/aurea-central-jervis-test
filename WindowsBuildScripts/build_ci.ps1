@@ -2,19 +2,29 @@ $ErrorActionPreference = "Stop"
 if (-not (Test-Path env:AdditionalMsBuildParameter)) { 
   $env:AdditionalMsBuildParameter = " "
 }
-Write-Host "====================================$($env:XSLTTool)====================================="
+
 Write-Host "Solution list: $env:SolutionList"
+Write-Host "Visual Studio version: $env:VisualStudio"
+
 $solutionList = $env:SolutionList.Replace("\`"","").Replace("`'","").Split(",")
 $buildConfig=$env:BuildConfiguration.Replace("\`"","").Replace("`'","")
 $additionalParams=$env:AdditionalMsBuildParameter.Replace("\`"","").Replace("`'","")
 $msbuild="`"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe`""
 $msbuild_parameters="/t:Clean,Compile,Rebuild /p:Configuration=$buildConfig $additionalParams"
+$currentDir= Get-Location
+$outputDir="$($currentDir.path)\JenkinsBuildOutput"
+
+Write-Host "Output Directory: $outputDir"
 Write-Host "MSbuid params: $msbuild_parameters"
 Write-Host "Build config: $buildConfig"
 Write-Host "AdditionalMsBuildParameter : $additionalParams"
 Write-Host "SolutionList : $solutionList"
 Write-Host "Current folder content"
-ls
+
+$jsonFilePath = "$($currentDir)\aurea-central-jervis\WindowsBuildScripts\toolsconfigs.json"
+$configJson = (Get-Content $jsonFilePath) | ConvertFrom-Json
+Write-Host $configJson
+
 #####################################Functions################################################################################################
 function Get-OutputhPath {
   param( [string]$BasePath, $Project,[string]$BuildConfiguration)
@@ -70,10 +80,8 @@ function Verify-IsWebProject{
 }
 
 ############################################################################################################################################
-$currentDir= Get-Location
-$outputDir="$($currentDir.path)\JenkinsBuildOutput"
 
-Write-Host "Output Directory: $outputDir"
+
 
 if(Test-Path $outputDir){
   Clear-Content -Path $outputDir -Force

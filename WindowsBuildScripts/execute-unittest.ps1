@@ -2,7 +2,13 @@ $ErrorActionPreference = "Stop"
 if (-not (Test-Path env:AdditionalMsBuildParameter)) { 
   $env:AdditionalMsBuildParameter = " "
 }
-$namespace=@{default="http://schemas.microsoft.com/developer/msbuild/2003" }       
+$currentDir= Get-Location
+$outputTestDir="$($currentDir.path)\JenkinsTestOutput"
+
+$namespace=@{default="http://schemas.microsoft.com/developer/msbuild/2003" }  
+$jsonFilePath = "$($currentDir)\aurea-central-jervis\WindowsBuildScripts\toolsconfigs.json"
+$configJson = (Get-Content $jsonFilePath) | ConvertFrom-Json
+$env:XSLTTool =$configJson.XSLTTool     
 
 Write-Host "Solution list: $env:SolutionList"
 $solutionList = $env:SolutionList.Replace("\`"","").Replace("`'","").Split(",")
@@ -87,8 +93,6 @@ function Verify-IsUnitTestProject{
   }
   
 #####################################Functions################################################################################################
-$currentDir= Get-Location
-$outputTestDir="$($currentDir.path)\JenkinsTestOutput"
 
 if(Test-Path $outputTestDir){
     Clear-Content -Path $outputTestDir -Force
@@ -142,6 +146,6 @@ foreach($solutionPath in $solutionList){
 $trxFiles=Get-ChildItem -Path "$outputTestDir" -Recurse -Include *.trx
 foreach($trxFile in $trxFiles){
     $DirectoryName=(Get-Item (Split-Path -Path $trxFile)).Name
-    & "C:\ProgramData\chocolatey\bin\SaxonHE\bin\Transform.exe" -s:"$($trxFile)" -xsl:"$($BasePath)\aurea-central-jervis\WindowsBuildScripts\trx-junitxml.xslt" -o:"$outputTestDir\$($DirectoryName).test.xml"
+    & "$env:XSLTTool" -s:"$($trxFile)" -xsl:"$($BasePath)\aurea-central-jervis\WindowsBuildScripts\trx-junitxml.xslt" -o:"$outputTestDir\$($DirectoryName).test.xml"
 }
 exit 0

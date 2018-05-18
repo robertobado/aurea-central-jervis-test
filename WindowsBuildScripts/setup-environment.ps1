@@ -5,7 +5,6 @@ If(!(Test-Path -Path "$env:ProgramData\Chocolatey")){
 $currentDir = Get-Location
 $jsonFilePath = "$($currentDir)\aurea-central-jervis\WindowsBuildScripts\toolsconfigs.json"
 $configJson = (Get-Content $jsonFilePath) | ConvertFrom-Json
-
 $env:XSLTTool =$configJson.XSLTTool
 choco install saxonhe -y
 exit 0

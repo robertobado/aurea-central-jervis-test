@@ -16,19 +16,17 @@ $configJson = (Get-Content $jsonFilePath) | ConvertFrom-Json
 $VSConfig = $configJson.VisualStudioVersions | Where-Object -FilterScript ({ $env:VisualStudio -eq $_.Name })
 
 Write-Host "Json filepath: $jsonFilePath "
-(Get-Content $jsonFilePath)
 
 $env:XSLTTool = $configJson.XSLTTool
 Write-Host "XSLTTool: $env:XSLTTool"
-Write-Host "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-Write-Host $VSConfig
-Write-Host "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 #$env:vstestconsole="`"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe`""
 $env:vstestconsole = "$($VSConfig.VSTest)"
+
 
 Write-Host "Build config: $buildConfig"
 Write-Host "AdditionalMsBuildParameter : $additionalParams"
 Write-Host "SolutionList : $solutionList"
+Write-Host "Test console: $env:vstestconsole"
 
 #####################################Functions################################################################################################
 function Get-ProjectsPath {
@@ -128,7 +126,7 @@ foreach($solutionPath in $solutionList){
         Write-Host $projectFolder;
         Write-Host $BasePath;
         Write-Host $BaseSolutionDir;
-		Write-Host (Split-Path -Path $project.File)
+		    Write-Host (Split-Path -Path $project.File)
 
         $outputPath=Get-OutputhPath -BasePath $BaseSolutionDir -Project $project -BuildConfiguration $BuildConfiguration 
         $assemblyName= Select-Xml -Path "$BaseSolutionDir\$($project.File)" -Xpath "/default:Project/default:PropertyGroup/default:AssemblyName/text()" -Namespace $namespace   | Select-Object -Expand node | Select-Object -Expand Value
@@ -142,11 +140,11 @@ foreach($solutionPath in $solutionList){
             New-Item -ItemType "directory" -Path "$($outputTestDir)\$($project.Name)" -Force 
             $testBinary="$($BaseSolutionDir)\$(Split-Path -Path $project.File)\$($outputPath)$($assemblyName).dll"
             if(Verify-IsNUnitStandAlone "$BaseSolutionDir\$($project.File)"){
-				choco install nunit-console-runner -y
+				        choco install nunit-console-runner -y
                 & nunit3-console.exe $testBinary --result="$($outputTestDir)\$($project.Name).test.xml;transform=$($BasePath)\aurea-central-jervis\WindowsBuildScripts\nunit3-junit.xslt"
             }
             else{
-                $cmdArgumentsToRunVsTest="/k $env:vstestconsole $testBinary /ResultsDirectory:$($outputTestDir)\$($project.Name) /logger:trx"
+                $cmdArgumentsToRunVsTest="/k `"$env:vstestconsole`" $testBinary /ResultsDirectory:$($outputTestDir)\$($project.Name) /logger:trx"
                 $buildCommand=Start-Process cmd.exe -ArgumentList $cmdArgumentsToRunVsTest -NoNewWindow -PassThru
                 Wait-Process -Id $buildCommand.id
             }

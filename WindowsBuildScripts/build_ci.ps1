@@ -27,32 +27,8 @@ $VSConfig=$configJson.VisualStudioVersions | Where-Object -FilterScript ({ $env:
 
 #$msbuild="`"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe`""
 $msbuild=$VSConfig.MSBuild
-Write-Host "+++++++++++++++++++++++++++++++++++++ $msbuild +++++++++++++++++++++++++++++++++++++++++++++++"
-$configJson | Format-List
-Write-Host "111---------- $env:VisualStudio ---------------------"
-$VSConfig | Format-List 
-Write-Host "222-------------------------------"
-$configJson.VisualStudioVersions  | Format-List
-Write-Host "-------------------------------" 
-($configJson.VisualStudioVersions).GetType()
-Write-Host "-------------------------------" 
-$configJson.VisualStudioVersions | Where-Object -FilterScript ({ $env:VisualStudio -eq $_.Name })
-Write-Host "-------------------------------" 
-$configJson.VisualStudioVersions | Where { $env:VisualStudio -eq $_.Name } | Select -First 1
-Write-Host "-------------------------------" 
-[Linq.Enumerable]::Where($configJson.VisualStudioVersions, [Func[Object,bool]]{ param($item) $item.Name -eq $env:VisualStudio })
-foreach($vsversion in $configJson.VisualStudioVersions){
-  Write-Host "***********************"
-  $vsversion.Name
-  $vsversion
-  if($vsversion.Name -eq $env:VisualStudio ){
-    Write-Host "VS found"
-  }
-  Write-Host "***********************"
-}
-Write-Host "333-------------------------------"
 Write-Host "vsconfig msbuild: $($VSConfig.MSBuild)"
-Write-Host "444-------------------------------"
+
 
 #####################################Functions################################################################################################
 function Get-OutputhPath {

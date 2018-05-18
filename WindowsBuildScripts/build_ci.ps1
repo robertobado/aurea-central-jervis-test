@@ -2,7 +2,7 @@ $ErrorActionPreference = "Stop"
 if (-not (Test-Path env:AdditionalMsBuildParameter)) { 
   $env:AdditionalMsBuildParameter = " "
 }
-
+Write-Host "====================================$($env:XSLTTool)====================================="
 Write-Host "Solution list: $env:SolutionList"
 $solutionList = $env:SolutionList.Replace("\`"","").Replace("`'","").Split(",")
 $buildConfig=$env:BuildConfiguration.Replace("\`"","").Replace("`'","")

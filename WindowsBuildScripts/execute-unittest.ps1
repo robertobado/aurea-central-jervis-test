@@ -128,7 +128,7 @@ foreach($solutionPath in $solutionList){
             $testBinary="$($BaseSolutionDir)\$(Split-Path -Path $project.File)\$($outputPath)$($assemblyName).dll"
             if(Verify-IsNUnitStandAlone "$BaseSolutionDir\$($project.File)"){
 				choco install nunit-console-runner -y
-                & nunit3-console.exe $testBinary --result="$($outputTestDir)\$($project.Name).test.xml;transform=$($BasePath)\BuildScripts\nunit3-junit.xslt"
+                & nunit3-console.exe $testBinary --result="$($outputTestDir)\$($project.Name).test.xml;transform=$($BasePath)\aurea-central-jervis\WindowsBuildScripts\nunit3-junit.xslt"
             }
             else{
                 $cmdArgumentsToRunVsTest="/k $vstestconsole $testBinary /ResultsDirectory:$($outputTestDir)\$($project.Name) /logger:trx"
@@ -142,6 +142,6 @@ foreach($solutionPath in $solutionList){
 $trxFiles=Get-ChildItem -Path "$outputTestDir" -Recurse -Include *.trx
 foreach($trxFile in $trxFiles){
     $DirectoryName=(Get-Item (Split-Path -Path $trxFile)).Name
-    & "C:\ProgramData\chocolatey\bin\SaxonHE\bin\Transform.exe" -s:"$($trxFile)" -xsl:"$($BasePath)\BuildScripts\trx-junitxml.xslt" -o:"$outputTestDir\$($DirectoryName).test.xml"
+    & "C:\ProgramData\chocolatey\bin\SaxonHE\bin\Transform.exe" -s:"$($trxFile)" -xsl:"$($BasePath)\aurea-central-jervis\WindowsBuildScripts\trx-junitxml.xslt" -o:"$outputTestDir\$($DirectoryName).test.xml"
 }
 exit 0

@@ -103,7 +103,12 @@ foreach($solutionPath in $solutionList){
 
   $buildCommand=Start-Process cmd.exe -ArgumentList $cmdArgumentsToRunMsBuild -NoNewWindow -PassThru
   Wait-Process -Id $buildCommand.id
-  Write-Host "---Build process ended---"
+  Write-Host "---Build process ended: $LastExitCode---"
+  if($LastExitCode -gt 0){
+    throw "msbuild failed"
+    exit $LastExitCode
+  }
+
 
   ####################Collect artifacts#################################
   $SolutionFile=[System.IO.Path]::Combine("$($currentDir.path)", ("$solutionPath" -replace  "/","`\"))
@@ -139,7 +144,7 @@ foreach($solutionPath in $solutionList){
         Write-Host "*****************Is a web project,publishing****************"
         New-Item -ItemType "directory" -Path "$($outputDir)\$($project.Name)" -Force 
         $msbuild_websitepublish=" /p:DeployOnBuild=true;DeployTarget=PipelinePreDeployCopyAllFilesToOneFolder;_PackageTempDir=`"$($outputDir)\$($project.Name)`";AutoParameterizationWebConfigConnectionStrings=false"
-        $cmdArgumentsToRunMsBuild="`"$msbuild`" `"$BasePath\$($project.File)`" $msbuild_websitepublish"
+        $cmdArgumentsToRunMsBuild="`"$msbuild`" `"$BasePath\$($project.File)`" $msbuild_websitepublish /v:$($env:VerbosityLevel)"
         Write-Host "command: $cmdArgumentsToRunMsBuild"
         $cmdArgumentsToRunMsBuild | Set-Content "$currentDir\$($project.Name).bat"
         $buildCommand=Start-Process cmd.exe -ArgumentList "/k $currentDir\$($project.Name).bat" -NoNewWindow -PassThru

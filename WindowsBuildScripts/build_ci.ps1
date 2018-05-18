@@ -95,7 +95,8 @@ else {
 
 foreach($solutionPath in $solutionList){
   Write-Host "---Running msbuild---"
-  $cmdArgumentsToRunMsBuild="/k $msbuild $solutionPath $msbuild_parameters"
+  $cmdArgumentsToRunMsBuild="/k `"$msbuild`" $solutionPath $msbuild_parameters"
+  Write-Host "Build Arguments: $cmdArgumentsToRunMsBuild"
 
   $buildCommand=Start-Process cmd.exe -ArgumentList $cmdArgumentsToRunMsBuild -NoNewWindow -PassThru
   Wait-Process -Id $buildCommand.id

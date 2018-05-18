@@ -25,6 +25,8 @@ $VSConfig=$configJson.VisualStudioVersions | Where-Object -FilterScript ({ $env:
 
 #$msbuild="`"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe`""
 $msbuild=$VSConfig.MSBuild
+Write-Host "+++++++++++++++++++++++++++++++++++++ $msbuild +++++++++++++++++++++++++++++++++++++++++++++++"
+Write-Host "vsconfig msbuild: $VSConfig.MSBuild"
 
 #####################################Functions################################################################################################
 function Get-OutputhPath {
@@ -93,7 +95,7 @@ else {
 }
 
 foreach($solutionPath in $solutionList){
-  Write-Host "---Running msbuild---"
+  Write-Host "---Running msbuild: $msbuild ---"
   $cmdArgumentsToRunMsBuild="/k `"$msbuild`" $solutionPath $msbuild_parameters"
   Write-Host "Build Arguments: $cmdArgumentsToRunMsBuild"
 

@@ -6,5 +6,8 @@ $currentDir = Get-Location
 $jsonFilePath = "$($currentDir)\aurea-central-jervis\WindowsBuildScripts\toolsconfigs.json"
 $configJson = (Get-Content $jsonFilePath) | ConvertFrom-Json
 
-choco install saxonhe -y
+if(!(Test-Path $configJson.XSLTTool)){
+  choco install saxonhe -y  
+}
+
 exit 0

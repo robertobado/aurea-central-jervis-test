@@ -26,6 +26,7 @@ pipeline {
                     powershell 'git submodule update --init'
                     powershell 'cd aurea-central-jervis; git checkout feature/windows-build'
                 }
+                echo "${HOME}"
                 powershell '.\\aurea-central-jervis\\WindowsBuildScripts\\setup-environment.ps1'
             }
         }
@@ -37,7 +38,11 @@ pipeline {
                 }
             }
             steps{
-                powershell '.\\aurea-central-jervis\\WindowsBuildScripts\\restore_nuget.ps1'
+                cache(maxCacheSize: 500, caches:[
+                    [$class: 'ArbitraryFileCache', excludes: '', includes: '**/*', path: '${HOME}/packages']
+                ]) {
+                    powershell '.\\aurea-central-jervis\\WindowsBuildScripts\\restore_nuget.ps1'   
+                }
             }
         }
         stage('Build .Net Solution') {

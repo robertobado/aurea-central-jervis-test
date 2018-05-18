@@ -9,6 +9,7 @@ pipeline {
         AdditionalMsBuildParameter = getVariable('AdditionalMsBuildParameter', ' /m')
         SolutionList = getVariable('SolutionList', 'default.sln')
         VisualStudio = getVariable('VisualStudio', 'VS2017')
+        VerbosityLevel = getVariable('VerbosityLevel', 'normal')
     }
     stages {
         

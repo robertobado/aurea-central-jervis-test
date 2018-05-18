@@ -7,6 +7,7 @@ Write-Host "Solution list: $env:SolutionList"
 Write-Host "Visual Studio version: $env:VisualStudio"
 
 $env:VisualStudio = $env:VisualStudio.Replace("\`"","").Replace("`'","")
+$env:VerbosityLevel = $env:VerbosityLevel.Replace("\`"","").Replace("`'","")
 $solutionList = $env:SolutionList.Replace("\`"","").Replace("`'","").Split(",")
 $buildConfig=$env:BuildConfiguration.Replace("\`"","").Replace("`'","")
 $additionalParams=$env:AdditionalMsBuildParameter.Replace("\`"","").Replace("`'","")
@@ -25,7 +26,6 @@ Write-Host "SolutionList : $solutionList"
 $configJson = (Get-Content $jsonFilePath) | ConvertFrom-Json
 $VSConfig=$configJson.VisualStudioVersions | Where-Object -FilterScript ({ $env:VisualStudio -eq $_.Name })
 
-#$msbuild="`"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe`""
 $msbuild=$VSConfig.MSBuild
 Write-Host "vsconfig msbuild: $($VSConfig.MSBuild)"
 
@@ -98,7 +98,7 @@ else {
 
 foreach($solutionPath in $solutionList){
   Write-Host "---Running msbuild: $msbuild ---"
-  $cmdArgumentsToRunMsBuild="/k `"$msbuild`" $solutionPath $msbuild_parameters"
+  $cmdArgumentsToRunMsBuild="/k `"$msbuild`" $solutionPath $msbuild_parameters /v:$($env:VerbosityLevel)"
   Write-Host "Build Arguments: $cmdArgumentsToRunMsBuild"
 
   $buildCommand=Start-Process cmd.exe -ArgumentList $cmdArgumentsToRunMsBuild -NoNewWindow -PassThru
@@ -139,7 +139,7 @@ foreach($solutionPath in $solutionList){
         Write-Host "*****************Is a web project,publishing****************"
         New-Item -ItemType "directory" -Path "$($outputDir)\$($project.Name)" -Force 
         $msbuild_websitepublish=" /p:DeployOnBuild=true;DeployTarget=PipelinePreDeployCopyAllFilesToOneFolder;_PackageTempDir=`"$($outputDir)\$($project.Name)`";AutoParameterizationWebConfigConnectionStrings=false"
-        $cmdArgumentsToRunMsBuild="$msbuild `"$BasePath\$($project.File)`" $msbuild_websitepublish"
+        $cmdArgumentsToRunMsBuild="`"$msbuild`" `"$BasePath\$($project.File)`" $msbuild_websitepublish"
         Write-Host "command: $cmdArgumentsToRunMsBuild"
         $cmdArgumentsToRunMsBuild | Set-Content "$currentDir\$($project.Name).bat"
         $buildCommand=Start-Process cmd.exe -ArgumentList "/k $currentDir\$($project.Name).bat" -NoNewWindow -PassThru

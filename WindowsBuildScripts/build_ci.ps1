@@ -26,17 +26,14 @@ $VSConfig=$configJson.VisualStudioVersions | Where-Object -FilterScript ({ $env:
 
 Write-Host "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 Write-Host "Json filepath: $jsonFilePath"
-(Get-Content $jsonFilePath)
 Write-Host "+++++++++++++++++++"
-Write-Host $configJson
-Write-Host $VSConfig
-Write-Host $VSConfig.MSBuild
+Write-Host $configJson | Format-List
+Write-Host "$($configJson.VisualStudioVersions)"
+Write-Host "$($VSConfig.MSBuild)"
 Write-Host "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
 #$msbuild="`"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe`""
 $msbuild="$($VSConfig.MSBuild)"
-
-
 
 
 

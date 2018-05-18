@@ -6,7 +6,7 @@ $currentDir = Get-Location
 $outputTestDir = "$($currentDir.path)\JenkinsTestOutput"
 
 $namespace=@{default="http://schemas.microsoft.com/developer/msbuild/2003" }  
-$jsonFilePath = "$($currentDir)\aurea-central-jervis\WindowsBuildScripts\toolsconfigs.json"
+$jsonFilePath = "$($currentDir.path)\aurea-central-jervis\WindowsBuildScripts\toolsconfigs.json"
 $configJson = (Get-Content $jsonFilePath) | ConvertFrom-Json
 $VSConfig = $configJson.VisualStudioVersions | Where-Object -FilterScript ({ $env:VisualStudio -eq $_.Name })
 

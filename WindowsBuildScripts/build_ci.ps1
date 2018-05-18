@@ -18,9 +18,8 @@ Write-Host "MSbuid params: $msbuild_parameters"
 Write-Host "Build config: $buildConfig"
 Write-Host "AdditionalMsBuildParameter : $additionalParams"
 Write-Host "SolutionList : $solutionList"
-Write-Host "Current folder content"
 
-$jsonFilePath = "$($currentDir)\aurea-central-jervis\WindowsBuildScripts\toolsconfigs.json"
+$jsonFilePath = "$($currentDir.path)\aurea-central-jervis\WindowsBuildScripts\toolsconfigs.json"
 $configJson = (Get-Content $jsonFilePath) | ConvertFrom-Json
 $VSConfig=$configJson.VisualStudioVersions | Where-Object -FilterScript ({ $env:VisualStudio -eq $_.Name })
 Write-Host $VSConfig

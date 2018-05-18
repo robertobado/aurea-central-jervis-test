@@ -12,7 +12,7 @@ $VSConfig = $configJson.VisualStudioVersions | Where-Object -FilterScript ({ $en
 
 $env:XSLTTool = $configJson.XSLTTool     
 #$env:vstestconsole="`"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe`""
-$env:vstestconsole = "`"$($VSConfig.VSTest)`""
+$env:vstestconsole = "$($VSConfig.VSTest)"
 
 
 Write-Host "Solution list: $env:SolutionList"

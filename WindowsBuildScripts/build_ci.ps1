@@ -6,6 +6,7 @@ if (-not (Test-Path env:AdditionalMsBuildParameter)) {
 Write-Host "Solution list: $env:SolutionList"
 Write-Host "Visual Studio version: $env:VisualStudio"
 
+$env:VisualStudio = $env:VisualStudio.Replace("\`"","").Replace("`'","")
 $solutionList = $env:SolutionList.Replace("\`"","").Replace("`'","").Split(",")
 $buildConfig=$env:BuildConfiguration.Replace("\`"","").Replace("`'","")
 $additionalParams=$env:AdditionalMsBuildParameter.Replace("\`"","").Replace("`'","")

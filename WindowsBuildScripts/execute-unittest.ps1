@@ -2,8 +2,13 @@ $ErrorActionPreference = "Stop"
 if (-not (Test-Path env:AdditionalMsBuildParameter)) { 
   $env:AdditionalMsBuildParameter = " "
 }
+
 $currentDir = Get-Location
 $outputTestDir = "$($currentDir.path)\JenkinsTestOutput"
+$env:VisualStudio = $env:VisualStudio.Replace("\`"","").Replace("`'","")
+$solutionList = $env:SolutionList.Replace("\`"","").Replace("`'","").Split(",")
+$buildConfig=$env:BuildConfiguration.Replace("\`"","").Replace("`'","")
+$additionalParams=$env:AdditionalMsBuildParameter.Replace("\`"","").Replace("`'","")
 
 $namespace=@{default="http://schemas.microsoft.com/developer/msbuild/2003" }  
 $jsonFilePath = "$($currentDir.path)\aurea-central-jervis\WindowsBuildScripts\toolsconfigs.json"
@@ -20,12 +25,6 @@ Write-Host $VSConfig
 Write-Host "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 #$env:vstestconsole="`"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe`""
 $env:vstestconsole = "$($VSConfig.VSTest)"
-
-
-Write-Host "Solution list: $env:SolutionList"
-$solutionList = $env:SolutionList.Replace("\`"","").Replace("`'","").Split(",")
-$buildConfig=$env:BuildConfiguration.Replace("\`"","").Replace("`'","")
-$additionalParams=$env:AdditionalMsBuildParameter.Replace("\`"","").Replace("`'","")
 
 Write-Host "Build config: $buildConfig"
 Write-Host "AdditionalMsBuildParameter : $additionalParams"

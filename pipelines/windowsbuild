@@ -39,7 +39,7 @@ pipeline {
             }
             steps{
                 cache(maxCacheSize: 500, caches:[
-                    [$class: 'ArbitraryFileCache', excludes: '', includes: '**/*', path: '${HOME}/packages']
+                    [$class: 'ArbitraryFileCache', excludes: '', includes: '**/*', path: 'C:/jk/${JOB_NAME}/b${BUILD_NUMBER}/**/packages']
                 ]) {
                     powershell '.\\aurea-central-jervis\\WindowsBuildScripts\\restore_nuget.ps1'   
                 }

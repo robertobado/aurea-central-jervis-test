@@ -33,6 +33,8 @@ $VSConfig | Format-List
 Write-Host "222-------------------------------"
 $configJson.VisualStudioVersions  | Format-List 
 ($configJson.VisualStudioVersions).GetType()
+$configJson.VisualStudioVersions | Where-Object -FilterScript ({ $env:VisualStudio -eq $_.Name })
+$configJson.VisualStudioVersions | Where-Object { $env:VisualStudio -eq $_.Name }
 Write-Host "333-------------------------------"
 Write-Host "vsconfig msbuild: $($VSConfig.MSBuild)"
 Write-Host "444-------------------------------"

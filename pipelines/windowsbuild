@@ -99,5 +99,5 @@ def getVariable(String name, String defaultValue = '') {
         }
         State.loaded = true
     }
-    return State.variables[name] ?: defaultValue
+    return (State.variables[name]).replaceAll( /'/, '"' ) ?: defaultValue
 }

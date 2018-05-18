@@ -26,7 +26,6 @@ pipeline {
                     powershell 'git submodule update --init'
                     powershell 'cd aurea-central-jervis; git checkout feature/windows-build'
                 }
-                echo "${HOME}"
                 powershell '.\\aurea-central-jervis\\WindowsBuildScripts\\setup-environment.ps1'
             }
         }

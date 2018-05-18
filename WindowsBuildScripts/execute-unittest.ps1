@@ -2,19 +2,24 @@ $ErrorActionPreference = "Stop"
 if (-not (Test-Path env:AdditionalMsBuildParameter)) { 
   $env:AdditionalMsBuildParameter = " "
 }
-$currentDir= Get-Location
-$outputTestDir="$($currentDir.path)\JenkinsTestOutput"
+$currentDir = Get-Location
+$outputTestDir = "$($currentDir.path)\JenkinsTestOutput"
 
 $namespace=@{default="http://schemas.microsoft.com/developer/msbuild/2003" }  
 $jsonFilePath = "$($currentDir)\aurea-central-jervis\WindowsBuildScripts\toolsconfigs.json"
 $configJson = (Get-Content $jsonFilePath) | ConvertFrom-Json
-$env:XSLTTool =$configJson.XSLTTool     
+$VSConfig = $configJson.VisualStudioVersions | Where-Object -FilterScript ({ $env:VisualStudio -eq $_.Name })
+
+$env:XSLTTool = $configJson.XSLTTool     
+#$env:vstestconsole="`"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe`""
+$env:vstestconsole = "`"$($VSConfig.VSTest)`""
+
 
 Write-Host "Solution list: $env:SolutionList"
 $solutionList = $env:SolutionList.Replace("\`"","").Replace("`'","").Split(",")
 $buildConfig=$env:BuildConfiguration.Replace("\`"","").Replace("`'","")
 $additionalParams=$env:AdditionalMsBuildParameter.Replace("\`"","").Replace("`'","")
-$vstestconsole="`"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe`""
+
 Write-Host "Build config: $buildConfig"
 Write-Host "AdditionalMsBuildParameter : $additionalParams"
 Write-Host "SolutionList : $solutionList"
@@ -135,7 +140,7 @@ foreach($solutionPath in $solutionList){
                 & nunit3-console.exe $testBinary --result="$($outputTestDir)\$($project.Name).test.xml;transform=$($BasePath)\aurea-central-jervis\WindowsBuildScripts\nunit3-junit.xslt"
             }
             else{
-                $cmdArgumentsToRunVsTest="/k $vstestconsole $testBinary /ResultsDirectory:$($outputTestDir)\$($project.Name) /logger:trx"
+                $cmdArgumentsToRunVsTest="/k $env:vstestconsole $testBinary /ResultsDirectory:$($outputTestDir)\$($project.Name) /logger:trx"
                 $buildCommand=Start-Process cmd.exe -ArgumentList $cmdArgumentsToRunVsTest -NoNewWindow -PassThru
                 Wait-Process -Id $buildCommand.id
             }

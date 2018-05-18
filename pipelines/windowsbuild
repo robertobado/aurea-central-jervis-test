@@ -25,7 +25,7 @@ pipeline {
                     powershell 'Write Host "${USERID}"'
                     powershell 'Write Host "${env:USERID}"'
                     powershell 'Write Host "${env.USERID}"'
-                    powershell 'git submodule add https://${USERID}:${PASSWORD}@github.com/trilogy-group/aurea-central-jervis.git'
+                    powershell 'git submodule add https://${env:USERID}:${env:PASSWORD}@github.com/trilogy-group/aurea-central-jervis.git'
                     powershell 'git submodule update --init'
                     powershell 'cd aurea-central-jervis; git checkout feature/windows-build'
                 }

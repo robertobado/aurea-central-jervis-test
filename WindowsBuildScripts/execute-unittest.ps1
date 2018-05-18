@@ -7,12 +7,17 @@ $outputTestDir = "$($currentDir.path)\JenkinsTestOutput"
 
 $namespace=@{default="http://schemas.microsoft.com/developer/msbuild/2003" }  
 $jsonFilePath = "$($currentDir.path)\aurea-central-jervis\WindowsBuildScripts\toolsconfigs.json"
-Write-Host "Json filepath: $jsonFilePath "
-(Get-Content $jsonFilePath)
 $configJson = (Get-Content $jsonFilePath) | ConvertFrom-Json
 $VSConfig = $configJson.VisualStudioVersions | Where-Object -FilterScript ({ $env:VisualStudio -eq $_.Name })
 
-$env:XSLTTool = $configJson.XSLTTool     
+Write-Host "Json filepath: $jsonFilePath "
+(Get-Content $jsonFilePath)
+
+$env:XSLTTool = $configJson.XSLTTool
+Write-Host "XSLTTool: $env:XSLTTool"
+Write-Host "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+Write-Host $VSConfig
+Write-Host "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 #$env:vstestconsole="`"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe`""
 $env:vstestconsole = "$($VSConfig.VSTest)"
 

@@ -103,6 +103,7 @@ foreach($solutionPath in $solutionList){
 
   $buildCommand=Start-Process cmd.exe -ArgumentList $cmdArgumentsToRunMsBuild -NoNewWindow -PassThru
   Wait-Process -Id $buildCommand.id
+  Write-Host $buildCommand
   Write-Host "---Build process ended: $($buildCommand.ExitCode)---"
   if($($buildCommand.ExitCode) -gt 0){
     throw "msbuild failed"

@@ -12,21 +12,24 @@ $additionalParams=$env:AdditionalMsBuildParameter.Replace("\`"","").Replace("`'"
 $msbuild_parameters="/t:Clean,Compile,Rebuild /p:Configuration=$buildConfig $additionalParams"
 $currentDir= Get-Location
 $outputDir="$($currentDir.path)\JenkinsBuildOutput"
+$jsonFilePath = "$($currentDir.path)\aurea-central-jervis\WindowsBuildScripts\toolsconfigs.json"
 
 Write-Host "Output Directory: $outputDir"
+Write-Host "Json filepath: $jsonFilePath"
 Write-Host "MSbuid params: $msbuild_parameters"
 Write-Host "Build config: $buildConfig"
 Write-Host "AdditionalMsBuildParameter : $additionalParams"
 Write-Host "SolutionList : $solutionList"
 
-$jsonFilePath = "$($currentDir.path)\aurea-central-jervis\WindowsBuildScripts\toolsconfigs.json"
 $configJson = (Get-Content $jsonFilePath) | ConvertFrom-Json
 $VSConfig=$configJson.VisualStudioVersions | Where-Object -FilterScript ({ $env:VisualStudio -eq $_.Name })
 
 #$msbuild="`"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe`""
 $msbuild=$VSConfig.MSBuild
 Write-Host "+++++++++++++++++++++++++++++++++++++ $msbuild +++++++++++++++++++++++++++++++++++++++++++++++"
-Write-Host "vsconfig msbuild: $VSConfig.MSBuild"
+$configJson | Format-List
+$VSConfig | Format-List 
+Write-Host "vsconfig msbuild: $($VSConfig.MSBuild)"
 
 #####################################Functions################################################################################################
 function Get-OutputhPath {

@@ -40,6 +40,15 @@ Write-Host "-------------------------------"
 $configJson.VisualStudioVersions | Where { $env:VisualStudio -eq $_.Name } | Select -First 1
 Write-Host "-------------------------------" 
 [Linq.Enumerable]::Where($configJson.VisualStudioVersions, [Func[Object,bool]]{ param($item) $item.Name -eq $env:VisualStudio })
+foreach($vsversion in $configJson.VisualStudioVersions){
+  Write-Host "***********************"
+  $vsversion.Name
+  $vsversion
+  if($vsversion.Name -eq $env:VisualStudio ){
+    Write-Host "VS found"
+  }
+  Write-Host "***********************"
+}
 Write-Host "333-------------------------------"
 Write-Host "vsconfig msbuild: $($VSConfig.MSBuild)"
 Write-Host "444-------------------------------"

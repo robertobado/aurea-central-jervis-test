@@ -97,8 +97,12 @@ else {
 }
 
 foreach($solutionPath in $solutionList){
+  $SolutionFile=[System.IO.Path]::Combine("$($currentDir.path)", ("$solutionPath" -replace  "/","`\"))
+  $BaseSolutionDir= [System.IO.Path]::GetDirectoryName("$SolutionFile")
+  $BasePath=$currentDir
+
   Write-Host "---Running msbuild: $msbuild ---"
-  $cmdArgumentsToRunMsBuild="/k `"$msbuild`" $solutionPath $msbuild_parameters /v:$($env:VerbosityLevel)"
+  $cmdArgumentsToRunMsBuild="/k `"$msbuild`" $solutionPath $msbuild_parameters /v:$($env:VerbosityLevel) || echo !errorLevel! > exitcode.txt"
   Write-Host "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"  
   Write-Host "Build Arguments: $cmdArgumentsToRunMsBuild"
   $buildCommand=Start-Process cmd.exe -ArgumentList $cmdArgumentsToRunMsBuild -NoNewWindow -PassThru
@@ -108,6 +112,7 @@ foreach($solutionPath in $solutionList){
   Wait-Process -Id $buildCommand.id
   Write-Host $buildCommand.HasExited
   Write-Host "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"  
+  Get-Content "$BaseSolutionDir\exitcode.txt"
   Write-Host "---Build process ended: $($buildCommand.ExitCode)---"
   if($($buildCommand.ExitCode) -gt 0){
     Write-Host "..................................................................MSBuild failed........................................."
@@ -116,9 +121,7 @@ foreach($solutionPath in $solutionList){
 
 
   ####################Collect artifacts#################################
-  $SolutionFile=[System.IO.Path]::Combine("$($currentDir.path)", ("$solutionPath" -replace  "/","`\"))
-  $BaseSolutionDir= [System.IO.Path]::GetDirectoryName("$SolutionFile")
-  $BasePath=$currentDir
+  
   Write-Host "---- $($currentDir.path)"
   Write-Host "---- $solutionPath"
   Write-Host "---- $SolutionFile"

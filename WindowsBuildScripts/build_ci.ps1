@@ -102,8 +102,11 @@ foreach($solutionPath in $solutionList){
   Write-Host "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"  
   Write-Host "Build Arguments: $cmdArgumentsToRunMsBuild"
   $buildCommand=Start-Process cmd.exe -ArgumentList $cmdArgumentsToRunMsBuild -NoNewWindow -PassThru
-  Wait-Process -Id $buildCommand.id
+  Write-Host "+++ build command+++"
   Write-Host $buildCommand
+  Write-Host "+++ build command+++"
+  Wait-Process -Id $buildCommand.id
+  Write-Host $buildCommand.HasExited
   Write-Host "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"  
   Write-Host "---Build process ended: $($buildCommand.ExitCode)---"
   if($($buildCommand.ExitCode) -gt 0){

@@ -103,7 +103,7 @@ foreach($solutionPath in $solutionList){
 
   Write-Host "---Running msbuild: $msbuild ---"
   $buildCommand=Start-Process -FilePath "$msbuild" -ArgumentList "$solutionPath $msbuild_parameters /v:$($env:VerbosityLevel)" -PassThru -wait -NoNewWindow
-  Wait-Process -Id $buildCommand.Id
+  #Wait-Process -Id $buildCommand.Id
   $buildCommand |Format-List
   Write-Host "---Build process ended: $($buildCommand.ExitCode)---"
   $buildCommand.ExitCode

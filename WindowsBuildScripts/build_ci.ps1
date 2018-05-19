@@ -102,18 +102,24 @@ foreach($solutionPath in $solutionList){
   $BasePath=$currentDir
 
   Write-Host "---Running msbuild: $msbuild ---"
-  $cmdArgumentsToRunMsBuild="/k `"$msbuild`" $solutionPath $msbuild_parameters /v:$($env:VerbosityLevel) || echo !errorLevel! > exitcode.txt"
-  Write-Host "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"  
-  Write-Host "Build Arguments: $cmdArgumentsToRunMsBuild"
-  $buildCommand=Start-Process cmd.exe -ArgumentList $cmdArgumentsToRunMsBuild -NoNewWindow -PassThru
-  Write-Host "+++ build command+++"
-  Write-Host $buildCommand
-  Write-Host "+++ build command+++"
-  Wait-Process -Id $buildCommand.id
-  Write-Host $buildCommand.HasExited
-  Write-Host "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"  
-  Get-Content "$BaseSolutionDir\exitcode.txt"
+  $buildCommand=Start-Process -FilePath "$msbuild" -ArgumentList "$solutionPath $msbuild_parameters /v:$($env:VerbosityLevel)" -PassThru -wait -NoNewWindow
+  Wait-Process -Id $buildCommand.Id
+  $buildCommand |Format-List
   Write-Host "---Build process ended: $($buildCommand.ExitCode)---"
+  $buildCommand.ExitCode
+  # $cmdArgumentsToRunMsBuild="/k `"$msbuild`" $solutionPath $msbuild_parameters /v:$($env:VerbosityLevel) || echo !errorLevel! > exitcode.txt"
+  # Write-Host "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"  
+  # Write-Host "Build Arguments: $cmdArgumentsToRunMsBuild"
+  # $buildCommand=Start-Process cmd.exe -ArgumentList $cmdArgumentsToRunMsBuild -NoNewWindow -PassThru
+  # Write-Host "+++ build command+++"
+  # Write-Host $buildCommand
+  # Write-Host "+++ build command+++"
+  # Wait-Process -Id $buildCommand.id
+  # Write-Host $buildCommand.HasExited
+  # Write-Host "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"  
+  # Get-Content "$BaseSolutionDir\exitcode.txt"
+  # Write-Host "---Build process ended: $($buildCommand.ExitCode)---"
+
   if($($buildCommand.ExitCode) -gt 0){
     Write-Host "..................................................................MSBuild failed........................................."
     exit $buildCommand.ExitCode

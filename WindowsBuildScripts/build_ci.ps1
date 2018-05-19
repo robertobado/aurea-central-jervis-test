@@ -102,8 +102,11 @@ foreach($solutionPath in $solutionList){
   $BasePath=$currentDir
 
   Write-Host "---Running msbuild: $msbuild ---"
+  Get-Date -Format g
   $buildCommand=Start-Process -FilePath "$msbuild" -ArgumentList "$solutionPath $msbuild_parameters /v:$($env:VerbosityLevel) /nodeReuse:false" -PassThru -wait -NoNewWindow
+  Get-Date -Format g
   Write-Host "---MSBuild ExitCode: $($buildCommand.ExitCode)---"
+  Get-Date -Format g
   if($($buildCommand.ExitCode) -gt 0){
     Write-Host "...................MSBuild failed..................."
     exit $buildCommand.ExitCode

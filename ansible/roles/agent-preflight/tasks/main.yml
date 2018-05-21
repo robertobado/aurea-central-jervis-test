@@ -31,7 +31,7 @@
   when: lookup('env','BRANCH_NAME') == ''
 - name: "Selecting target environment"
   set_fact:
-    environment_name: "{{ (branch_environment_map[lookup('env','BRANCH_NAME') | lower] | default(branch_environment_map.feature) )[lookup('env','BRANCH_NAME') | lower] | default('dev') }}"
+    environment_name: "{{ (branch_environment_map[lookup('env','BRANCH_NAME').split('/') | first | lower] | default(branch_environment_map.feature) )[lookup('env','BRANCH_NAME').split('/') | first | lower] | default('dev') }}"
   when: lookup('env','BRANCH_NAME') != ''
 - name: "Evaluating if trigger is Pull Request"
   set_fact:

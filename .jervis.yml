@@ -11,6 +11,27 @@ variables:
   - MY_VAR=xyz
   - DEPLOYMENT_TARGET=docker
 
+notifications:
+# on_success, on_failure modes
+# - always: always send a notification
+# - never: never send a notification
+# possible notifications options - slack, email
+  slack:
+    # Configure the Jenkins integration for each channel
+    # https://my.slack.com/services/new/jenkins-ci
+    rooms:
+      - channel: "<slack_team_domain_name>:<api_token>:<#channel_name>"
+        on_success: always
+        on_failure: always
+      - channel: "<slack_team_domain_name>:<api_token>:<#another_channel_name"
+        on_success: always
+        on_failure: always
+  email:
+    recipients:
+      - to: <list of emails>
+        on_success: always
+        on_failure: always
+
 env:
   global:
     - JERVIS_SERVER_IMAGE_BASE_URL=registry2.swarm.devfactory.com/aurea/central/jervis/server

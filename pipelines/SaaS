@@ -7,6 +7,9 @@ TODO:
 2. Investigate why ANSIBLE_VAULT_PASSWORD is per stage and not global
 */
 
+State.setContext(this)
+notify = new Notify()
+
 pipeline {
     environment {
         DEPLOYMENT_TARGET = getVariable('DEPLOYMENT_TARGET', 'docker')
@@ -197,11 +200,45 @@ pipeline {
                 }
         }
     }
+    post {
+        success {
+            script {
+                notify.send(env, currentBuild, 'success')
+            }
+        }
+        failure {
+            script {
+                notify.send(env, currentBuild, 'failure')
+            }
+        }
+        changed {
+            script {
+                notify.send(env, currentBuild, 'changed')
+            }
+        }
+    }
 }
 
 class State {
     static Boolean loaded = false
     static Map<String, String> variables = [:]
+    static def context = null
+    static def setContext(_context) {
+        context = _context
+    }
+    static def getContext() {
+        return context
+    }
+    // Get parsed .jervis.yml
+    static def getJervisYaml() {
+        def jervisYaml = [:]
+
+        def rawYaml = context.readFile file: '.jervis.yml', encoding: 'UTF-8'
+        def yaml = new Yaml()
+        jervisYaml = yaml.load(rawYaml)
+
+        return jervisYaml
+    }
 }
 
 /**
@@ -215,7 +252,7 @@ class State {
  */
 def getVariable(String name, String defaultValue = '') {
     if (! State.loaded) {
-        def list = getJervisYaml()
+        def list = State.getJervisYaml()
         def vars = list['variables'] ?: [:]
         vars.each{ variable ->
             def (key, value) = variable.tokenize('=')
@@ -226,13 +263,121 @@ def getVariable(String name, String defaultValue = '') {
     return State.variables[name] ?: defaultValue
 }
 
-// Get parsed .jervis.yml
-def Map getJervisYaml() {
-  def jervisYaml = [:]
+class Notify {
+    final String SUCCESS = 'SUCCESS'
+    final String FAILURE = 'FAILURE'
+    final String UNSTABLE = 'UNSTABLE'
 
-  def rawYaml = readFile file: '.jervis.yml', encoding: 'UTF-8'
-  def yaml = new Yaml()
-  jervisYaml = yaml.load(rawYaml)
+    private rules = [:]
+    private parsed = false
 
-  return jervisYaml
+    def Notify() {
+    }
+
+    void parseRules() {
+        if (this.parsed) {
+            return
+        }
+        this.parsed = true
+        def list = State.getJervisYaml()
+        this.rules = list['notifications'] ?: [:]
+    }
+
+    def send(env, currentBuild, postMode) {
+        this.parseRules()
+
+        if (this.rules.size() == 0)
+            return
+
+        if (this.rules['slack']) {
+            this.sendSlackMessage(env, currentBuild, postMode)
+        }
+        if (this.rules['email']) {
+            this.sendEmailMessage(env, currentBuild, postMode)
+        }
+    }
+
+    void sendSlackMessage(env, currentBuild, postMode) {
+        def rules = this.rules['slack']['rooms']
+        def context = State.getContext()
+
+        rules.each { room ->
+            def channel = room['channel']
+            def onSuccess = room['on_success'] ?: 'never'
+            def onFailure = room['on_failure'] ?: 'never'
+            if (this.canSend(postMode, onSuccess, onFailure)) {
+                this.sendSlack(env, currentBuild, channel)
+            }
+        }
+    }
+
+    void sendEmailMessage(env, currentBuild, postMode) {
+        def rules = this.rules['email']['recipients']
+        rules.each { item ->
+            def recipients = item['to']
+            def onSuccess = item['on_success'] ?: 'never'
+            def onFailure = item['on_failure'] ?: 'never'
+            if (this.canSend(postMode, onSuccess, onFailure)) {
+                this.sendMail(env, currentBuild, recipients)
+            } else {
+                State.getContext().println "No email notification is sent: ${postMode}, ${onSuccess}, ${onFailure}"
+            }
+        }
+    }
+
+    boolean canSend(postMode, onSuccess, onFailure) {
+        if (postMode == 'success') {
+            if (onSuccess == 'always') {
+                return true
+            }
+        } else if (postMode == 'failure') {
+            if (onFailure == 'always') {
+                return true
+            }
+        }
+        return false
+    }
+
+    void sendSlack(env, currentBuild, channel) {
+        def context = State.getContext()
+        def result = currentBuild.currentResult
+        def (domain, token, channelName) = channel.tokenize(':')
+        def messageText = ''
+        def color = 'good'
+
+        if (result == SUCCESS) {
+            messageText = "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}) [duration: ${currentBuild.durationString}]"
+        } else if (result == FAILURE) {
+            messageText = "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL}) [duration: ${currentBuild.durationString}]"
+            color = 'danger'
+        } else {
+            return
+        }
+        context.slackSend(teamDomain: domain,
+                token: token,
+                channel: channelName,
+                color: color,
+                message: messageText)
+    }
+
+    void sendMail(env, currentBuild, recipients) {
+        def result = currentBuild.currentResult
+        def bodyText = ''
+        def titleText = ''
+        def context = State.getContext()
+        if (result == SUCCESS) {
+            titleText = "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+            bodyText = """SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]': Check console output at '${env.BUILD_URL}' [duration: ${currentBuild.durationString}]"""
+        } else if (result == FAILURE) {
+            titleText = "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+            bodyText = """FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]': Check console output at '${env.BUILD_URL}' [duration: ${currentBuild.durationString}]"""
+        } else {
+            return
+        }
+        context.mail(to: recipients,
+                mimeType: 'text/html',
+                subject: titleText,
+                body: bodyText
+        )
+    }
 }

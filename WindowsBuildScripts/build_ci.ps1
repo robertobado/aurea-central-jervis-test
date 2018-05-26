@@ -104,6 +104,7 @@ foreach($solutionPath in $solutionList){
   Write-Host "---Running msbuild: $msbuild ---"
   Get-Date -Format g
   $buildCommand=Start-Process -FilePath "$msbuild" -ArgumentList "$solutionPath $msbuild_parameters /v:$($env:VerbosityLevel) /nodeReuse:false" -PassThru -wait -NoNewWindow
+  $buildCommand | Format-List
   Get-Date -Format g
   Write-Host "---MSBuild ExitCode: $($buildCommand.ExitCode)---"
   Get-Date -Format g
@@ -126,11 +127,15 @@ foreach($solutionPath in $solutionList){
   Foreach($project in $projects){
     $IsWebProject=$FALSE
     $projectFolder=Split-Path -Path "$BaseSolutionDir\$($project.File)"
+    if(!(Test-Path "$BaseSolutionDir\$($project.File)")){
+      Write-Host "The project references not point to a project file, must be a logical folder"
+      continue
+    }
     Write-Host "**********************************Project artifact collect: $($project.Name)******************************************"
     Write-Host $projectFolder;
     Write-Host $BasePath;
     Write-Host $BaseSolutionDir;
-    
+
     $outputPath=Get-OutputhPath -BasePath $BaseSolutionDir -Project $project -BuildConfiguration $BuildConfiguration
     Write-Host "Out: $outputPath";
     
@@ -148,7 +153,7 @@ foreach($solutionPath in $solutionList){
         Write-Host "*****************Is a web project,publishing****************"
         New-Item -ItemType "directory" -Path "$($outputDir)\$($project.Name)" -Force 
         $msbuild_websitepublish=" /p:DeployOnBuild=true;DeployTarget=PipelinePreDeployCopyAllFilesToOneFolder;_PackageTempDir=`"$($outputDir)\$($project.Name)`";AutoParameterizationWebConfigConnectionStrings=false"
-        $cmdArgumentsToRunMsBuild="`"$msbuild`" `"$BasePath\$($project.File)`" $msbuild_websitepublish /v:$($env:VerbosityLevel)"
+        $cmdArgumentsToRunMsBuild="`"$msbuild`" `"$BaseSolutionDir\$($project.File)`" $msbuild_websitepublish /v:$($env:VerbosityLevel)"
         Write-Host "command: $cmdArgumentsToRunMsBuild"
         $cmdArgumentsToRunMsBuild | Set-Content "$currentDir\$($project.Name).bat"
         $buildCommand=Start-Process cmd.exe -ArgumentList "/k $currentDir\$($project.Name).bat" -NoNewWindow -PassThru

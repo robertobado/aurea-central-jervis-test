@@ -100,12 +100,12 @@ foreach($solutionPath in $solutionList){
   $SolutionFile=[System.IO.Path]::Combine("$($currentDir.path)", ("$solutionPath" -replace  "/","`\"))
   $BaseSolutionDir= [System.IO.Path]::GetDirectoryName("$SolutionFile")
   $BasePath=$currentDir
-
   Write-Host "---Running msbuild: $msbuild ---"
   Get-Date -Format g
   $buildCommand=Start-Process -FilePath "$msbuild" -ArgumentList "$solutionPath $msbuild_parameters /v:$($env:VerbosityLevel) /nodeReuse:false" -PassThru -NoNewWindow
   $buildCommand | Format-List
   Wait-Process -Id $buildCommand.Id
+  Write-Host "+++++++++++++++++++++++++++++++++process ended++++++++++++++++++++++++++++++++++"
   Get-Date -Format g
   Write-Host "---MSBuild ExitCode: $($buildCommand.ExitCode)---"
   Get-Date -Format g

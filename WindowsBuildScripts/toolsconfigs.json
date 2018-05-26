@@ -6,7 +6,7 @@
 			"VSTest":"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\TestAgent\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe"
 		},
 		{
-			"Name":"VS2015",
+			"Name":"VS2013",
 			"MSBuild":"C:\\Program Files (x86)\\MSBuild\\12.0\\Bin\\MSBuild.exe",
 			"VSTest":"C:\\Program Files (x86)\\Microsoft Visual Studio 12.0\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow\\vstest.console.exe"
 		},

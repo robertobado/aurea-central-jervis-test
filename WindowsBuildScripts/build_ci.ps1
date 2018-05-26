@@ -11,7 +11,7 @@ $env:VerbosityLevel = $env:VerbosityLevel.Replace("\`"","").Replace("`'","")
 $solutionList = $env:SolutionList.Replace("\`"","").Replace("`'","").Split(",")
 $buildConfig=$env:BuildConfiguration.Replace("\`"","").Replace("`'","")
 $additionalParams=$env:AdditionalMsBuildParameter.Replace("\`"","").Replace("`'","")
-$msbuild_parameters="/t:Clean,Compile,Rebuild /p:Configuration=$buildConfig $additionalParams"
+$msbuild_parameters="/t:Clean,Rebuild /p:Configuration=$buildConfig $additionalParams"
 $currentDir= Get-Location
 $outputDir="$($currentDir.path)\JenkinsBuildOutput"
 $jsonFilePath = "$($currentDir.path)\aurea-central-jervis\WindowsBuildScripts\toolsconfigs.json"

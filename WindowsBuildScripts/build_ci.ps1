@@ -102,9 +102,18 @@ foreach($solutionPath in $solutionList){
   $BasePath=$currentDir
   Write-Host "---Running msbuild: $msbuild ---"
   Get-Date -Format g
-  $buildCommand=Start-Process -FilePath "$msbuild" -ArgumentList "$solutionPath $msbuild_parameters /v:$($env:VerbosityLevel) /nodeReuse:false" -PassThru -NoNewWindow
+  $buildCommand=Start-Process -FilePath "$msbuild" -ArgumentList "$solutionPath $msbuild_parameters /v:$($env:VerbosityLevel) /nodeReuse:false" -Wait -PassThru -NoNewWindow
   $buildCommand | Format-List
-  Wait-Process -Id $buildCommand.Id
+  #Wait-Process -Id $buildCommand.Id
+  $ProcessActive = Get-Process -Id $buildCommand.Id -ErrorAction SilentlyContinue
+  if($ProcessActive -eq $null)
+  {
+   Write-host "I am not running"
+  }
+  else
+  {
+   Write-host "I am running"
+  }
   Write-Host "+++++++++++++++++++++++++++++++++process ended++++++++++++++++++++++++++++++++++"
   Get-Date -Format g
   Write-Host "---MSBuild ExitCode: $($buildCommand.ExitCode)---"
@@ -132,11 +141,16 @@ foreach($solutionPath in $solutionList){
       Write-Host "The project references not point to a project file, must be a logical folder"
       continue
     }
+    if((Get-Item "$BaseSolutionDir\$($project.File)") -is [System.IO.DirectoryInfo] ){
+      Write-Host "Is a physical folder container"
+      continue
+    }
+
     Write-Host "**********************************Project artifact collect: $($project.Name)******************************************"
     Write-Host $projectFolder;
     Write-Host $BasePath;
     Write-Host $BaseSolutionDir;
-
+    
     $outputPath=Get-OutputhPath -BasePath $BaseSolutionDir -Project $project -BuildConfiguration $BuildConfiguration
     Write-Host "Out: $outputPath";
     

@@ -122,6 +122,15 @@ foreach($solutionPath in $solutionList){
 
     Foreach($project in $projects){
         $projectFolder=Split-Path -Path "$BasePath\$($project.File)"
+        if(!(Test-Path "$BaseSolutionDir\$($project.File)")){
+          Write-Host "The project references not point to a project file, must be a logical folder"
+        continue
+        }
+        if((Get-Item "$BaseSolutionDir\$($project.File)") -is [System.IO.DirectoryInfo] ){
+          Write-Host "Is a physical folder container"
+          continue
+        }  
+
         Write-Host "**********************************$($project.Name)  unit test******************************************"
         Write-Host $projectFolder;
         Write-Host $BasePath;

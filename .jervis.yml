@@ -20,16 +20,8 @@ notifications:
     # Configure the Jenkins integration for each channel
     # https://my.slack.com/services/new/jenkins-ci
     rooms:
-      - channel: "<slack_team_domain_name>:<api_token>:<#channel_name>"
-        on_success: always
-        on_failure: always
-      - channel: "<slack_team_domain_name>:<api_token>:<#another_channel_name"
-        on_success: always
-        on_failure: always
-  email:
-    recipients:
-      - to: <list of emails>
-        on_success: always
+      - channel: "devfactorydev:VkVhrfzU7Lx7dFZWxJtzC4ku:#jervis_builds"
+        on_success: never
         on_failure: always
 
 env:

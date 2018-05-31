@@ -137,10 +137,10 @@ pipeline {
                 }
         }
         stage('Promote Packages') {
-                /* Promote Packages only runs when branch is release */
+                /* Promote Packages only runs when branch is qa or release */
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'release')
+                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'release')
                     }
                 }
                 environment {

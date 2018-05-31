@@ -10,7 +10,7 @@
   tags: docker-image-build
   retries: 3
 
-- name: "Building docker image {{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.name.split(':') | first }}:{{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].tag_suffix }}"
+- name: "Building docker images with tag {{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].tag_suffix }}"
   docker_image:
      path: "../../{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.path }}"
      name: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.name }}:{{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].tag_suffix }}"

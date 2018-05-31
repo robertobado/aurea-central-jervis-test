@@ -1,4 +1,4 @@
-- name: "Promoting docker image from tag {{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].tag_suffix }} to tag {{ hostvars['localhost'].promote_tag_suffix }}"
+- name: "Promoting docker image from tag {{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].tag_suffix }} to tag {{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].promote_tag_suffix }}"
   docker_image:
      name: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.name }}:{{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].tag_suffix }}"
      repository: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.name.split(':') | first }}:{{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].promote_tag_suffix }}"

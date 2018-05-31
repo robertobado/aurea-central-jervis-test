@@ -8,6 +8,9 @@ TODO:
 */
 
 pipeline {
+    environment {
+        DEPLOYMENT_TARGET = getVariable('DEPLOYMENT_TARGET', 'docker')
+    }
     agent {
         label 'stable && docker && linux && ansible'
     }
@@ -48,7 +51,22 @@ pipeline {
                 }
                 steps {
                   sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                  sh 'export COMPOSE_FORCE_WINDOWS_HOST=1 && ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-service-deploy,ec2-instance,ec2-service-deploy,k8s-service-deploy --vault-password-file=.ansible-vault-password'
+                  sh 'export COMPOSE_FORCE_WINDOWS_HOST=1 && ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-service-deploy,ec2-instance,ec2-service-deploy,vmware-group,k8s-service-deploy --vault-password-file=.ansible-vault-password'
+                }
+        }
+        stage('VMWare Service Deploy') {
+                when {
+                    expression {
+                        return ("$DEPLOYMENT_TARGET" == 'vmware')
+                    }
+                }
+                environment {
+                  ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
+                  COMPOSE_FORCE_WINDOWS_HOST = 1
+                }
+                steps {
+                  sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+                  sh 'export COMPOSE_FORCE_WINDOWS_HOST=1 && ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags vmware-create,vmware-service-deploy --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Health Checks') {

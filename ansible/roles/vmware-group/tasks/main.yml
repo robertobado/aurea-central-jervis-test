@@ -1,0 +1,25 @@
+---
+- name: Create vmware
+  include_tasks: create.yml
+
+- name: "Mapping VMWare instance services"
+  set_fact:
+    dynamic_inventory: "{{ dynamic_inventory | union( [
+                           hostvars[inventory_hostname] |
+                            combine({
+                                      'ansible_winrm_server_cert_validation': 'ignore',
+                                      'ansible_host': vm_facts.instance.ipv4,
+                                      'ansible_connection': 'winrm',
+                                      'ansible_user': winrm_ansible_user,
+                                      'ansible_password': winrm_ansible_password,
+                                      'name': service.name ~ '@'  ~ inventory_hostname,
+                                      'service_name': service.name,
+                                      'groups': group_names + ['vmware-service'],
+                                      'jervis': {}
+                                    })
+                           ])
+                        }}"
+  loop: "{{ services }}"
+  loop_control:
+    loop_var: service
+    label: "{{ service.name }}"

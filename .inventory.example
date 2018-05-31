@@ -3,6 +3,38 @@ all:
     environment_name: dev
     project: app
 
+vmware-group:
+  vars:
+    ansible_connection: local
+    vsphere_host: "vcenter-1.vmware.central.local"
+    vsphere_user: "<AD-login>@devfactory.local"
+    vsphere_datacenter: "SDDC-Datacenter"
+    # if vsphere_password is not specified the env variable VMWARE_PASSWORD is used
+    #vsphere_password: ""
+    vsphere_folder: "Workloads/Jervis"
+    vsphere_resource_pool: "Compute-ResourcePool"
+    # https://www.vmware.com/support/developer/converter-sdk/conv55_apireference/vim.vm.GuestOsDescriptor.GuestOsIdentifier.html
+    vm_guest_id: ubuntu64Guest
+    vm_memory: 2048
+    vm_vcpu: 2
+    vm_template: "Ubuntu16.04-Template"
+    vm_name: "{{ project }}-{{ environment_name }}"
+    vsphere_datastore: vsanDatastore
+    vm_state: poweredon
+    vm_state_change_force: yes
+    vm_disk:
+      - size_gb: 2
+        type: thin
+        datastore: '{{ vsphere_datastore }}'
+      - size_gb: 2
+        type: thin
+        datastore: '{{ vsphere_datastore }}'
+      - size_gb: 16
+        type: thin
+        datastore: '{{ vsphere_datastore }}'
+  hosts:
+    vmware-create-host:
+
 k8s-group:
   vars:
     ansible_connection: local

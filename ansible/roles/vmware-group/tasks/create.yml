@@ -1,0 +1,35 @@
+---
+- name: Create a VM from a template 
+  vmware_guest:
+    hostname: '{{ vsphere_host }}'
+    username: '{{ vsphere_user }}'
+    password: '{{ vsphere_password | default(omit) }}'
+    datacenter: '{{ vsphere_datacenter }}'
+    folder: '{{ vsphere_folder }}'
+    resource_pool: "{{ vsphere_resource_pool }}"
+    validate_certs: no
+    name: '{{ vm_name }}'
+    state: "{{ vm_state | default('poweredon') }}"
+    guest_id: '{{ vm_guest_id }}'
+    annotation: "{{ vm_name }}"
+    disk: "{{ vm_disk | default(omit) }}"
+    networks: "{{ vm_networks | default(omit) }}"
+    force: "{{ vm_state_change_force | default('no') }}"
+    hardware:
+      memory_mb: '{{ vm_memory }}'
+      num_cpus: '{{ vm_vcpu }}'
+      customization: "{{ vm_customization | default(omit) }}"
+    template: '{{ vm_template }}'
+    wait_for_ip_address: "{{ vm_wait_for_ip | default('yes') }}"
+
+- name: Collect info about the VM created
+  vmware_guest_facts:
+      hostname: '{{ vsphere_host }}'
+      username: '{{ vsphere_user }}'
+      password: '{{ vsphere_password | default(omit) }}'
+      datacenter: '{{ vsphere_datacenter }}'
+      folder: '{{ vsphere_folder }}'
+      validate_certs: no
+      name: '{{ vm_name }}'
+  register: vm_facts
+  when: perform_destroy is not defined

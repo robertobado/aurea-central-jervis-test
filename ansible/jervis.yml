@@ -44,6 +44,29 @@
   tags: always
   roles:
     - docker-host
+
+- name: Checking if we are going to destroy vmware...
+  tasks:
+    - name: Set perform_destroy...
+      set_fact:
+        perform_destroy: true
+  hosts:
+    - vmware-group
+  tags:
+    - destroy
+
+- name: Aurea Central Jervis VMWare Deploy
+  strategy: free
+  hosts:
+    - vmware-group
+  tags:
+    - vmware-create
+  vars:
+    - dynamic_inventory: []
+    - jervis: "{{ hostvars['localhost'].jervis }}"
+  gather_facts: no
+  roles:
+    - vmware-group
     
 - name: Aurea Central Jervis Build Inventory
   hosts: 
@@ -71,12 +94,22 @@
   roles:
     - container-update
 
-- name: Aurea Central Jervis Services
+- name: Aurea Central Jervis VMWare deploy
   strategy: free
   hosts: 
+    - vmware-service
+  tags:
+    - vmware-service-deploy
+  gather_facts: no
+  roles:
+    - service-deploy
+
+- name: Aurea Central Jervis Services
+  strategy: free
+  hosts:
     - ec2-service
     - docker-service
-  tags: 
+  tags:
     - ec2-service-deploy
     - docker-service-deploy
   gather_facts: no

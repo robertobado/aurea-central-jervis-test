@@ -37,3 +37,26 @@
   set_fact:
     environment_name: "{{ branch_environment_map[ environment_name ][lookup('env','CHANGE_TARGET') | default(environment_name, true) | lower] }}"
   when: lookup('env','IS_PR_BUILD') != '' and lookup('env','IS_PR_BUILD') | bool
+- name: "Fetching version tags..."
+  find: 
+    paths: "{{ lookup('env', 'WORKSPACE') }}/.git/refs/tags"
+    contains: "{{ lookup('env', 'GIT_COMMIT') }}"
+  register: tag_ref_find_list
+  delegate_to: localhost
+  delegate_facts: true
+- name: "Converting version"
+  set_fact:
+    version_tag: "{{ (tag_ref_find_list.files | last).path.split('/') | last }}"  
+    tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME') ].tag_suffix }}"
+    promote_tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME') ].promote_tag_suffix }}"
+  delegate_to: localhost
+  delegate_facts: true
+  when: lookup('env','BRANCH_NAME') != '' and tag_ref_find_list.files
+- name: "Defaulting version to git commit"
+  set_fact:
+    version_tag: "{{ lookup('env','GIT_COMMIT') }}"  
+    tag_suffix: "-UNSTABLE"
+    promote_tag_suffix: "-DEVEL"
+  delegate_to: localhost
+  delegate_facts: true
+  when: not tag_ref_find_list.files

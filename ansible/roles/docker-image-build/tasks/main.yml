@@ -10,11 +10,12 @@
   tags: docker-image-build
   retries: 3
 
-- name: Building docker images
+- name: "Building docker image {{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.name.split(':') | first }}:{{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].tag_suffix }}"
   docker_image:
      path: "../../{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.path }}"
      name: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.name }}:{{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].tag_suffix }}"
      repository: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.name.split(':') | first }}:{{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].tag_suffix }}"
+     force: yes
      push: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.push | default('yes')}}"
      dockerfile: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.dockerfile | default(omit)}}"
      docker_host: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.docker_host | default('tcp://dlb1.aureacentral.com:2375')}}"

@@ -1,6 +1,8 @@
 #!groovy
 import org.yaml.snakeyaml.Yaml
 
+agentLabel=getVariable('AgentLabel', 'stable && windows && vs2017 && ec2')
+
 pipeline {
     agent none
     options { skipDefaultCheckout() }
@@ -16,7 +18,7 @@ pipeline {
         stage('Setup environment'){
             agent {
                 node{
-                    label 'stable && windows && vs2017 && ec2'
+                    label agentLabel
                     customWorkspace "C:/jk/${JOB_NAME}/b${BUILD_NUMBER}"
                 }
             }
@@ -33,7 +35,7 @@ pipeline {
         stage('Nuget Restore') {
             agent {
                 node{
-                    label 'stable && windows && vs2017 && ec2'
+                    label agentLabel
                     customWorkspace "C:/jk/${JOB_NAME}/b${BUILD_NUMBER}"
                 }
             }
@@ -44,7 +46,7 @@ pipeline {
         stage('Build .Net Solution') {
             agent {
                 node{
-                    label 'stable && windows && vs2017 && ec2'
+                    label agentLabel
                     customWorkspace "C:/jk/${JOB_NAME}/b${BUILD_NUMBER}"
                 }
             }
@@ -59,7 +61,7 @@ pipeline {
         stage('Execute unit tests') {
             agent {
                 node{
-                    label 'stable && windows && vs2017 && ec2'
+                    label agentLabel
                     customWorkspace "C:/jk/${JOB_NAME}/b${BUILD_NUMBER}"
                 }
             }

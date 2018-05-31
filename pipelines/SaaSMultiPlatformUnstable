@@ -39,7 +39,7 @@ pipeline {
                 steps {
                   unstash 'artifacts'
                   sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                  sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-image-build --vault-password-file=.ansible-vault-password'
+                  sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-image-build --vault-password-file=.ansible-vault-password -vvvvvvvvvv'
                 }
         }
         stage('Service Deploy') {
@@ -149,7 +149,7 @@ pipeline {
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags promote-packages --vault-password-file=.ansible-vault-password'
+                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags promote-packages --vault-password-file=.ansible-vault-password -vvvvvvvvvv'
                 }
         }
         stage('Send Notification') {

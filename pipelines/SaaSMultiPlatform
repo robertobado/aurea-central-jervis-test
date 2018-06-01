@@ -62,11 +62,14 @@ pipeline {
                 }
                 environment {
                   ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
+                  VMWARE_USER = credentials('vsphere-user-name')
+                  VMWARE_PASSWORD = credentials('vsphere-user-password')
                   COMPOSE_FORCE_WINDOWS_HOST = 1
+                  OBJC_DISABLE_INITIALIZE_FORK_SAFETY="YES"
                 }
                 steps {
                   sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                  sh 'export COMPOSE_FORCE_WINDOWS_HOST=1 && ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags vmware-create,vmware-service-deploy --vault-password-file=.ansible-vault-password'
+                  sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags vmware-create,vmware-service-deploy --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Health Checks') {

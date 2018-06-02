@@ -38,20 +38,22 @@
     environment_name: "{{ branch_environment_map[ environment_name ][lookup('env','CHANGE_TARGET') | default(environment_name, true) | lower] }}"
   when: lookup('env','IS_PR_BUILD') != '' and lookup('env','IS_PR_BUILD') | bool
 - name: "Fetching version tags..."
-  find: 
-    paths: "{{ lookup('env', 'WORKSPACE') }}/.git/refs/tags"
-    contains: "{{ lookup('env', 'GIT_COMMIT') }}"
-  register: tag_ref_find_list
+  shell: git describe --tags --abbrev=0
+  args:
+    chdir: "{{ lookup('env', 'WORKSPACE') }}"
+  register: version_tag_describe_result
+  failed_when: version_tag_describe_result.rc != 0 and 'No names found' not in version_tag_describe_result.stderr
   delegate_to: localhost
   delegate_facts: true
+  check_mode: false
 - name: "Converting version"
   set_fact:
-    version_tag: "{{ (tag_ref_find_list.files | last).path.split('/') | last }}"  
+    version_tag: "{{ version_tag_describe_result.stdout }}"  
     tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME') ].tag_suffix }}"
     promote_tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME') ].promote_tag_suffix }}"
   delegate_to: localhost
   delegate_facts: true
-  when: lookup('env','BRANCH_NAME') != '' and tag_ref_find_list.files
+  when: lookup('env','BRANCH_NAME') != '' and version_tag_describe_result.rc == 0
 - name: "Defaulting version to git commit"
   set_fact:
     version_tag: "{{ lookup('env','GIT_COMMIT') }}"  
@@ -59,4 +61,4 @@
     promote_tag_suffix: "-DEVEL"
   delegate_to: localhost
   delegate_facts: true
-  when: not tag_ref_find_list.files
+  when: lookup('env','BRANCH_NAME') == '' or (version_tag_describe_result.rc != 0 and 'No names found' not in version_tag_describe_result.stderr)

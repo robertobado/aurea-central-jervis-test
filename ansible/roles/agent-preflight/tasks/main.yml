@@ -49,8 +49,8 @@
 - name: "Converting version"
   set_fact:
     version_tag: "{{ version_tag_describe_result.stdout }}"  
-    tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME') ].tag_suffix }}"
-    promote_tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME') ].promote_tag_suffix | default(omit) }}"
+    tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME').split('/') | first | lower ].tag_suffix }}"
+    promote_tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME').split('/') | first | lower ].promote_tag_suffix | default(omit) }}"
   delegate_to: localhost
   delegate_facts: true
   when: lookup('env','BRANCH_NAME') != '' and version_tag_describe_result.rc == 0

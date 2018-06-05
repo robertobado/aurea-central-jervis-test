@@ -2,17 +2,44 @@
 
 ## How to prepare
 
-1. Copy contents of this dir into your local host
-2. Install application: `python setup.py install`
-3. You can remove contents of this dir from your localhost
-4. Go to https://github.com/settings/tokens
-5. Generate token with at least these permissions:
+1. Go to https://github.com/settings/tokens
+2. Generate token with at least these permissions:
     * repo
     * admin:repo_hook
     * read:org
     * read:user
-6. Save token somewhere
+3. Save token somewhere
 
+## How to install
+
+### Installation from binaries
+
+**These instructions can be shared for product/saasops teams** (URL available for everyone)
+
+1. Open this directory https://drive.google.com/open?id=1-Cmm-yZ3OnwAg1aYxZwzaneTWrvVxNMG
+2. Download `.egg` OR `.whl` file matched to your python version (`python --version`)
+3. Install package
+
+*For `.egg` you need `easy_install` preinstalled (`pip install easy_install`)*
+
+```bash
+$ easy_install aurea_github_jervis_webhooks-0.1.0-py2.7.egg
+OR
+$ easy_install aurea_github_jervis_webhooks-0.1.0-py3.6.egg
+```
+
+*For `.whl` you need `wheel` preinstalled (`pip install wheel`)*
+
+```bash
+$ pip install aurea_github_jervis_webhooks-0.1.0-py2-none-any.whl
+OR
+$ pip install aurea_github_jervis_webhooks-0.1.0-py3-none-any.whl
+```
+
+### Installation from sources
+
+1. Copy contents of this dir into your local host
+2. Install application: `python setup.py install`
 
 ## How to run
 
@@ -22,7 +49,7 @@
 
 Script have inline documentation:
 
-```
+```bash
 $ aurea-jervis-webhooks -h
 
 Executing aurea-jervis-webhooks version 0.1.0.
@@ -53,7 +80,7 @@ optional arguments:
 
 ### How to add webhook
 
-```
+```bash
 aurea-jervis-webhooks \
     -t ${GIT_TOKEN} \
     -j http://jervis-public.aureacentral.com/github-webhook/ \
@@ -65,7 +92,7 @@ aurea-jervis-webhooks \
 
 Just add `-d` flag, and no need to provide `secret` in this case
 
-```
+```bash
 aurea-jervis-webhooks \
     -t ${GIT_TOKEN} \
     -j http://jervis-public.aureacentral.com/github-webhook/ \

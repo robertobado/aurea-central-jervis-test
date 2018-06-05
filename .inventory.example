@@ -62,6 +62,7 @@ k8s-group:
     k8s-deployment-group:
     k8s-service-group:
     k8s-ingress-group:
+    k8s-object-group:
 
 k8s-deployment-group:
   hosts:
@@ -104,3 +105,20 @@ k8s-ingress-group:
                     backend:
                       serviceName: "{{ environment_name }}-{{ project }}-service1"
                       servicePort: 80
+
+# deploy all other k8s objects (configmaps, cronjobs, statefulsets, etc.)
+k8s-object-group:
+  hosts:
+    k8s-object-host:
+      definitions:
+        object1:
+          # full yml definition
+          definition:
+            apiVersion: v1
+            kind: ConfigMap
+            metadata:
+              name: configmap_name1
+            data:
+              special-key: |
+                var1=10
+                var2=20

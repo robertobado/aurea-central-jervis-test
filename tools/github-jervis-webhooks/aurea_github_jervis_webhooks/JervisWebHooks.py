@@ -2,7 +2,7 @@
 
 """aurea-github-jervis-webhooks.JervisWebHooks: provides entry point main()."""
 
-import sys
+# import sys
 import argparse
 import os
 from github import Github
@@ -81,7 +81,7 @@ class JervisWebHooks:
     @staticmethod
     def main():
         print("Executing aurea-github-jervis-webhooks version %s." % JervisWebHooks.__version__)
-        print("List of arguments")#: %s" % sys.argv[1:])
+        print("List of arguments")  #: %s" % sys.argv[1:])
         parser = argparse.ArgumentParser(
             description="Automatic provision webhooks in GitHub for Jervis."
         )

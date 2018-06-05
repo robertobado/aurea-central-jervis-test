@@ -3,14 +3,15 @@
 ## How to prepare
 
 1. Copy contents of this dir into your local host
-2. Install dependency: `pip install pyGithub`
-3. Go to https://github.com/settings/tokens
-4. Generate token with at least these permissions:
+2. Install application: `python setup.py install`
+3. You can remove contents of this dir from your localhost
+4. Go to https://github.com/settings/tokens
+5. Generate token with at least these permissions:
     * repo
     * admin:repo_hook
     * read:org
     * read:user
-5. Save token somewhere
+6. Save token somewhere
 
 
 ## How to run
@@ -22,7 +23,7 @@
 Script have inline documentation:
 
 ```
-$ python aurea-github-jervis-webhooks.py -h
+$ aurea-jervis-webhooks -h
 
 Executing aurea-github-jervis-webhooks version 0.1.0.
 List of arguments
@@ -53,10 +54,10 @@ optional arguments:
 ### How to add webhook
 
 ```
-python aurea-github-jervis-webhooks.py \
+aurea-jervis-webhooks \
     -t ${GIT_TOKEN} \
     -j http://jervis-public.aureacentral.com/github-webhook/ \
-    -s "some_secret" \
+    -s ${JERVIS_SECRET} \
     -r mobilogy-jsteam-group-cellephones,mobilogy-arya-services-qawala
 ```
 
@@ -65,7 +66,7 @@ python aurea-github-jervis-webhooks.py \
 Just add `-d` flag, and no need to provide `secret` in this case
 
 ```
-python aurea-github-jervis-webhooks.py \
+aurea-jervis-webhooks \
     -t ${GIT_TOKEN} \
     -j http://jervis-public.aureacentral.com/github-webhook/ \
     -r mobilogy-jsteam-group-cellephones,mobilogy-arya-services-qawala

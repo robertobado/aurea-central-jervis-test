@@ -25,9 +25,9 @@ Script have inline documentation:
 ```
 $ aurea-jervis-webhooks -h
 
-Executing aurea-github-jervis-webhooks version 0.1.0.
+Executing aurea-jervis-webhooks version 0.1.0.
 List of arguments
-usage: aurea-github-jervis-webhooks.py [-h] -t TOKEN [-o ORGANIZATION]
+usage: aurea-jervis-webhooks [-h] -t TOKEN [-o ORGANIZATION]
                                        [-j JENKINS] [-s SECRET] [-d] [-f FILE]
                                        [-r REPOSITORIES]
 

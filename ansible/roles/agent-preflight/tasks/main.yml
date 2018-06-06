@@ -38,27 +38,17 @@
     environment_name: "{{ branch_environment_map[ environment_name ][lookup('env','CHANGE_TARGET') | default(environment_name, true) | lower] }}"
   when: lookup('env','IS_PR_BUILD') != '' and lookup('env','IS_PR_BUILD') | bool
 - name: "Fetching version tags..."
-  shell: git describe --tags --abbrev=0
+  shell: 'git describe --tags --abbrev=0 || echo $GIT_COMMIT'
   args:
     chdir: "{{ lookup('env', 'WORKSPACE') }}"
   register: version_tag_describe_result
-  failed_when: version_tag_describe_result.rc != 0 and 'No names found' not in version_tag_describe_result.stderr
   delegate_to: localhost
   delegate_facts: true
   check_mode: false
 - name: "Converting version"
   set_fact:
     version_tag: "{{ version_tag_describe_result.stdout }}"  
-    tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME').split('/') | first | lower ].tag_suffix }}"
-    promote_tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME').split('/') | first | lower ].promote_tag_suffix | default(omit) }}"
+    tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME').split('/') | first | lower ].tag_suffix | default('-UNSTABLE') }}"
+    promote_tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME').split('/') | first | lower ].promote_tag_suffix | default('-DEVEL') }}"
   delegate_to: localhost
   delegate_facts: true
-  when: lookup('env','BRANCH_NAME') != '' and version_tag_describe_result.rc == 0
-- name: "Defaulting version to git commit"
-  set_fact:
-    version_tag: "{{ lookup('env','GIT_COMMIT') }}"  
-    tag_suffix: "-UNSTABLE"
-    promote_tag_suffix: "-DEVEL"
-  delegate_to: localhost
-  delegate_facts: true
-  when: lookup('env','BRANCH_NAME') == '' or (version_tag_describe_result.rc != 0 and 'No names found' not in version_tag_describe_result.stderr)

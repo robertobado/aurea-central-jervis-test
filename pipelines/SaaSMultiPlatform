@@ -41,7 +41,7 @@ pipeline {
                 steps {
                   unstash 'artifacts'
                   sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                  sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-image-build --vault-password-file=.ansible-vault-password'
+                  sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i ${INVENTORY_NAME} --tags docker-image-build --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Service Deploy') {
@@ -51,7 +51,7 @@ pipeline {
                 }
                 steps {
                   sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                  sh 'export COMPOSE_FORCE_WINDOWS_HOST=1 && ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags docker-service-deploy,ec2-instance,ec2-service-deploy,vmware-group,k8s-service-deploy --vault-password-file=.ansible-vault-password'
+                  sh 'export COMPOSE_FORCE_WINDOWS_HOST=1 && ansible-playbook aurea-central-jervis/ansible/jervis.yml -i ${INVENTORY_NAME} --tags docker-service-deploy,ec2-instance,ec2-service-deploy,vmware-group,k8s-service-deploy --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('VMWare Service Deploy') {
@@ -69,7 +69,7 @@ pipeline {
                 }
                 steps {
                   sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                  sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags vmware-create,vmware-service-deploy --vault-password-file=.ansible-vault-password'
+                  sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i ${INVENTORY_NAME} --tags vmware-create,vmware-service-deploy --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Health Checks') {
@@ -79,7 +79,7 @@ pipeline {
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags health-check --vault-password-file=.ansible-vault-password'
+                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i ${INVENTORY_NAME} --tags health-check --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Smoke Tests') {
@@ -94,7 +94,7 @@ pipeline {
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags smoke-test --vault-password-file=.ansible-vault-password'
+                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i ${INVENTORY_NAME} --tags smoke-test --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Regression Tests') {
@@ -109,7 +109,7 @@ pipeline {
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags regression-test --vault-password-file=.ansible-vault-password'
+                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i ${INVENTORY_NAME} --tags regression-test --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Performance Tests') {
@@ -124,7 +124,7 @@ pipeline {
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags performance-test --vault-password-file=.ansible-vault-password'
+                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i ${INVENTORY_NAME} --tags performance-test --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Load Tests') {
@@ -139,7 +139,7 @@ pipeline {
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags load-test --vault-password-file=.ansible-vault-password'
+                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i ${INVENTORY_NAME} --tags load-test --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Security Tests') {
@@ -154,7 +154,7 @@ pipeline {
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags security-test --vault-password-file=.ansible-vault-password'
+                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i ${INVENTORY_NAME} --tags security-test --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Promote Packages') {
@@ -169,7 +169,7 @@ pipeline {
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags promote-packages --vault-password-file=.ansible-vault-password'
+                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i ${INVENTORY_NAME} --tags promote-packages --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Send Notification') {
@@ -179,7 +179,7 @@ pipeline {
                 }
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i .inventory --tags send-notification --vault-password-file=.ansible-vault-password'
+                    sh 'ansible-playbook aurea-central-jervis/ansible/jervis.yml -i ${INVENTORY_NAME} --tags send-notification --vault-password-file=.ansible-vault-password'
                 }
         }
     }

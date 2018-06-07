@@ -17,8 +17,8 @@
 - name: Pausing local deployments
   pause:
     seconds: 1
-    prompt: "Ansible detected you are not running in a CICD environment like Jenkins. While it's possible to run Jervis Ansible outside CICD, 
-    you must mimic it's environment and provide general use environment variables: GIT_COMMIT CHANGE_TARGE BRANCH_NAME, IS_PR_BUILD. 
+    prompt: "Ansible detected you are not running in a CICD environment like Jenkins. While it's possible to run Jervis Ansible outside CICD,
+    you must mimic it's environment and provide general use environment variables: GIT_COMMIT CHANGE_TARGE BRANCH_NAME, IS_PR_BUILD.
     We will default to dev and random values and resume your deploy in a couple of seconds. To dismiss this message, setup your environment properly | comment"
   when: lookup('env','BRANCH_NAME') == ''
   register: agent_check_result
@@ -38,17 +38,29 @@
     environment_name: "{{ branch_environment_map[ environment_name ][lookup('env','CHANGE_TARGET') | default(environment_name, true) | lower] }}"
   when: lookup('env','IS_PR_BUILD') != '' and lookup('env','IS_PR_BUILD') | bool
 - name: "Fetching version tags..."
-  shell: 'git describe --tags --abbrev=0 || echo $GIT_COMMIT'
+  shell: 'git describe --tags --abbrev=0 || echo $GIT_COMMIT | cut -c1-7'
   args:
     chdir: "{{ lookup('env', 'WORKSPACE') }}"
   register: version_tag_describe_result
   delegate_to: localhost
   delegate_facts: true
   check_mode: false
-- name: "Converting version"
+- name: "Fetching git hash commit..."
+  shell: 'echo $GIT_COMMIT | cut -c1-7'
+  args:
+    chdir: "{{ lookup('env', 'WORKSPACE') }}"
+  register: version_git_hash_result
+  delegate_to: localhost
+  delegate_facts: true
+  check_mode: false
+- name: "Get Suffix..."
   set_fact:
-    version_tag: "{{ version_tag_describe_result.stdout }}"  
     tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME').split('/') | first | lower ].tag_suffix | default('-UNSTABLE') }}"
     promote_tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME').split('/') | first | lower ].promote_tag_suffix | default('-DEVEL') }}"
+  delegate_to: localhost
+  delegate_facts: true
+- name: "Converting version"
+  set_fact:
+    version_tag: "{{ version_tag_describe_result.stdout if (hostvars['localhost'].tag_suffix != '-DEVEL') else version_git_hash_result.stdout }}"
   delegate_to: localhost
   delegate_facts: true

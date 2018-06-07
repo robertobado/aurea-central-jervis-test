@@ -1,2 +1,0 @@
-- name: "Promote Packages"
-  shell: "echo Promote Packages"

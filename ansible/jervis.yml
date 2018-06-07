@@ -5,17 +5,26 @@
       feature: 
         feature: dev
         develop: dev
+        tag_suffix: -DEVEL
+        promote_tag_suffix: -CI
       develop:
         develop: regression
         qa: regression
+        tag_suffix: -CI
+        promote_tag_suffix: -SNAPSHOT
       qa:
         qa: qa
         release: qa
+        tag_suffix: -SNAPSHOT
+        promote_tag_suffix: -CANDIDATE
       release:
         release: staging
         master: staging
+        tag_suffix: -CANDIDATE
+        promote_tag_suffix: -RELEASE
       master: 
         master: prod
+        tag_suffix: -RELEASE
   hosts: 
     - all
   tags: always
@@ -198,7 +207,7 @@
     - jervis: "{{ hostvars['localhost'].jervis }}"
   gather_facts: no
   roles:
-    - promote-packages    
+    - docker-image-promote
 
 - name: Aurea Central Jervis Send Notification
   strategy: free

@@ -4,6 +4,10 @@
     container_image_tag: "{{ lookup('env','GIT_COMMIT') }}"
   when: container_image_tag is not defined
 
+- name: Run k8s object deployment tasks
+  include_tasks: object.yml
+  when: inventory_hostname == 'k8s-object-host'
+
 - name: Run k8s services tasks
   include_tasks: service.yml
   when: inventory_hostname == 'k8s-service-host'

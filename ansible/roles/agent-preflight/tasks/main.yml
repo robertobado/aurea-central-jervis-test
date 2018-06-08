@@ -45,29 +45,16 @@
   delegate_to: localhost
   delegate_facts: true
   check_mode: false
-- name: "Fetching git hash commit..."
-  shell: 'echo $GIT_COMMIT | cut -c1-7'
-  args:
-    chdir: "{{ lookup('env', 'WORKSPACE') }}"
-  register: version_git_hash_result
-  delegate_to: localhost
-  delegate_facts: true
-  check_mode: false
 - name: "Get Suffix..."
   set_fact:
+    version_tag: "{{ version_tag_describe_result.stdout }}"
     tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME').split('/') | first | lower ].tag_suffix | default('-UNSTABLE') }}"
     promote_tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME').split('/') | first | lower ].promote_tag_suffix | default('-DEVEL') }}"
   delegate_to: localhost
   delegate_facts: true
-- name: "Converting version (from tag)"
-  when: "{{ hostvars['localhost'].tag_suffix != '-DEVEL' }}"
-  set_fact:
-    version_tag: "{{ version_tag_describe_result.stdout }}"
-  delegate_to: localhost
-  delegate_facts: true
 - name: "Converting version (from git hash)"
-  when: "{{ hostvars['localhost'].tag_suffix == '-DEVEL' }}"
+  when: "{{ hostvars['localhost'].environment_name == 'dev' }}"
   set_fact:
-    version_tag: "{{ version_git_hash_result.stdout }}"
+    version_tag: "{{ lookup('env', 'GIT_COMMIT')[:7] }}"
   delegate_to: localhost
   delegate_facts: true

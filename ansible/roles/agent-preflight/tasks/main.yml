@@ -53,7 +53,7 @@
   delegate_to: localhost
   delegate_facts: true
 - name: "Using git hash for development)"
-  when: "{{ hostvars['localhost'].environment_name == 'dev' }}"
+  when: environment_name == 'dev'
   set_fact:
     version_tag: "{{ lookup('env', 'GIT_COMMIT')[:7] }}"
   delegate_to: localhost

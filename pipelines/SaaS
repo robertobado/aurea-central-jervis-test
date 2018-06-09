@@ -14,6 +14,7 @@ pipeline {
     environment {
         DEPLOYMENT_TARGET = getVariable('DEPLOYMENT_TARGET', 'docker')
         JERVIS_PLAYBOOK = 'aurea-central-jervis/ansible/jervis.yml'
+        CENTRAL_JERVIS_BRANCH = getVariable('CENTRAL_JERVIS_BRANCH', 'master')
     }
     agent {
         label 'stable && docker && linux && ansible'
@@ -29,6 +30,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'github-user-and-token', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
                     sh 'git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git'
                     sh 'git submodule update --init'
+                    sh 'cd aurea-central-jervis && git checkout $CENTRAL_JERVIS_BRANCH'
                 }
             }
         }

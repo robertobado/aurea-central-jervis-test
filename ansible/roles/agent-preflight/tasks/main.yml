@@ -3,6 +3,8 @@
     file: "{{ possible_jervis_filename }}"
     name: jervis
   with_first_found:
+    - "{{ lookup('env', 'WORKSPACE') }}/{{ lookup('env', 'JERVIS_YAML') }}"
+    - "{{ lookup('env', 'JERVIS_YAML') }}"
     - "{{ lookup('env', 'WORKSPACE') }}/.jervis.yml"
     - "{{ lookup('env', 'WORKSPACE') }}/.jervis.yaml"
     - "{{ lookup('env', 'WORKSPACE') }}/.travis.yml"

@@ -7,6 +7,8 @@
         develop: dev
         tag_suffix: -DEVEL
         promote_tag_suffix: -CI
+        # for debug purpose
+        feature-develop: dev
       develop:
         develop: regression
         qa: regression
@@ -25,6 +27,25 @@
       master: 
         master: prod
         tag_suffix: -RELEASE
+      # for debug purpose
+      feature-develop:
+        feature-develop: regression
+        feature-qa: regression
+        tag_suffix: -CI
+        promote_tag_suffix: -SNAPSHOT-DEVEL
+      feature-qa:
+        feature-qa: qa
+        feature-release: qa
+        tag_suffix: -SNAPSHOT-DEVEL
+        promote_tag_suffix: -CANDIDATE-DEVEL
+      feature-release:
+        feature-release: staging
+        feature-master: staging
+        tag_suffix: -CANDIDATE-DEVEL
+        promote_tag_suffix: -RELEASE-DEVEL
+      feature-master: 
+        feature-master: staging
+        tag_suffix: -RELEASE-DEVEL
   hosts: 
     - all
   tags: always

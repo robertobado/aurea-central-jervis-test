@@ -33,6 +33,7 @@ pipeline {
 //                    sh 'git submodule update --init'
                     sh "git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git;git submodule update --init;cd aurea-central-jervis && git checkout $CENTRAL_JERVIS_BRANCH"
                 }
+                setJervisYaml("$JERVIS_YAML")
             }
         }
         stage('Custom Step') {
@@ -232,6 +233,7 @@ pipeline {
 class State {
     static Boolean loaded = false
     static Map<String, String> variables = [:]
+    static String jervisYamlFileName
     static def context = null
     static def setContext(_context) {
         context = _context
@@ -239,17 +241,23 @@ class State {
     static def getContext() {
         return context
     }
+    static def setJervisYaml(jervisYaml) {
+        jervisYamlFileName = jervisYaml
+    }
     // Get parsed .jervis.yml
     static def getJervisYaml() {
         def jervisYaml = [:]
-        String jervisYamlFileName = "$JERVIS_YAML"
-        println("jervisYamlFileName=$jervisYamlFileName")
+        State.getContext().println("jervisYamlFileName=$jervisYamlFileName")
         def rawYaml = context.readFile file: jervisYamlFileName, encoding: 'UTF-8'
         def yaml = new Yaml()
         jervisYaml = yaml.load(rawYaml)
 
         return jervisYaml
     }
+}
+
+def setJervisYaml(String jervisYaml) {
+    State.setJervisYaml(jervisYaml)
 }
 
 /**

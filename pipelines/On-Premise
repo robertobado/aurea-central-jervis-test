@@ -34,6 +34,11 @@ pipeline {
                 }
             }
         }
+        stage('Custom Step') {
+            steps {
+                sh 'echo Jervis Yaml file = "$JERVIS_YAML" '
+            }
+        }
         stage('Build Docker Image') {
             /* Do not build when branch is master or release */
             when {

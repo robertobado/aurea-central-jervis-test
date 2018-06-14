@@ -15,6 +15,7 @@ pipeline {
         DEPLOYMENT_TARGET = getVariable('DEPLOYMENT_TARGET', 'docker')
         JERVIS_PLAYBOOK = 'aurea-central-jervis/ansible/jervis.yml'
         CENTRAL_JERVIS_BRANCH = getVariable('CENTRAL_JERVIS_BRANCH', 'master')
+        JERVIS_YML = '.jervis.yml'
     }
     agent {
         label 'stable && docker && linux && ansible'
@@ -242,7 +243,7 @@ class State {
     static def getJervisYaml() {
         def jervisYaml = [:]
 
-        def rawYaml = context.readFile file: '.jervis.yml', encoding: 'UTF-8'
+        def rawYaml = context.readFile file: "$JERVIS_YAML", encoding: 'UTF-8'
         def yaml = new Yaml()
         jervisYaml = yaml.load(rawYaml)
 

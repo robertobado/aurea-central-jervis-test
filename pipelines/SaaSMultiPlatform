@@ -52,7 +52,7 @@ pipeline {
                 }
                 steps {
                   sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                  sh 'export COMPOSE_FORCE_WINDOWS_HOST=1 && ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags docker-service-deploy,ec2-instance,ec2-service-deploy,vmware-group,k8s-service-deploy --vault-password-file=.ansible-vault-password'
+                  sh 'export COMPOSE_FORCE_WINDOWS_HOST=1 && ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags docker-service-deploy,ec2-instance,ec2-service-deploy,vmware-group,k8s-deploy --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('VMWare Service Deploy') {

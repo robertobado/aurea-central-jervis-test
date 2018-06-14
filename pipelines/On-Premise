@@ -246,7 +246,6 @@ pipeline {
 class State {
     static Boolean loaded = false
     static Map<String, String> variables = [:]
-    static Map<String, Object> yaml =
     static def context = null
     static def setContext(_context) {
         context = _context

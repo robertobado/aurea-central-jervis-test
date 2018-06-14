@@ -17,7 +17,7 @@ spec:
 #      restartPolicy: "{{ restart_policy }}" 
       nodeSelector:
         kubernetes.io/hostname: "{{ k8s_hostname if environment_name == 'prod' else 'w1' | default(omit) }}"
-        central-stage: "{{ 'prod' if environment_name == 'prod' else 'staging' }}"
+        central-stage: "{{ 'prod' if environment_name == 'prod' else null | default(omit) }}"
       tolerations:
       - effect: "{{ 'NoSchedule' if environment_name != 'prod' else null | default(omit) }}"
         key: "{{ 'immutable' if environment_name != 'prod' else null | default(omit) }}"

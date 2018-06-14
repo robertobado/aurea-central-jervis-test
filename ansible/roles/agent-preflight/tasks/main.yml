@@ -1,18 +1,7 @@
 - name: "Searching Jervis Configuration"
   include_vars:
-    file: "{{ possible_jervis_filename }}"
+    file: "{{ lookup('env', 'WORKSPACE') }}/{{ lookup('env', 'JERVIS_YAML') }}"
     name: jervis
-  with_first_found:
-    - "{{ lookup('env', 'WORKSPACE') }}/.jervis.yml"
-    - "{{ lookup('env', 'WORKSPACE') }}/.jervis.yaml"
-    - "{{ lookup('env', 'WORKSPACE') }}/.travis.yml"
-    - "{{ lookup('env', 'WORKSPACE') }}/.travis.yaml"
-    - ".jervis.yml"
-    - ".jervis.yaml"
-    - ".travis.yml"
-    - ".travis.yaml"
-  loop_control:
-    loop_var: possible_jervis_filename
   connection: local
 - name: Pausing local deployments
   pause:

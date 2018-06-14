@@ -257,6 +257,7 @@ class State {
 }
 
 def setJervisYaml(String jervisYaml) {
+    State.getContext().println("initial set:jervisYaml=$jervisYaml")
     State.setJervisYaml(jervisYaml)
 }
 

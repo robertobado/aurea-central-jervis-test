@@ -34,7 +34,7 @@ pipeline {
         }
         stage('Custom Step') {
             steps {
-                sh 'echo "Jervis Yaml file = $JERVIS_YAML" '
+                sh 'echo Jervis Yaml file = "$JERVIS_YAML" '
             }
         }
         stage('Build Docker Image') {
@@ -254,8 +254,8 @@ class State {
     // Get parsed .jervis.yml
     static def getJervisYaml() {
         def jervisYaml = [:]
-
-        def rawYaml = context.readFile file: "$JERVIS_YAML", encoding: 'UTF-8'
+        String yamlFileName = "$JERVIS_YAML"
+        def rawYaml = context.readFile file: yamlFileName, encoding: 'UTF-8'
         def yaml = new Yaml()
         jervisYaml = yaml.load(rawYaml)
 

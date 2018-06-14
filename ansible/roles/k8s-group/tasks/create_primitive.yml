@@ -11,9 +11,22 @@
 
 - name: Include default deployment definition
   include_vars:
-    # load vars from (deployment|service|ingress).yml
+    # load vars from (service|ingress).yml
     file: "vars/{{ type }}.yml"
     name: deploymentDefinition
+  when: type != 'deployment'
+
+- name: Include default prod deployment definition
+  include_vars:
+    file: "vars/deployment-prod.yml"
+    name: deploymentDefinition
+  when: type == 'deployment' and environment_name == 'prod'
+
+- name: Include default prod deployment definition
+  include_vars:
+    file: "vars/deployment-staging.yml"
+    name: deploymentDefinition
+  when: type == 'deployment' and environment_name != 'prod'
 
 - name: Create definition
   set_fact:

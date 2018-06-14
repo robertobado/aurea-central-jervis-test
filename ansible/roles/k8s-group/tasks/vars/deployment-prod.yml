@@ -1,0 +1,31 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  namespace: "{{ namespace }}"
+  name: "{{ container_hostname }}"
+  labels:
+    name: "{{ container_hostname }}"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: "{{ container_hostname }}"
+        app_name: "{{ container_hostname }}"
+    spec:
+# todo: figure out why the policy "Always" is not working
+#      restartPolicy: "{{ restart_policy }}" 
+      nodeSelector:
+        kubernetes.io/hostname: "{{ k8s_hostname }}"
+        central-stage: "prod"
+      containers:
+        - name: "{{ container_hostname }}"
+          imagePullPolicy: "{{ image_pull_policy }}"
+          image: "{{ container_base_image }}:{{ container_image_tag }}"
+          resources:
+            limits: 
+              cpu: "{{ resources_limits_cpu }}"
+              memory: "{{ resources_limits_memory }}"
+            requests:
+              cpu: "{{ resources_requests_cpu }}"
+              memory: "{{ resources_requests_memory }}"

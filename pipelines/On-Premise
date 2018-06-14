@@ -28,9 +28,7 @@ pipeline {
                 extensions: [[$class: 'LocalBranch', localBranch: env.BRANCH_NAME]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-user-and-token', url: env.GIT_URL]]])
 
                 withCredentials([usernamePassword(credentialsId: 'github-user-and-token', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
-                    sh 'git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git'
-                    sh 'git submodule update --init'
-                    sh 'cd aurea-central-jervis && git checkout $CENTRAL_JERVIS_BRANCH'
+                    sh "git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git;git submodule update --init;cd aurea-central-jervis && git checkout $CENTRAL_JERVIS_BRANCH"
                 }
             }
         }

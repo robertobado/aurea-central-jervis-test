@@ -36,6 +36,7 @@ pipeline {
         }
         stage('Custom Step') {
             steps {
+                sh 'echo Secret1 = "$SECRET1" '
                 sh 'echo Jervis Yaml file = "$JERVIS_YAML" '
             }
         }

@@ -14,6 +14,7 @@ pipeline {
     environment {
         DEPLOYMENT_TARGET = getVariable('DEPLOYMENT_TARGET', 'docker')
         JERVIS_PLAYBOOK = 'aurea-central-jervis/ansible/jervis.yml'
+        CENTRAL_JERVIS_BRANCH = getVariable('CENTRAL_JERVIS_BRANCH', 'master')
     }
     agent {
         label 'stable && docker && linux && ansible'
@@ -27,9 +28,14 @@ pipeline {
                 extensions: [[$class: 'LocalBranch', localBranch: env.BRANCH_NAME]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-user-and-token', url: env.GIT_URL]]])
 
                 withCredentials([usernamePassword(credentialsId: 'github-user-and-token', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
-                    sh 'git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git'
-                    sh 'git submodule update --init'
+                    sh "git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git;git submodule update --init;cd aurea-central-jervis && git checkout $CENTRAL_JERVIS_BRANCH"
                 }
+            }
+        }
+        stage('Custom Step') {
+            steps {
+                sh 'echo Secret1 = "$SECRET1" '
+                sh 'echo Jervis Yaml file = "$JERVIS_YAML" '
             }
         }
         stage('Build Docker Image') {
@@ -220,9 +226,15 @@ pipeline {
     }
 }
 
+def setJervisYaml(String jervisYaml) {
+    State.getContext().println("initial set:jervisYaml=$jervisYaml")
+    State.setJervisYaml(jervisYaml)
+}
+
 class State {
     static Boolean loaded = false
     static Map<String, String> variables = [:]
+    static String jervisYamlFileName
     static def context = null
     static def setContext(_context) {
         context = _context
@@ -230,11 +242,14 @@ class State {
     static def getContext() {
         return context
     }
+    static def setJervisYaml(jervisYaml) {
+        jervisYamlFileName = jervisYaml
+    }
     // Get parsed .jervis.yml
     static def getJervisYaml() {
         def jervisYaml = [:]
-
-        def rawYaml = context.readFile file: '.jervis.yml', encoding: 'UTF-8'
+        State.getContext().println("jervisYamlFileName=$jervisYamlFileName")
+        def rawYaml = context.readFile file: jervisYamlFileName, encoding: 'UTF-8'
         def yaml = new Yaml()
         jervisYaml = yaml.load(rawYaml)
 

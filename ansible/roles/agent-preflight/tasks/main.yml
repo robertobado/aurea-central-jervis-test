@@ -24,7 +24,7 @@
   when: lookup('env','BRANCH_NAME') != ''
 - name: "Evaluating if trigger is Pull Request"
   set_fact:
-    environment_name: "{{ branch_environment_map[ environment_name ][lookup('env','CHANGE_TARGET') | default(environment_name, true) | lower] }}"
+    environment_name: "{{ branch_environment_map[ lookup('env','BRANCH_NAME').split('/') | first | lower ][lookup('env','CHANGE_TARGET') | default(environment_name, true) | lower] }}"
   when: lookup('env','IS_PR_BUILD') != '' and lookup('env','IS_PR_BUILD') | bool
 - name: "Fetching version tags..."
   shell: 'git describe --tags --abbrev=0 || echo $GIT_COMMIT | cut -c1-7'

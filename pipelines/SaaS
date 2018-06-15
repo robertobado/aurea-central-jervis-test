@@ -30,6 +30,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'github-user-and-token', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
                     sh "git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git;git submodule update --init;cd aurea-central-jervis && git checkout $CENTRAL_JERVIS_BRANCH"
                 }
+                setJervisYaml("$JERVIS_YAML")
             }
         }
         stage('Custom Step') {

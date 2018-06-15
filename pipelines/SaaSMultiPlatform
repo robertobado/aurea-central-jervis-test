@@ -21,7 +21,7 @@ pipeline {
                 // Default Git checkout done by Jervis is not compatible with aLine.
                 // Please refer: https://jira.devfactory.com/browse/FIRE-14613
                 checkout([$class: 'GitSCM', branches: [[name: env.BRANCH_NAME]], doGenerateSubmoduleConfigurations: false,
-                extensions: [[$class: 'LocalBranch', localBranch: env.BRANCH_NAME]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-user-and-token', url: env.GIT_URL]]])
+                extensions: [[$class: 'LocalBranch', localBranch: env.BRANCH_NAME],[$class: 'CloneOption', noTags: true, reference: '', shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-user-and-token', url: env.GIT_URL]]])
 
                 withCredentials([usernamePassword(credentialsId: 'github-user-and-token', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
                     sh 'git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git'

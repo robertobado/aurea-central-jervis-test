@@ -93,6 +93,11 @@ pipeline {
         }
         stage('Health Checks') {
                 /* Health Checks are run for all branches */
+                when {
+                    expression {
+                        return (State.getRawYaml().contains("health-check"))
+                    }
+                }
                 environment {
                     ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
                 }
@@ -105,7 +110,7 @@ pipeline {
                 /* Smoke test only runs when branch is qa or regression*/
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
+                        return ( ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression') && State.getRawYaml().contains("smoke-test") )
                     }
                 }
                 environment {
@@ -120,7 +125,7 @@ pipeline {
                 /* Regression test only runs when branch is qa or regression*/
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
+                        return ( ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression') && State.getRawYaml().contains("regression-test"))
                     }
                 }
                 environment {
@@ -135,7 +140,7 @@ pipeline {
                 /* Performance test only runs when branch is qa or regression*/
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
+                        return ( ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression') && State.getRawYaml().contains("performance-test"))
                     }
                 }
                 environment {
@@ -150,7 +155,7 @@ pipeline {
                 /* Load test only runs when branch is qa or regression*/
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
+                        return ( ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression') && State.getRawYaml().contains("load-test") )
                     }
                 }
                 environment {
@@ -165,7 +170,7 @@ pipeline {
                 /* Security test only runs when branch is qa or regression*/
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
+                        return ( ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression') && State.getRawYaml().contains("security-test") )
                     }
                 }
                 environment {
@@ -180,7 +185,7 @@ pipeline {
                 /* Promote Packages only runs when branch is release */
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'release')
+                        return ( ("${GIT_BRANCH}" == 'release') && State.getRawYaml().contains("docker_image"))
                     }
                 }
                 environment {
@@ -189,16 +194,6 @@ pipeline {
                 steps {
                     sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags promote-packages --vault-password-file=.ansible-vault-password'
-                }
-        }
-        stage('Send Notification') {
-                /* Notifications are sent for all branches */
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
-                steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags send-notification --vault-password-file=.ansible-vault-password'
                 }
         }
     }

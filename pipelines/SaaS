@@ -33,17 +33,11 @@ pipeline {
                 }
             }
         }
-        stage('Custom Step') {
-            steps {
-                sh 'echo Secret1 = "$SECRET1" '
-                sh 'echo Jervis Yaml file = "$JERVIS_YAML" '
-            }
-        }
         stage('Build Docker Image') {
                 /* Do not build when branch is master or release */
                 when {
                   expression {
-                    return !("${GIT_BRANCH}" == 'master' || "${GIT_BRANCH}" == 'release')
+                    return ( !("${GIT_BRANCH}" == 'master' || "${GIT_BRANCH}" == 'release') && State.getRawYaml().contains("docker_image") )
                     }
                 }
                 environment {
@@ -231,6 +225,7 @@ class State {
     static Boolean loaded = false
     static Map<String, String> variables = [:]
     static String jervisYamlFileName
+    static String rawJervisYaml
     static def context = null
     static def setContext(_context) {
         context = _context
@@ -241,13 +236,19 @@ class State {
     static def setJervisYaml(jervisYaml) {
         jervisYamlFileName = jervisYaml
     }
+    static def getRawYaml() {
+        if(! loaded) {
+            rawJervisYaml = context.readFile file: jervisYamlFileName, encoding: 'UTF-8'
+        }
+        return rawJervisYaml
+    }
     // Get parsed .jervis.yml
     static def getJervisYaml() {
         def jervisYaml = [:]
         State.getContext().println("jervisYamlFileName=$jervisYamlFileName")
-        def rawYaml = context.readFile file: jervisYamlFileName, encoding: 'UTF-8'
+        rawJervisYaml = context.readFile file: jervisYamlFileName, encoding: 'UTF-8'
         def yaml = new Yaml()
-        jervisYaml = yaml.load(rawYaml)
+        jervisYaml = yaml.load(rawJervisYaml)
 
         return jervisYaml
     }

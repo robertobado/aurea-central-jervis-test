@@ -24,13 +24,31 @@
     content: "{{ rawDefinition | to_nice_yaml }}"
     dest: "/tmp/raw_definition_{{ type }}.yml"
 
+- name: Remove kubernetes primitive from an inline definition "{{ type }}"
+  kubernetes:
+    api_endpoint: "{{ api_host }}"
+    state: "absent"
+    service_token: "{{ api_key }}"
+    #propagation_policy: "Orphan", "Foreground", "Background"
+    propagation_policy: "{{ 'Foreground' if type == 'deployment' else omit }}"
+    inline_data: "{{ rawDefinition }}"
+  register: k8s_result_remove
+
+- name: Show delete result for "{{ type }}"
+  debug: var=k8s_result_remove
+
+- name: sleep for 10 seconds
+  wait_for: timeout=10
+  delegate_to: localhost
+  when: type == 'deployment'
+
 - name: Create kubernetes primitive from an inline definition "{{ type }}"
   kubernetes:
     api_endpoint: "{{ api_host }}"
-    state: "{{ 'absent' if (perform_destroy is defined and perform_destroy) else 'present' }}"
+    state: "present"
     service_token: "{{ api_key }}"
     inline_data: "{{ rawDefinition }}"
   register: k8s_result
 
-- name: Show result
+- name: Show create result for "{{ type }}"
   debug: var=k8s_result

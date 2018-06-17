@@ -256,12 +256,13 @@ def api_request(module, url, method="GET", headers=None, data=None):
     body = None
     if data:
         data = json.dumps(data)
+
+    headers = {}
     if service_token:
         token = base64.b64decode(service_token)
-        if headers:
-            headers.update({"Authorization":"Bearer " + str(token)})
-        else:
-            headers = {"Authorization": "Bearer " + str(token)}
+        headers.update({"Authorization":"Bearer " + str(token)})
+    headers.update({"Content-Type": "application/json"})
+
     response, info = fetch_url(module, url, method=method, headers=headers, data=data)
     if int(info['status']) == -1:
         module.fail_json(msg="Failed to execute the API request: %s" % info['msg'], url=url, method=method, headers=headers)
@@ -287,7 +288,13 @@ def k8s_delete_resource(module, url, data):
         module.fail_json(msg="Missing a named resource in object metadata when trying to remove a resource")
 
     url = url + '/' + name
-    info, body = api_request(module, url, method="DELETE")
+
+    policy = module.params.get('propagation_policy', '')
+    custom_data = None
+    if policy:
+        custom_data = {'kind': 'DeleteOptions', 'apiVersion': 'v1', 'propagationPolicy': policy}
+    info, body = api_request(module, url, method="DELETE", data=custom_data)
+
     if info['status'] == 404:
         return False, "Resource name '%s' already absent" % name
     elif info['status'] >= 400:
@@ -345,6 +352,7 @@ def main():
             url_username=dict(default="", aliases=["username"]),
             url_password=dict(default="", no_log=True, aliases=["password"]),
             service_token=dict(default="", no_log=True, aliases=["token"]),
+            propagation_policy=dict(default="", choices=["", "Orphan", "Foreground", "Background"]),
             force_basic_auth=dict(default="yes"),
             validate_certs=dict(default=False, type='bool'),
             certificate_authority_data=dict(required=False),

@@ -56,7 +56,6 @@ k8s-group:
     resources_requests_memory: "1Gi"
 
     container_base_image: "registry2.swarm.devfactory.com/aurea/central/test"
-    container_image_tag: "latest"
 
   children:
     k8s-deployment-group:

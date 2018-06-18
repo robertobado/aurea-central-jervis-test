@@ -1,7 +1,7 @@
 ---
 - name: Set container_image_tag if not defined
   set_fact:
-    container_image_tag: "{{ lookup('env','GIT_COMMIT') }}"
+    container_image_tag: "{{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].tag_suffix }}"
   when: container_image_tag is not defined
 
 - name: Run k8s object deployment tasks

@@ -89,6 +89,7 @@
   strategy: free
   hosts: 
     - docker-service
+    - k8s-group
   tags: docker-image-build
   gather_facts: no
   roles:

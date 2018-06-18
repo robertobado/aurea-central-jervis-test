@@ -21,11 +21,11 @@
 - name: "Selecting target environment"
   set_fact:
     environment_name: "{{ (branch_environment_map[lookup('env','BRANCH_NAME').split('/') | first | lower] | default(branch_environment_map.feature) )[lookup('env','BRANCH_NAME').split('/') | first | lower] | default('dev') }}"
-  when: lookup('env','BRANCH_NAME') != ''
+  when: lookup('env','BRANCH_NAME') != '' and environment_name is not defined
 - name: "Evaluating if trigger is Pull Request"
   set_fact:
     environment_name: "{{ (branch_environment_map[lookup('env','BRANCH_NAME').split('/') | first | lower] | default(branch_environment_map.feature) )[lookup('env','CHANGE_TARGET') | default(environment_name, true) | lower] | default('dev') }}"
-  when: lookup('env','IS_PR_BUILD') != '' and lookup('env','IS_PR_BUILD') | bool
+  when: lookup('env','IS_PR_BUILD') != '' and lookup('env','IS_PR_BUILD') and environment_name is not defined | bool
 - name: "Fetching version tags..."
   shell: 'git describe --tags --abbrev=0 || echo $GIT_COMMIT | cut -c1-7'
   args:

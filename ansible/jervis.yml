@@ -25,10 +25,10 @@
       master: 
         master: prod
         tag_suffix: -RELEASE
-    _tmp_var: "{{ lookup('env','BRANCH_NAME').split('/') | first | lower }}"
+    _env_branch_name: "{{ lookup('env','BRANCH_NAME').split('/') | first | lower }}"
     # define key from branch_environment_map which is corresponding to the current BRANCH_NAME
     # if key is not found then set default value = 'feature'
-    branch_environment_key: "{{ 'feature' if branch_environment_map[ _tmp_var ] is not defined else _tmp_var }}"
+    branch_environment_key: "{{ 'feature' if branch_environment_map[ _env_branch_name ] is not defined else _env_branch_name }}"
 
   hosts: 
     - all

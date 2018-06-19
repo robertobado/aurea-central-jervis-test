@@ -24,3 +24,8 @@
   register: docker_image_build_result
   when: hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first] is defined and hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image is defined
   tags: docker-image-build
+
+- name: "Set docker_image_build_result"
+  set_fact:
+    docker_image_build_result: "{{ docker_image_build_result }}"
+  when: docker_image_build_result is defined

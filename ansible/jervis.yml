@@ -136,6 +136,7 @@
   hosts:
     - docker-service
     - ec2-service
+    - k8s-group
   tags: health-check
   vars:
     step_name: health-check

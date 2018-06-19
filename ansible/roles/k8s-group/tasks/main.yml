@@ -1,10 +1,14 @@
 ---
-- debug: var=docker_image_build_result
+- debug: var=hostvars['localhost']
   deletage_to: localhost
-- debug: var=hostvars['localhost'].docker_image_build_result
-  deletage_to: localhost
+  delegate_facts: true
 - debug: var=jervis.services
   deletage_to: localhost
+  delegate_facts: true
+- debug: var=hostvars
+  deletage_to: localhost
+  delegate_facts: true
+
 - name: Check if docker image was built
   fail:
     msg: |

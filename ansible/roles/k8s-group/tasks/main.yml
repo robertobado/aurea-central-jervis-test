@@ -1,11 +1,11 @@
 ---
-- debug: var=hostvars['localhost']
+- debug: var=hostvars['localhost'].docker_image_build_result
   deletage_to: localhost
   delegate_facts: true
 - debug: var=jervis.services
   deletage_to: localhost
   delegate_facts: true
-- debug: var=hostvars
+- debug: var=docker_image_build_result
   deletage_to: localhost
   delegate_facts: true
 

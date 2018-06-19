@@ -1,7 +1,5 @@
 #!groovy
-import org.yaml.snakeyaml.Yaml
-
-/* 
+/*
 TODO: 
 1. Refactor code in steps section into a function to improve readability and maintenance 
 2. Investigate why ANSIBLE_VAULT_PASSWORD is per stage and not global
@@ -9,9 +7,7 @@ TODO:
 
 pipeline {
     environment {
-        DEPLOYMENT_TARGET = getVariable('DEPLOYMENT_TARGET', 'docker')
         JERVIS_PLAYBOOK = 'aurea-central-jervis/ansible/jervis.yml'
-        CENTRAL_JERVIS_BRANCH = getVariable('CENTRAL_JERVIS_BRANCH', 'master')
     }
     agent {
         label 'stable && docker && linux && ansible'
@@ -157,53 +153,5 @@ pipeline {
                     sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags promote-packages --vault-password-file=.ansible-vault-password -vvvvvvvvvv'
                 }
         }
-        stage('Send Notification') {
-                /* Notifications are sent for all branches */
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
-                steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags send-notification --vault-password-file=.ansible-vault-password'
-                }
-        }
     }
-}
-
-class State {
-    static Boolean loaded = false
-    static Map<String, String> variables = [:]
-}
-
-/**
- * If Jenkins shows errors like
- * "Scripts not permitted to use new org.yaml.snakeyaml.Yaml"
- * Then you need to approve signatures on this page for local installation:
- * http://localhost:8080/scriptApproval/
- *
- * or for sandbox
- * http://jervis-sandbox2.devfactory.com/scriptApproval/
- */
-def getVariable(String name, String defaultValue = '') {
-    if (! State.loaded) {
-        def list = getJervisYaml()
-        def vars = list['variables'] ?: [:]
-        vars.each{ variable ->
-            def (key, value) = variable.tokenize('=')
-            State.variables[key] = value
-        }
-        State.loaded = true
-    }
-    return State.variables[name] ?: defaultValue
-}
-
-// Get parsed .jervis.yml
-def Map getJervisYaml() {
-  def jervisYaml = [:]
-
-  def rawYaml = readFile file: '.jervis.yml', encoding: 'UTF-8'
-  def yaml = new Yaml()
-  jervisYaml = yaml.load(rawYaml)
-
-  return jervisYaml
 }

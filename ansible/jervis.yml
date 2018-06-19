@@ -215,18 +215,6 @@
   roles:
     - docker-image-promote
 
-- name: Aurea Central Jervis Send Notification
-  strategy: free
-  hosts: 
-    - docker-service
-    - ec2-service
-  tags: send-notification
-  vars:    
-    - jervis: "{{ hostvars['localhost'].jervis }}"
-  gather_facts: no
-  roles:
-    - send-notification    
-
 - name: Checking if we are going to destroy...
   tasks:
     - name: Set perform_destroy...

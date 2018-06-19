@@ -148,6 +148,7 @@
   hosts:
     - docker-service
     - ec2-service
+    - k8s-group
   tags: smoke-test
   vars:
     step_name: smoke-test
@@ -160,6 +161,7 @@
   hosts:
     - docker-service
     - ec2-service
+    - k8s-group
   tags: regression-test
   vars:
     step_name: regression-test
@@ -172,6 +174,7 @@
   hosts:
     - docker-service
     - ec2-service
+    - k8s-group
   tags: performance-test
   vars:
     step_name: performance-test
@@ -184,6 +187,7 @@
   hosts:
     - docker-service
     - ec2-service
+    - k8s-group
   tags: load-test
   vars:
     step_name: load-test
@@ -196,6 +200,7 @@
   hosts:
     - docker-service
     - ec2-service
+    - k8s-group
   tags: security-test
   vars:
     step_name: security-test

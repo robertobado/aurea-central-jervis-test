@@ -9,11 +9,10 @@ pipeline {
     environment {
         JERVIS_PLAYBOOK = 'aurea-central-jervis/ansible/jervis.yml'
     }
-    agent {
-        label 'stable && docker && linux && ansible'
-    }
+    agent none
     stages {
         stage('Checkout SCM') {
+            agent { label 'stable && docker && linux && ansible' }
             steps {
                 // Default Git checkout done by Jervis is not compatible with aLine.
                 // Please refer: https://jira.devfactory.com/browse/FIRE-14613
@@ -26,7 +25,14 @@ pipeline {
                 }
             }
         }
+        stage('Custom Stage') {
+            agent { label "${BUILD_DOCKER_IMAGE_LABEL}" }
+            steps {
+                sh 'echo this is  a custom step!!!'
+            }
+        }
         stage('Build Docker Image') {
+            agent { label "${BUILD_DOCKER_IMAGE_LABEL}" }
                 /* Do not build when branch is master or release */
                 when {
                   expression {
@@ -43,6 +49,7 @@ pipeline {
                 }
         }
         stage('CDH Service Deploy') {
+            agent { label "${CDH_DEPLOY_LABEL}" }
                 when {
                     expression {
                         return ("$DEPLOYMENT_TARGET" == 'docker')
@@ -57,6 +64,7 @@ pipeline {
                 }
         }
         stage('EC2 Service Deploy') {
+            agent { label "${EC2_DEPLOY_LABEL}" }
                 when {
                     expression {
                         return ("$DEPLOYMENT_TARGET" == 'ec2')
@@ -71,6 +79,7 @@ pipeline {
                 }
         }
         stage('K8s Service Deploy') {
+            agent { label "${K8S_DEPLOY_LABEL}" }
                 when {
                     expression {
                         return ("$DEPLOYMENT_TARGET" == 'k8s')
@@ -85,6 +94,7 @@ pipeline {
                 }
         }
         stage('Health Checks') {
+            agent { label "${HEALTH_CHECK_LABEL}" }
                 /* Health Checks are run for all branches */
                 environment {
                     ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
@@ -95,6 +105,7 @@ pipeline {
                 }
         }
         stage('Smoke Tests') {
+            agent { label "${SMOKE_TEST_LABEL}" }
                 /* Smoke test only runs when branch is qa or regression*/
                 when {
                     expression {
@@ -110,6 +121,7 @@ pipeline {
                 }
         }
         stage('Regression Tests') {
+            agent { label "${REGRESSION_TEST_LABEL}" }
                 /* Regression test only runs when branch is qa or regression*/
                 when {
                     expression {
@@ -125,6 +137,7 @@ pipeline {
                 }
         }
         stage('Performance Tests') {
+            agent { label "${PERFORMANCE_TEST_LABEL}" }
                 /* Performance test only runs when branch is qa or regression*/
                 when {
                     expression {
@@ -140,6 +153,7 @@ pipeline {
                 }
         }
         stage('Load Tests') {
+            agent { label "${LOAD_TEST_LABEL}" }
                 /* Load test only runs when branch is qa or regression*/
                 when {
                     expression {
@@ -155,6 +169,7 @@ pipeline {
                 }
         }
         stage('Security Tests') {
+            agent { label "${SECURITY_TEST_LABEL}" }
                 /* Security test only runs when branch is qa or regression*/
                 when {
                     expression {
@@ -170,6 +185,7 @@ pipeline {
                 }
         }
         stage('Promote Packages') {
+            agent { label "${PROMOTE_PACKAGES_LABEL}" }
                 /* Promote Packages only runs when branch is release */
                 when {
                     expression {
@@ -185,6 +201,7 @@ pipeline {
                 }
         }
         stage('Send Notification') {
+            agent { label 'stable && docker && linux && ansible' }
                 /* Notifications are sent for all branches */
                 environment {
                     ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')

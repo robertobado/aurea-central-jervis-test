@@ -21,11 +21,12 @@
      docker_host: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.docker_host | default('tcp://dlb1.aureacentral.com:2375')}}"
   delegate_to: localhost
   delegate_facts: true
-  register: docker_image_build_result
+  register: build_result
   when: hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first] is defined and hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image is defined
   tags: docker-image-build
 
 - name: "Set docker_image_build_result"
   set_fact:
-    docker_image_build_result: "{{ docker_image_build_result }}"
-  when: docker_image_build_result is defined
+    docker_image_build_result: "{{ build_result }}"
+  when: build_result|success
+  delegate_to: localhost

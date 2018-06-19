@@ -1,4 +1,11 @@
 ---
+- name: Check if docker image was built
+  fail:
+    msg: |
+      Docker image was not built, though you have defined services in .jervis.yml file.
+      Have you added proper service hostname in k8s-group inventory?
+  when: hostvars['localhost'].docker_image_build_result is not defined and jervis.services is defined
+
 - name: Set container_image_tag if not defined
   set_fact:
     container_image_tag: "{{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].tag_suffix }}"

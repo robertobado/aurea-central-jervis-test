@@ -184,16 +184,5 @@ pipeline {
                     sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags promote-packages --vault-password-file=.ansible-vault-password'
                 }
         }
-        stage('Send Notification') {
-                /* Notifications are sent for all branches */
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
-                steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags send-notification --vault-password-file=.ansible-vault-password'
-                }
-        }
     }
-
 }

@@ -36,7 +36,7 @@ pipeline {
                 /* Do not build when branch is master or release */
                 when {
                   expression {
-                    return !("${GIT_BRANCH}" == 'master' || "${GIT_BRANCH}" == 'release')
+                    return !("${GIT_BRANCH}" == 'master' || "${GIT_BRANCH}" == 'release' || "${GIT_BRANCH}" == 'develop')
                     }
                 }
                 environment {

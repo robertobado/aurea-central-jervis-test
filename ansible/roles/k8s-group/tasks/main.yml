@@ -5,6 +5,8 @@
       Docker image was not built, though you have defined services in .jervis.yml file.
       Have you added proper service hostname in k8s-group inventory?
   when: hostvars['localhost'].docker_image_build_result is not defined and jervis.services is defined
+  delegate_to: localhost
+  run_once: true
 
 - name: Set container_image_tag if not defined
   set_fact:

@@ -2,7 +2,7 @@
 - name: Aurea Central Jervis Preflight
   vars:
     branch_environment_map:
-      feature: 
+      feature:
         feature: dev
         develop: dev
         tag_suffix: -DEVEL
@@ -22,7 +22,7 @@
         master: staging
         tag_suffix: -CANDIDATE
         promote_tag_suffix: -RELEASE
-      master: 
+      master:
         master: prod
         tag_suffix: -RELEASE
     _env_branch_name: "{{ lookup('env','BRANCH_NAME').split('/') | first | lower }}"
@@ -30,16 +30,16 @@
     # if key is not found then set default value = 'feature'
     branch_environment_key: "{{ 'feature' if branch_environment_map[ _env_branch_name ] is not defined else _env_branch_name }}"
 
-  hosts: 
+  hosts:
     - all
   tags: always
   gather_facts: no
   roles:
     - agent-preflight
-    
+
 - name: Aurea Central Jervis EC2 Hosts
   serial: 100%
-  hosts: 
+  hosts:
     - ec2
   tags: always
   vars:
@@ -50,7 +50,7 @@
 
 - name: Aurea Central Jervis Docker Hosts
   serial: 100%
-  hosts: 
+  hosts:
     - docker-host
   vars:
     dynamic_inventory: []
@@ -81,28 +81,28 @@
   gather_facts: no
   roles:
     - vmware-group
-    
+
 - name: Aurea Central Jervis Build Inventory
-  hosts: 
+  hosts:
     - localhost
   tags: always
   gather_facts: no
   roles:
     - agent-build-inventory
-  
+
 - name: Aurea Central Jervis Docker Images
   strategy: free
-  hosts: 
+  hosts:
     - docker-service
     - k8s-group
   tags: docker-image-build
   gather_facts: no
   roles:
     - docker-image-build
-  
+
 - name: Aurea Central Jervis Docker Containers
   strategy: free
-  hosts: 
+  hosts:
     - docker-service
   tags: docker-service-deploy
   gather_facts: no
@@ -111,7 +111,7 @@
 
 - name: Aurea Central Jervis VMWare deploy
   strategy: free
-  hosts: 
+  hosts:
     - vmware-service
   tags:
     - vmware-service-deploy
@@ -133,11 +133,12 @@
 
 - name: Aurea Central Jervis Health Checks
   strategy: free
-  hosts: 
+  hosts:
     - docker-service
     - ec2-service
+    - k8s-group
   tags: health-check
-  vars:    
+  vars:
     step_name: health-check
   gather_facts: no
   roles:
@@ -145,11 +146,12 @@
 
 - name: Aurea Central Jervis Smoke Tests
   strategy: free
-  hosts: 
+  hosts:
     - docker-service
     - ec2-service
+    - k8s-group
   tags: smoke-test
-  vars:    
+  vars:
     step_name: smoke-test
   gather_facts: no
   roles:
@@ -157,11 +159,12 @@
 
 - name: Aurea Central Jervis Regression Tests
   strategy: free
-  hosts: 
+  hosts:
     - docker-service
     - ec2-service
+    - k8s-group
   tags: regression-test
-  vars:    
+  vars:
     step_name: regression-test
   gather_facts: no
   roles:
@@ -169,11 +172,12 @@
 
 - name: Aurea Central Jervis Performance Tests
   strategy: free
-  hosts: 
+  hosts:
     - docker-service
     - ec2-service
+    - k8s-group
   tags: performance-test
-  vars:    
+  vars:
     step_name: performance-test
   gather_facts: no
   roles:
@@ -181,11 +185,12 @@
 
 - name: Aurea Central Jervis Load Tests
   strategy: free
-  hosts: 
+  hosts:
     - docker-service
     - ec2-service
+    - k8s-group
   tags: load-test
-  vars:    
+  vars:
     step_name: load-test
   gather_facts: no
   roles:
@@ -193,23 +198,25 @@
 
 - name: Aurea Central Jervis Security Tests
   strategy: free
-  hosts: 
+  hosts:
     - docker-service
     - ec2-service
+    - k8s-group
   tags: security-test
-  vars:    
+  vars:
     step_name: security-test
   gather_facts: no
   roles:
-    - dynamic-task 
+    - dynamic-task
 
 - name: Aurea Central Jervis Promote Packages
   strategy: free
-  hosts: 
+  hosts:
     - docker-service
     - ec2-service
+    - k8s-group
   tags: promote-packages
-  vars:    
+  vars:
     - jervis: "{{ hostvars['localhost'].jervis }}"
   gather_facts: no
   roles:

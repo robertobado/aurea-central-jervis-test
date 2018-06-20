@@ -131,6 +131,28 @@
   roles:
     - service-deploy
 
+- name: Aurea Central Jervis Custom Docker Image
+  strategy: free
+  hosts:
+    - localhost
+  tags: custom-docker-image
+  vars:
+    step_name: custom-docker-image
+  gather_facts: no
+  roles:
+    - dynamic-task
+
+- name: Aurea Central Jervis Integration tests
+  strategy: free
+  hosts:
+    - localhost
+  tags: integration-test
+  vars:
+    step_name: integration-test
+  gather_facts: no
+  roles:
+    - dynamic-task
+
 - name: Aurea Central Jervis Health Checks
   strategy: free
   hosts: 

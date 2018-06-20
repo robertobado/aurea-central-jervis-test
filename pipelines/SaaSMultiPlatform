@@ -12,11 +12,10 @@ pipeline {
         DEPLOYMENT_TARGET = getVariable('DEPLOYMENT_TARGET', 'docker')
         JERVIS_PLAYBOOK = 'aurea-central-jervis/ansible/jervis.yml'
     }
-    agent {
-        label 'stable && docker && linux && ansible'
-    }
+    agent none
     stages {
         stage('Checkout SCM') {
+            agent { label 'stable && docker && linux && ansible' }
             steps {
                 // Default Git checkout done by Jervis is not compatible with aLine.
                 // Please refer: https://jira.devfactory.com/browse/FIRE-14613
@@ -30,6 +29,7 @@ pipeline {
             }
         }
         stage('Build Docker Image') {
+            agent { label 'stable && docker && linux && ansible' }
                 /* Do not build when branch is master or release */
                 when {
                   expression {

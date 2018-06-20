@@ -119,21 +119,13 @@
   roles:
     - service-deploy
 
-- name: Aurea Central Jervis Docker Services
-  strategy: free
-  hosts:
-    - docker-service
-  tags:
-    - docker-service-deploy
-  gather_facts: no
-  roles:
-    - service-deploy
-
 - name: Aurea Central Jervis Services
   strategy: free
   hosts:
+    - docker-service
     - ec2-service
   tags:
+    - docker-service-deploy
     - ec2-service-deploy
   gather_facts: no
   roles:

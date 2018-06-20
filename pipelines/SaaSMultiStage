@@ -6,9 +6,9 @@ TODO:
 */
 
 def defaultLabel = 'stable && docker && linux && ansible'
-println('env.BRANCH_NAME=${env.BRANCH_NAME}')
-println('env.GIT_URL=${env.GIT_URL}')
-node(defaultLabel) {
+println("env.BRANCH_NAME=${env.BRANCH_NAME}")
+println("env.GIT_URL=${env.GIT_URL}")
+node(defaulLabel) {
     stage('Checkout SCM') {
         checkout([$class: 'GitSCM', branches: [[name: env.BRANCH_NAME]], doGenerateSubmoduleConfigurations: false,
                   extensions: [[$class: 'LocalBranch', localBranch: env.BRANCH_NAME]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-user-and-token', url: env.GIT_URL]]])

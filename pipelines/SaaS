@@ -9,15 +9,16 @@ pipeline {
     environment {
         JERVIS_PLAYBOOK = 'aurea-central-jervis/ansible/jervis.yml'
     }
-    agent none
+    agent {
+        label 'stable && docker && linux && ansible'
+    }
     stages {
         stage('Checkout SCM') {
-            agent { label 'stable && docker && linux && ansible' }
             steps {
                 // Default Git checkout done by Jervis is not compatible with aLine.
                 // Please refer: https://jira.devfactory.com/browse/FIRE-14613
                 checkout([$class: 'GitSCM', branches: [[name: env.BRANCH_NAME]], doGenerateSubmoduleConfigurations: false,
-                extensions: [[$class: 'LocalBranch', localBranch: env.BRANCH_NAME]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-user-and-token', url: env.GIT_URL]]])
+                          extensions: [[$class: 'LocalBranch', localBranch: env.BRANCH_NAME]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-user-and-token', url: env.GIT_URL]]])
 
                 withCredentials([usernamePassword(credentialsId: 'github-user-and-token', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
                     sh 'git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git'
@@ -25,192 +26,163 @@ pipeline {
                 }
             }
         }
-        stage('Custom Stage') {
-            agent { label "${BUILD_DOCKER_IMAGE_LABEL}" }
+        stage('Build Docker Image') {
+            /* Do not build when branch is master or release */
+            when {
+                expression {
+                    return !("${GIT_BRANCH}" == 'master' || "${GIT_BRANCH}" == 'release')
+                }
+            }
+            environment {
+                ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
+            }
             steps {
-                sh 'echo this is  a custom step!!!'
+                unstash 'artifacts'
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags docker-image-build --vault-password-file=.ansible-vault-password'
             }
         }
-        stage('Build Docker Image') {
-            agent { label "${BUILD_DOCKER_IMAGE_LABEL}" }
-                /* Do not build when branch is master or release */
-                when {
-                  expression {
-                    return !("${GIT_BRANCH}" == 'master' || "${GIT_BRANCH}" == 'release' || "${GIT_BRANCH}" == 'develop')
-                    }
-                }
-                environment {
-                  ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
-                steps {
-                  unstash 'artifacts'
-                  sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                  sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags docker-image-build --vault-password-file=.ansible-vault-password'
-                }
-        }
         stage('CDH Service Deploy') {
-            agent { label "${CDH_DEPLOY_LABEL}" }
-                when {
-                    expression {
-                        return ("$DEPLOYMENT_TARGET" == 'docker')
-                    }
+            when {
+                expression {
+                    return ("$DEPLOYMENT_TARGET" == 'docker')
                 }
-                environment {
-                  ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
-                steps {
-                  sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                  sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags docker-service-deploy --vault-password-file=.ansible-vault-password'
-                }
+            }
+            environment {
+                ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
+            }
+            steps {
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags docker-service-deploy --vault-password-file=.ansible-vault-password'
+            }
         }
         stage('EC2 Service Deploy') {
-            agent { label "${EC2_DEPLOY_LABEL}" }
-                when {
-                    expression {
-                        return ("$DEPLOYMENT_TARGET" == 'ec2')
-                    }
+            when {
+                expression {
+                    return ("$DEPLOYMENT_TARGET" == 'ec2')
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
-                steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags ec2-instance,ec2-service-deploy --vault-password-file=.ansible-vault-password'
-                }
+            }
+            environment {
+                ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
+            }
+            steps {
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags ec2-instance,ec2-service-deploy --vault-password-file=.ansible-vault-password'
+            }
         }
         stage('K8s Service Deploy') {
-            agent { label "${K8S_DEPLOY_LABEL}" }
-                when {
-                    expression {
-                        return ("$DEPLOYMENT_TARGET" == 'k8s')
-                    }
+            when {
+                expression {
+                    return ("$DEPLOYMENT_TARGET" == 'k8s')
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
-                steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags k8s-deploy --vault-password-file=.ansible-vault-password'
-                }
+            }
+            environment {
+                ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
+            }
+            steps {
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags k8s-deploy --vault-password-file=.ansible-vault-password'
+            }
         }
         stage('Health Checks') {
-            agent { label "${HEALTH_CHECK_LABEL}" }
-                /* Health Checks are run for all branches */
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
-                steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags health-check --vault-password-file=.ansible-vault-password'
-                }
+            /* Health Checks are run for all branches */
+            environment {
+                ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
+            }
+            steps {
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags health-check --vault-password-file=.ansible-vault-password'
+            }
         }
         stage('Smoke Tests') {
-            agent { label "${SMOKE_TEST_LABEL}" }
-                /* Smoke test only runs when branch is qa or regression*/
-                when {
-                    expression {
-                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
-                    }
+            /* Smoke test only runs when branch is qa or regression*/
+            when {
+                expression {
+                    return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
-                steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags smoke-test --vault-password-file=.ansible-vault-password'
-                }
+            }
+            environment {
+                ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
+            }
+            steps {
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags smoke-test --vault-password-file=.ansible-vault-password'
+            }
         }
         stage('Regression Tests') {
-            agent { label "${REGRESSION_TEST_LABEL}" }
-                /* Regression test only runs when branch is qa or regression*/
-                when {
-                    expression {
-                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
-                    }
+            /* Regression test only runs when branch is qa or regression*/
+            when {
+                expression {
+                    return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
-                steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags regression-test --vault-password-file=.ansible-vault-password'
-                }
+            }
+            environment {
+                ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
+            }
+            steps {
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags regression-test --vault-password-file=.ansible-vault-password'
+            }
         }
         stage('Performance Tests') {
-            agent { label "${PERFORMANCE_TEST_LABEL}" }
-                /* Performance test only runs when branch is qa or regression*/
-                when {
-                    expression {
-                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
-                    }
+            /* Performance test only runs when branch is qa or regression*/
+            when {
+                expression {
+                    return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
-                steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags performance-test --vault-password-file=.ansible-vault-password'
-                }
+            }
+            environment {
+                ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
+            }
+            steps {
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags performance-test --vault-password-file=.ansible-vault-password'
+            }
         }
         stage('Load Tests') {
-            agent { label "${LOAD_TEST_LABEL}" }
-                /* Load test only runs when branch is qa or regression*/
-                when {
-                    expression {
-                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
-                    }
+            /* Load test only runs when branch is qa or regression*/
+            when {
+                expression {
+                    return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
-                steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags load-test --vault-password-file=.ansible-vault-password'
-                }
+            }
+            environment {
+                ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
+            }
+            steps {
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags load-test --vault-password-file=.ansible-vault-password'
+            }
         }
         stage('Security Tests') {
-            agent { label "${SECURITY_TEST_LABEL}" }
-                /* Security test only runs when branch is qa or regression*/
-                when {
-                    expression {
-                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
-                    }
+            /* Security test only runs when branch is qa or regression*/
+            when {
+                expression {
+                    return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
-                steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags security-test --vault-password-file=.ansible-vault-password'
-                }
+            }
+            environment {
+                ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
+            }
+            steps {
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags security-test --vault-password-file=.ansible-vault-password'
+            }
         }
         stage('Promote Packages') {
-            agent { label "${PROMOTE_PACKAGES_LABEL}" }
-                /* Promote Packages only runs when branch is release */
-                when {
-                    expression {
-                        return ("${GIT_BRANCH}" == 'release')
-                    }
+            /* Promote Packages only runs when branch is release */
+            when {
+                expression {
+                    return ("${GIT_BRANCH}" == 'release')
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
-                steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags promote-packages --vault-password-file=.ansible-vault-password'
-                }
-        }
-        stage('Send Notification') {
-            agent { label 'stable && docker && linux && ansible' }
-                /* Notifications are sent for all branches */
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
-                steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags send-notification --vault-password-file=.ansible-vault-password'
-                }
+            }
+            environment {
+                ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
+            }
+            steps {
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
+                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags promote-packages --vault-password-file=.ansible-vault-password'
+            }
         }
     }
-
 }

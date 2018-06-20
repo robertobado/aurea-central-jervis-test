@@ -6,14 +6,14 @@ TODO:
 */
 
 def defaultLabel = 'stable && docker && linux && ansible'
-println("env.BRANCH_NAME=${env.BRANCH_NAME}")
-println("BUILD_DOCKER_IMAGE_LABEL=${BUILD_DOCKER_IMAGE_LABEL}")
-//println("DEPLOYMENT_TARGET=$DEPLOYMENT_TARGET")
-node(defaultLabel) {
+
+//node(defaultLabel) {
     stage('Checkout SCM') {
-        checkout scm
-        withCredentials([usernamePassword(credentialsId: 'github-user-and-token', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
-            sh 'git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git && git submodule update --init'
+        node(defaultLabel) {
+            checkout scm
+            withCredentials([usernamePassword(credentialsId: 'github-user-and-token', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
+                sh 'git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git && git submodule update --init'
+            }
         }
     }
     stage('Custom Stage') {
@@ -32,7 +32,7 @@ node(defaultLabel) {
             }
         }
     }
-}
+
 
 //pipeline {
 //    environment {

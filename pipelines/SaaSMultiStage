@@ -20,12 +20,12 @@ node(defaultLabel) {
             sh 'echo this is  a custom step!!!'
         }
     }
-    if(env.JERVIS_RAW_YAML.contains("docker_image") &&
+    if(env.JERVIS_RAW_YAML.contains("docker-k8s-agents") &&
             !("${GIT_BRANCH}" == 'master' || "${GIT_BRANCH}" == 'release') ) {
         stage('Build Docker Image') {
             node("${BUILD_DOCKER_IMAGE_LABEL}") {
                 def ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                unstash 'artifacts'
+                //unstash 'artifacts'
                 sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                 sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags docker-image-build --vault-password-file=.ansible-vault-password'
             }

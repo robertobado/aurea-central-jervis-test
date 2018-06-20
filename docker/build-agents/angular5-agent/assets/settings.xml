@@ -1,0 +1,27 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                https://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <servers>
+        <server>
+            <id>nexus3-aurea-releases</id>
+            <username>NEXUS_RELEASES_LOGIN</username>
+            <password>NEXUS_RELEASES_PASSWORD</password>
+        </server>
+        <server>
+            <id>nexus3-aurea-snapshots</id>
+            <username>NEXUS_SNAPSHOTS_LOGIN</username>
+            <password>NEXUS_SNAPSHOTS_PASSWORD</password>
+        </server>
+        <server>
+            <id>nexus3-aurea-thirdparty</id>
+            <username>NEXUS_THIRDPARTY_LOGIN</username>
+            <password>NEXUS_THIRDPARTY_PASSWORD</password>
+        </server>
+        <server>
+            <id>nexus3-aurea-sites</id>
+            <username>NEXUS_SITES_LOGIN</username>
+            <password>NEXUS_SITES_PASSWORD</password>
+        </server>
+    </servers>
+</settings>

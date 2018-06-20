@@ -1,7 +1,7 @@
 #!groovy
 /*
-TODO:
-1. Refactor code in steps section into a function to improve readability and maintenance
+TODO: 
+1. Refactor code in steps section into a function to improve readability and maintenance 
 2. Investigate why ANSIBLE_VAULT_PASSWORD is per stage and not global
 */
 

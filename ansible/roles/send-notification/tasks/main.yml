@@ -1,3 +1,0 @@
-- name: "Send Notifications"
-  shell: "echo Send Notifications"
-  delegate_to: localhost

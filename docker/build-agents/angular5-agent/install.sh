@@ -5,7 +5,7 @@ yum update -y
 yum install -y \
             awscli docker.io bzip2 libfontconfig openssh-server curl sudo \
             xorg xvfb xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic \
-            python-software-properties zip
+            python-software-properties zip git
 
 cat << EOF > /etc/yum.repos.d/google-chrome.repo
 [google-chrome]

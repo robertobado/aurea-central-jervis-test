@@ -20,11 +20,11 @@
   when: lookup('env','BRANCH_NAME') == ''
 - name: "Selecting target environment"
   set_fact:
-    environment_name: "{{ (branch_environment_map[lookup('env','BRANCH_NAME').split('/') | first | lower] | default(branch_environment_map.feature) )[lookup('env','BRANCH_NAME').split('/') | first | lower] | default('dev') }}"
-  when: lookup('env','BRANCH_NAME') != ''
+    environment_name: "{{ branch_environment_map[ branch_environment_key ][ branch_environment_key ] | default('dev') }}"
+  when: lookup('env','BRANCH_NAME') != '' and environment_name is not defined
 - name: "Evaluating if trigger is Pull Request"
   set_fact:
-    environment_name: "{{ (branch_environment_map[lookup('env','BRANCH_NAME').split('/') | first | lower] | default(branch_environment_map.feature) )[lookup('env','CHANGE_TARGET') | default(environment_name, true) | lower] | default('dev') }}"
+    environment_name: "{{ branch_environment_map[ branch_environment_key ][ lookup('env','CHANGE_TARGET') | default(environment_name, true) | lower] | default('dev') }}"
   when: lookup('env','IS_PR_BUILD') != '' and lookup('env','IS_PR_BUILD') | bool
 - name: "Fetching version tags..."
   shell: 'git describe --tags --abbrev=0 || echo $GIT_COMMIT | cut -c1-7'
@@ -37,8 +37,8 @@
 - name: "Converting version"
   set_fact:
     version_tag: "{{ version_tag_describe_result.stdout }}"
-    tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME').split('/') | first | lower ].tag_suffix | default('-UNSTABLE') }}"
-    promote_tag_suffix: "{{ branch_environment_map[ lookup('env','BRANCH_NAME').split('/') | first | lower ].promote_tag_suffix | default('-DEVEL') }}"
+    tag_suffix: "{{ branch_environment_map[ branch_environment_key ].tag_suffix | default('-UNSTABLE') }}"
+    promote_tag_suffix: "{{ branch_environment_map[ branch_environment_key ].promote_tag_suffix | default('-DEVEL') }}"
   delegate_to: localhost
   delegate_facts: true
 - name: "Using git hash for development)"

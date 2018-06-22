@@ -2,12 +2,13 @@
 /*
 TODO: 
 1. Refactor code in steps section into a function to improve readability and maintenance 
-2. Investigate why ANSIBLE_VAULT_PASSWORD is per stage and not global
 */
 
 pipeline {
     environment {
         JERVIS_PLAYBOOK = 'aurea-central-jervis/ansible/jervis.yml'
+        ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
+        COMPOSE_FORCE_WINDOWS_HOST = 1
     }
     agent {
         label 'stable && docker && linux && ansible'
@@ -21,9 +22,9 @@ pipeline {
                 extensions: [[$class: 'LocalBranch', localBranch: env.BRANCH_NAME]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-user-and-token', url: env.GIT_URL]]])
 
                 withCredentials([usernamePassword(credentialsId: 'github-user-and-token', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
-                    sh 'git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git'
-                    sh 'git submodule update --init'
+                    sh 'git clone https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git'
                 }
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
             }
         }
         stage('Build Docker Image') {
@@ -33,23 +34,30 @@ pipeline {
                     return !("${GIT_BRANCH}" == 'master' || "${GIT_BRANCH}" == 'release')
                     }
                 }
-                environment {
-                  ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
                   unstash 'artifacts'
-                  sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                  sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags docker-image-build --vault-password-file=.ansible-vault-password'
+                    script {
+                        Map ansible_tasks = [failFast: true]
+                        env.JERVIS_YAMLS.tokenize(',').each{ String jervisFile ->
+                            ansible_tasks[jervisFile] = {
+                                sh 'JERVIS_FILE=${jervisFile} ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags docker-image-build --vault-password-file=.ansible-vault-password'
+                            }
+                        }
+                        parallel(ansible_tasks)
+                    }
                 }
         }
         stage('Service Deploy') {
-                environment {
-                  ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                  COMPOSE_FORCE_WINDOWS_HOST = 1
-                }
                 steps {
-                  sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                  sh 'export COMPOSE_FORCE_WINDOWS_HOST=1 && ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags docker-service-deploy,ec2-instance,ec2-service-deploy,vmware-group,k8s-deploy --vault-password-file=.ansible-vault-password'
+                    script {
+                        Map ansible_tasks = [failFast: true]
+                        env.JERVIS_YAMLS.tokenize(',').each{ String jervisFile ->
+                            ansible_tasks[jervisFile] = {
+                                sh 'export COMPOSE_FORCE_WINDOWS_HOST=1 && ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags docker-service-deploy,ec2-instance,ec2-service-deploy,vmware-group,k8s-deploy --vault-password-file=.ansible-vault-password'
+                            }
+                        }
+                        parallel(ansible_tasks)
+                    }
                 }
         }
         stage('VMWare Service Deploy') {
@@ -59,25 +67,34 @@ pipeline {
                     }
                 }
                 environment {
-                  ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
                   VMWARE_USER = credentials('vsphere-user-name')
                   VMWARE_PASSWORD = credentials('vsphere-user-password')
-                  COMPOSE_FORCE_WINDOWS_HOST = 1
                   OBJC_DISABLE_INITIALIZE_FORK_SAFETY="YES"
                 }
                 steps {
-                  sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                  sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags vmware-create,vmware-service-deploy --vault-password-file=.ansible-vault-password'
+                    script {
+                        Map ansible_tasks = [failFast: true]
+                        env.JERVIS_YAMLS.tokenize(',').each{ String jervisFile ->
+                            ansible_tasks[jervisFile] = {
+                                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags vmware-create,vmware-service-deploy --vault-password-file=.ansible-vault-password'
+                            }
+                        }
+                        parallel(ansible_tasks)
+                    }
                 }
         }
         stage('Health Checks') {
                 /* Health Checks are run for all branches */
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags health-check --vault-password-file=.ansible-vault-password'
+                    script {
+                        Map ansible_tasks = [failFast: true]
+                        env.JERVIS_YAMLS.tokenize(',').each{ String jervisFile ->
+                            ansible_tasks[jervisFile] = {
+                                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags health-check --vault-password-file=.ansible-vault-password'
+                            }
+                        }
+                        parallel(ansible_tasks)
+                    }
                 }
         }
         stage('Smoke Tests') {
@@ -87,12 +104,16 @@ pipeline {
                         return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
                     }
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags smoke-test --vault-password-file=.ansible-vault-password'
+                    script {
+                        Map ansible_tasks = [failFast: true]
+                        env.JERVIS_YAMLS.tokenize(',').each{ String jervisFile ->
+                            ansible_tasks[jervisFile] = {
+                                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags smoke-test --vault-password-file=.ansible-vault-password'
+                            }
+                        }
+                        parallel(ansible_tasks)
+                    }
                 }
         }
         stage('Regression Tests') {
@@ -102,12 +123,16 @@ pipeline {
                         return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
                     }
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags regression-test --vault-password-file=.ansible-vault-password'
+                    script {
+                        Map ansible_tasks = [failFast: true]
+                        env.JERVIS_YAMLS.tokenize(',').each{ String jervisFile ->
+                            ansible_tasks[jervisFile] = {
+                                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags regression-test --vault-password-file=.ansible-vault-password'
+                            }
+                        }
+                        parallel(ansible_tasks)
+                    }
                 }
         }
         stage('Performance Tests') {
@@ -117,12 +142,16 @@ pipeline {
                         return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
                     }
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags performance-test --vault-password-file=.ansible-vault-password'
+                    script {
+                        Map ansible_tasks = [failFast: true]
+                        env.JERVIS_YAMLS.tokenize(',').each{ String jervisFile ->
+                            ansible_tasks[jervisFile] = {
+                                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags performance-test --vault-password-file=.ansible-vault-password'
+                            }
+                        }
+                        parallel(ansible_tasks)
+                    }
                 }
         }
         stage('Load Tests') {
@@ -132,12 +161,16 @@ pipeline {
                         return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
                     }
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags load-test --vault-password-file=.ansible-vault-password'
+                    script {
+                        Map ansible_tasks = [failFast: true]
+                        env.JERVIS_YAMLS.tokenize(',').each{ String jervisFile ->
+                            ansible_tasks[jervisFile] = {
+                                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags load-test --vault-password-file=.ansible-vault-password'
+                            }
+                        }
+                        parallel(ansible_tasks)
+                    }
                 }
         }
         stage('Security Tests') {
@@ -147,12 +180,16 @@ pipeline {
                         return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
                     }
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags security-test --vault-password-file=.ansible-vault-password'
+                    script {
+                        Map ansible_tasks = [failFast: true]
+                        env.JERVIS_YAMLS.tokenize(',').each{ String jervisFile ->
+                            ansible_tasks[jervisFile] = {
+                                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags security-test --vault-password-file=.ansible-vault-password'
+                            }
+                        }
+                        parallel(ansible_tasks)
+                    }
                 }
         }
         stage('Promote Packages') {
@@ -162,12 +199,16 @@ pipeline {
                         return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'release')
                     }
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
-                    sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags promote-packages --vault-password-file=.ansible-vault-password'
+                    script {
+                        Map ansible_tasks = [failFast: true]
+                        env.JERVIS_YAMLS.tokenize(',').each{ String jervisFile ->
+                            ansible_tasks[jervisFile] = {
+                                sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags promote-packages --vault-password-file=.ansible-vault-password'
+                            }
+                        }
+                        parallel(ansible_tasks)
+                    }
                 }
         }
     }

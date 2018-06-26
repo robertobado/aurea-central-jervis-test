@@ -38,8 +38,11 @@ pipeline {
                   unstash 'artifacts'
                     script {
                         Map ansible_tasks = [failFast: true]
+                        println "env.JERVIS_YAMLS=${env.JERVIS_YAMLS}"
+                        println "env.JERVIS_YAMLS.tokenize=${env.JERVIS_YAMLS.tokenize(',')}"
                         env.JERVIS_YAMLS.tokenize(',').each{ String jervisFile ->
                             ansible_tasks[jervisFile] = {
+                                println "jervisFile=${jervisFile}"
                                 sh 'JERVIS_YAML=${jervisFile} ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags docker-image-build --vault-password-file=.ansible-vault-password'
                             }
                         }

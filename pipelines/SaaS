@@ -171,6 +171,12 @@ pipeline {
                 }
         }
         stage('Promote Packages') {
+            /* Promote Packages only runs when branch is release or qa branches */
+                when {
+                    expression {
+                        return ("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'release' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'qa' )
+                    }
+                }
                 environment {
                     ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
                 }

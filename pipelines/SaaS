@@ -21,16 +21,17 @@ pipeline {
                 extensions: [[$class: 'LocalBranch', localBranch: env.BRANCH_NAME]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-user-and-token', url: env.GIT_URL]]])
 
                 withCredentials([usernamePassword(credentialsId: 'github-user-and-token', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
-                    sh 'git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git'
-                    sh 'git submodule update --init'
+                    sh 'git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git && git submodule update --init && cd aurea-central-jervis && git checkout $CENTRAL_JERVIS_BRANCH'
                 }
+                println("branch first tag = ")
+                println("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase())
             }
         }
         stage('Build Docker Image') {
                 /* Do not build when branch is master or release */
                 when {
                   expression {
-                    return !("${GIT_BRANCH}" == 'master' || "${GIT_BRANCH}" == 'release')
+                    return !("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'master' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'release')
                     }
                 }
                 environment {
@@ -98,7 +99,7 @@ pipeline {
                 /* Smoke test only runs when branch is qa or regression*/
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
+                        return ("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'qa' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'regression')
                     }
                 }
                 environment {
@@ -113,7 +114,7 @@ pipeline {
                 /* Regression test only runs when branch is qa or regression*/
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
+                        return ("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'qa' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'regression')
                     }
                 }
                 environment {
@@ -128,7 +129,7 @@ pipeline {
                 /* Performance test only runs when branch is qa or regression*/
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
+                        return ("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'qa' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'regression')
                     }
                 }
                 environment {
@@ -143,7 +144,7 @@ pipeline {
                 /* Load test only runs when branch is qa or regression*/
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
+                        return ("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'qa' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'regression')
                     }
                 }
                 environment {
@@ -158,7 +159,7 @@ pipeline {
                 /* Security test only runs when branch is qa or regression*/
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'qa' || "${GIT_BRANCH}" == 'regression')
+                        return ("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'qa' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'regression')
                     }
                 }
                 environment {
@@ -173,7 +174,7 @@ pipeline {
                 /* Promote Packages only runs when branch is release */
                 when {
                     expression {
-                        return ("${GIT_BRANCH}" == 'release')
+                        return ("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'release')
                     }
                 }
                 environment {

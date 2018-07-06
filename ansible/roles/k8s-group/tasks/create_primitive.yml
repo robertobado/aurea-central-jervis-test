@@ -33,14 +33,11 @@
     propagation_policy: "{{ 'Foreground' if type == 'deployment' else omit }}"
     inline_data: "{{ rawDefinition }}"
   register: k8s_result_remove
+  when: type != 'deployment'
+
 
 - name: Show delete result for "{{ type }}"
   debug: var=k8s_result_remove
-
-- name: sleep for 10 seconds
-  wait_for: timeout=10
-  delegate_to: localhost
-  when: type == 'deployment'
 
 - name: Create kubernetes primitive from an inline definition "{{ type }}"
   kubernetes:
@@ -52,3 +49,15 @@
 
 - name: Show create result for "{{ type }}"
   debug: var=k8s_result
+
+- name: Apply replace for "{{ type }}"
+  kubernetes:
+    api_endpoint: "{{ api_host }}"
+    state: "replace"
+    service_token: "{{ api_key }}"
+    inline_data: "{{ rawDefinition }}"
+  register: k8s_replace_result
+  when: type == 'deployment'
+
+- name: Show replace result for "{{ type }}"
+  debug: var=k8s_replace_result

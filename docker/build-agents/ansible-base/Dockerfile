@@ -8,7 +8,7 @@ RUN curl -o- https://download.docker.com/linux/debian/dists/stretch/pool/stable/
 RUN dpkg -i docker.deb || rm docker.deb
 RUN apt --fix-broken -y install
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
-RUN echo deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main >>  /etc/apt/sources.list
+RUN echo deb http://ppa.launchpad.net/ansible/ansible-2.5/ubuntu trusty main >>  /etc/apt/sources.list
 RUN apt-get update
 RUN apt-get install ansible  -y
 RUN pip uninstall docker-py; pip uninstall docker; pip install docker docker-compose "pywinrm>=0.2.2"; \

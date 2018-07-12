@@ -19,6 +19,7 @@
      push: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.push | default('yes')}}"
      dockerfile: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.dockerfile | default(omit)}}"
      docker_host: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.docker_host | default('tcp://dlb1.aureacentral.com:2375')}}"
+     timeout: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.timeout | default(omit)}}"
   delegate_to: localhost
   delegate_facts: true
   when: hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first] is defined and hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image is defined

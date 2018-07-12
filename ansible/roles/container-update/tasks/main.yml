@@ -145,9 +145,9 @@
     tls_hostname: "{{ hostvars[inventory_hostname.split('@') | last].tls_hostname | default(omit) }}"
     tls_verify: "{{ hostvars[inventory_hostname.split('@') | last].tls_verify | default(omit) }}"
   environment:
-    IMAGE_TAG: hostvars['localhost'].version_tag ~ hostvars['localhost'].tag_suffix
-    ENV_NAME: environment_name
-    PRODUCT: product
+    IMAGE_TAG: "{{ hostvars['localhost'].version_tag ~ hostvars['localhost'].tag_suffix }}"
+    ENV_NAME: "{{ environment_name }}"
+    PRODUCT: "{{ product }}"
   delegate_to: localhost
   retries: 3
   when: hostvars[inventory_hostname.split('@') | last].project_src is defined

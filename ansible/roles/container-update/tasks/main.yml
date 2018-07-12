@@ -244,4 +244,4 @@
     working_dir: "{{ hostvars[inventory_hostname.split('@') | last].working_dir | default(omit) }}"
   delegate_to: localhost
   retries: 3
-  when: hostvars[inventory_hostname.split('@') | last].cpus is not defined
+  when: hostvars[inventory_hostname.split('@') | last].cpus is not defined and hostvars[inventory_hostname.split('@') | last].project_src is not defined

@@ -124,7 +124,7 @@
     stopped: "{{ hostvars[inventory_hostname.split('@') | last].stopped | default(omit) }}"
     pull: "{{ hostvars[inventory_hostname.split('@') | last].pull | default(omit) }}"
     project_src: "../../{{ hostvars[inventory_hostname.split('@') | last].project_src }}"
-    services: "{{ hostvars[inventory_hostname.split('@') | last].services | default(omit) }}"
+    services: "{{ hostvars[inventory_hostname.split('@') | last].docker_compose_services | default(omit) }}"
     files: "{{ hostvars[inventory_hostname.split('@') | last].files | default(omit) }}"
     docker_host: "{{ docker_host | default(omit) }}"
     timeout: "{{ hostvars[inventory_hostname.split('@') | last].timeout | default(omit) }}"

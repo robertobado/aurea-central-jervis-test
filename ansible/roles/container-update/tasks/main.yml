@@ -116,6 +116,42 @@
   retries: 3
   when: hostvars[inventory_hostname.split('@') | last].cpus is defined
 
+- name: "Updating docker using docker-compose.yml"
+  docker_service:
+    project_name: "{{ environment_name }}_{{ product }}_{{ inventory_hostname.split('@') | last }}"
+    recreate: "{{ hostvars[inventory_hostname.split('@') | last].recreate | default(omit) }}"
+    state: "{{ hostvars[inventory_hostname.split('@') | last].state | default(omit) }}"
+    stopped: "{{ hostvars[inventory_hostname.split('@') | last].stopped | default(omit) }}"
+    pull: "{{ hostvars[inventory_hostname.split('@') | last].pull | default(omit) }}"
+    project_src: "../../{{ hostvars[inventory_hostname.split('@') | last].project_src }}"
+    services: "{{ hostvars[inventory_hostname.split('@') | last].docker_compose_services | default(omit) }}"
+    files: "{{ hostvars[inventory_hostname.split('@') | last].files | default(omit) }}"
+    docker_host: "{{ docker_host | default(omit) }}"
+    timeout: "{{ hostvars[inventory_hostname.split('@') | last].timeout | default(omit) }}"
+    build: "{{ hostvars[inventory_hostname.split('@') | last].build | default(omit) }}"
+    debug: "{{ hostvars[inventory_hostname.split('@') | last].debug | default(omit) }}"
+    dependencies: "{{ hostvars[inventory_hostname.split('@') | last].dependencies | default(omit) }}"
+    hostname_check: "{{ hostvars[inventory_hostname.split('@') | last].hostname_check | default(omit) }}"
+    cacert_path: "{{ hostvars[inventory_hostname.split('@') | last].cacert_path | default(omit) }}"
+    cert_path: "{{ hostvars[inventory_hostname.split('@') | last].cert_path | default(omit) }}"
+    key_path: "{{ hostvars[inventory_hostname.split('@') | last].key_path | default(omit) }}"
+    nocache: "{{ hostvars[inventory_hostname.split('@') | last].nocache | default(omit) }}"
+    remove_images: "{{ hostvars[inventory_hostname.split('@') | last].remove_images | default(omit) }}"
+    remove_volumes: "{{ hostvars[inventory_hostname.split('@') | last].remove_volumes | default(omit) }}"
+    restarted: "{{ hostvars[inventory_hostname.split('@') | last].restarted | default(omit) }}"
+    scale: "{{ hostvars[inventory_hostname.split('@') | last].scale | default(omit) }}"
+    ssl_version: "{{ hostvars[inventory_hostname.split('@') | last].ssl_version | default(omit) }}"
+    tls: "{{ hostvars[inventory_hostname.split('@') | last].tls | default(omit) }}"
+    tls_hostname: "{{ hostvars[inventory_hostname.split('@') | last].tls_hostname | default(omit) }}"
+    tls_verify: "{{ hostvars[inventory_hostname.split('@') | last].tls_verify | default(omit) }}"
+  environment:
+    IMAGE_TAG: "{{ hostvars['localhost'].version_tag ~ hostvars['localhost'].tag_suffix }}"
+    ENV_NAME: "{{ environment_name }}"
+    PRODUCT: "{{ product }}"
+  delegate_to: localhost
+  retries: 3
+  when: hostvars[inventory_hostname.split('@') | last].project_src is defined
+
 - name: "Updating docker using container module"
   docker_container:
     api_version: "{{ hostvars[inventory_hostname.split('@') | last].api_version | default(omit) }}"
@@ -208,4 +244,4 @@
     working_dir: "{{ hostvars[inventory_hostname.split('@') | last].working_dir | default(omit) }}"
   delegate_to: localhost
   retries: 3
-  when: hostvars[inventory_hostname.split('@') | last].cpus is not defined
+  when: hostvars[inventory_hostname.split('@') | last].cpus is not defined and hostvars[inventory_hostname.split('@') | last].project_src is not defined

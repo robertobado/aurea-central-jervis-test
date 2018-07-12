@@ -116,6 +116,22 @@
   retries: 3
   when: hostvars[inventory_hostname.split('@') | last].cpus is defined
 
+- name: "Updating docker using docker-compose.yml"
+  docker_service:
+    project_name: "{{ environment_name }}_{{ product }}_{{ inventory_hostname.split('@') | last }}"
+    recreate: "{{ hostvars[inventory_hostname.split('@') | last].recreate | default(omit) }}"
+    state: "{{ hostvars[inventory_hostname.split('@') | last].state | default(omit) }}"
+    stopped: "{{ hostvars[inventory_hostname.split('@') | last].stopped | default(omit) }}"
+    pull: "{{ hostvars[inventory_hostname.split('@') | last].pull | default(omit) }}"
+    project_src: "{{ hostvars[inventory_hostname.split('@') | last].project_src }}"
+    services: "{{ hostvars[inventory_hostname.split('@') | last].services | default(omit) }}"
+    files: "{{ hostvars[inventory_hostname.split('@') | last].files | default(omit) }}"
+    docker_host: "{{ docker_host | default(omit) }}"
+    timeout: "{{ hostvars[inventory_hostname.split('@') | last].timeout | default(120) }}"
+  delegate_to: localhost
+  retries: 3
+  when: hostvars[inventory_hostname.split('@') | last].project_src is defined
+
 - name: "Updating docker using container module"
   docker_container:
     api_version: "{{ hostvars[inventory_hostname.split('@') | last].api_version | default(omit) }}"

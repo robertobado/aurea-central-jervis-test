@@ -4,7 +4,7 @@
      repository: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.name.split(':') | first }}:{{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].promote_tag_suffix }}"
      push: yes
      force: yes
-     docker_host: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.docker_host | default('tcp://dlb1.aureacentral.com:2375')}}"
+     docker_host: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.docker_host | default('tcp://docker-build.aureacentral.com:2375')}}"
   delegate_to: localhost
   delegate_facts: true
   when: hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first] is defined and hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image is defined

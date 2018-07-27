@@ -78,11 +78,7 @@ ENV USERNAME=root
 
 ENV TC_PATH=/opt/buildagent
 
-ENV DOCKER_CERT_PATH=/root/.docker
-
-ENV DOCKER_TLS_VERIFY=1
-
-ENV DOCKER_HOST=dlb1.aureacentral.com:2376
+ENV DOCKER_HOST=docker-build.aureacentral.com:2375
 
 ENV TEAMCITY_BUILD_INIT_PATH=/opt/buildagent/lib/serviceMessages.jar:/opt/buildagent/lib/runtime-util.jar:/opt/buildagent/plugins/gradle-runner/lib/gradle-runner-common.jar
 

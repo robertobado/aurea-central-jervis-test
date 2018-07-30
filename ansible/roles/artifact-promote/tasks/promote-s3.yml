@@ -24,15 +24,6 @@
   tags: artifact-promote
 
 - name: "Downloading S3 artifact {{ artifact.src }}"
-  debug:
-    msg: "dest={{ tempfile_result.path }}/[{{ artifact.src.split('/') | difference(artifact.src.split('/') | first) | join('/') }}][{{ object_key.split(artifact.src.split('/') | difference(artifact.src.split('/') | first) | join('/')) | last }}]"
-  delegate_to: localhost
-  loop: "{{ list_result.s3_keys }}"
-  loop_control:
-    loop_var: object_key
-  tags: artifact-promote
-
-- name: "Downloading S3 artifact {{ artifact.src }}"
   aws_s3:
     aws_access_key: "{{ s3_access_key }}"
     aws_secret_key: "{{ s3_secret_key }}"

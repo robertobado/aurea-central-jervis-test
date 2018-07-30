@@ -27,6 +27,26 @@ pipeline {
                 sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
             }
         }
+        stage('Publish Artifacts') {
+                /* Do not publish when branch is master or release */
+                when {
+                  expression {
+                    return !("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'master' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'release')
+                    }
+                }
+                steps {
+                  unstash 'artifacts'
+                    script {
+                        Map ansible_tasks = [failFast: true]
+                        env.JERVIS_YAMLS.tokenize(',').each{ String jervisFile ->
+                            ansible_tasks[jervisFile] = {
+                                sh "JERVIS_YAML=${jervisFile} ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags artifact-publish --vault-password-file=.ansible-vault-password"
+                            }
+                        }
+                        parallel(ansible_tasks)
+                    }
+                }
+        }
         stage('Build Docker Image') {
                 /* Do not build when branch is master or release */
                 when {
@@ -204,7 +224,7 @@ pipeline {
                         Map ansible_tasks = [failFast: true]
                         env.JERVIS_YAMLS.tokenize(',').each{ String jervisFile ->
                             ansible_tasks[jervisFile] = {
-                                sh "JERVIS_YAML=${jervisFile} ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags promote-packages --vault-password-file=.ansible-vault-password"
+                                sh "JERVIS_YAML=${jervisFile} ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags promote-packages,artifact-promote --vault-password-file=.ansible-vault-password"
                             }
                         }
                         parallel(ansible_tasks)

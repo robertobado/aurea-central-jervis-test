@@ -1,0 +1,13 @@
+- name: "Promoting nexus artifacts"
+  include_tasks: promote-nexus.yml
+  loop: "{{ (hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].nexus | default({ 'promote': {} })).promote[environment_name] | default([])}}"
+  loop_control:
+    loop_var: artifact
+  tags: artifact-promote
+
+- name: "Promoting s3 artifacts"
+  include_tasks: promote-s3.yml
+  loop: "{{ (hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].s3 | default({ 'promote': {} })).promote[environment_name] | default([])}}"
+  loop_control:
+    loop_var: artifact
+  tags: artifact-promote

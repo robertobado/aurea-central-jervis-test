@@ -1,0 +1,71 @@
+
+- name: "Listing S3 artifact path {{ artifact.src }}"
+  aws_s3:
+    aws_access_key: "{{ s3_access_key }}"
+    aws_secret_key: "{{ s3_secret_key }}"
+    bucket: "{{ artifact.src.split('/') | first }}"
+    prefix: "{{ artifact.src.split('/') | difference(artifact.src.split('/') | first) | join('/') }}"
+    mode: list
+  delegate_to: localhost
+  register: list_result
+  tags: artifact-promote
+
+- name:
+  set_fact:
+    artifact_type: "{{ 'file' if list_result.s3_keys[0] == (artifact.src.split('/') | difference(artifact.src.split('/') | first) | join('/')) else 'directory' }}"
+  delegate_to: localhost
+  tags: artifact-promote
+
+- name: "Creating temporary file for {{ artifact.src }}"
+  tempfile:
+    state: "{{ artifact_type }}"
+  register: tempfile_result
+  delegate_to: localhost
+  tags: artifact-promote
+
+- name: "Downloading S3 artifact {{ artifact.src }}"
+  debug:
+    msg: "dest={{ tempfile_result.path }}/[{{ artifact.src.split('/') | difference(artifact.src.split('/') | first) | join('/') }}][{{ object_key.split(artifact.src.split('/') | difference(artifact.src.split('/') | first) | join('/')) | last }}]"
+  delegate_to: localhost
+  loop: "{{ list_result.s3_keys }}"
+  loop_control:
+    loop_var: object_key
+  tags: artifact-promote
+
+- name: "Downloading S3 artifact {{ artifact.src }}"
+  aws_s3:
+    aws_access_key: "{{ s3_access_key }}"
+    aws_secret_key: "{{ s3_secret_key }}"
+    bucket: "{{ artifact.src.split('/') | first }}"
+    object: "{{ object_key }}"
+    mode: get
+    dest: "{{ tempfile_result.path }}/{{ object_key.split((artifact.src.split('/') | difference(artifact.src.split('/') | first) | join('/'))) | last }}"
+  delegate_to: localhost
+  loop: "{{ list_result.s3_keys }}"
+  loop_control:
+    loop_var: object_key
+  tags: artifact-promote
+    
+- name: Publishing S3 artifacts directory
+  s3_sync:
+    aws_access_key: "{{ s3_access_key }}"
+    aws_secret_key: "{{ s3_secret_key }}"
+    bucket: "{{ artifact.target.split('/') | first }}"
+    key_prefix: "{{ artifact.target.split('/') | difference(artifact.target.split('/') | first) | join('/') }}"
+    file_root: "{{ tempfile_result.path }}"
+    region: "{{ artifact.region | default('us-east-1') }}"
+  delegate_to: localhost
+  when: artifact_type == 'directory'
+  tags: artifact-promote
+
+- name: Publishing S3 artifact file
+  aws_s3:
+    aws_access_key: "{{ s3_access_key }}"
+    aws_secret_key: "{{ s3_secret_key }}"
+    bucket: "{{ artifact.src.split('/') | first }}"
+    object: "{{ artifact.target.split('/') | difference(artifact.target.split('/') | first) | join('/') }}"
+    mode: put
+    src: "{{ tempfile_result.path }}"
+  delegate_to: localhost
+  when: artifact_type == 'file'
+  tags: artifact-promote

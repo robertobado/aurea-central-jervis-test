@@ -1,0 +1,34 @@
+- name: Testing if we will overwrite something we shouldn't
+  uri:
+    url: "https://nexus.devfactory.com/repository/{{ artifact.target }}"
+    user: "{{ nexus_username }}"
+    password: "{{ nexus_password }}"
+    method: HEAD
+    force_basic_auth: yes
+    status_code: 404
+  delegate_to: localhost
+  loop: "{{ (hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].nexus | default({ 'publish': {} })).publish[environment_name] | default([])}}"
+  loop_control:
+    loop_var: artifact
+  when: not (artifact.overwrite | default(false))
+
+- name: Publishing Nexus Artifacts
+  shell: "curl -k -X PUT -v --upload-file {{ lookup('env','WORKSPACE') ~ '/' ~ artifact.src }} -u '{{ nexus_username }}:{{ nexus_password }}' 'https://nexus.devfactory.com/repository/{{ artifact.target }}'"
+  delegate_to: localhost
+  loop: "{{ (hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].nexus | default({ 'publish': {} })).publish[environment_name] | default([])}}"
+  loop_control:
+    loop_var: artifact
+  when: hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].nexus is defined
+
+- name: Publishing S3 Artifacts
+  s3_sync:
+    aws_access_key: "{{ s3_access_key }}"
+    aws_secret_key: "{{ s3_secret_key }}"
+    bucket: "{{ artifact.target.split('/') | first }}"
+    key_prefix: "{{ artifact.target.split('/') | difference(artifact.target.split('/') | first) | join('/') }}"
+    file_root: "{{ lookup('env','WORKSPACE') ~ '/' ~ artifact.src }}"
+    region: "{{ artifact.region | default('us-east-1') }}"
+  delegate_to: localhost
+  loop: "{{ (hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].s3 | default({ 'publish': {} })).publish[environment_name] | default([]) }}"
+  loop_control:
+    loop_var: artifact

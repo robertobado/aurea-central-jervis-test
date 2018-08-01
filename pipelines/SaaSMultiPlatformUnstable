@@ -68,6 +68,7 @@ pipeline {
                 steps {
                   sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                   sh "ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags vmware-create,vmware-service-deploy --vault-password-file=.ansible-vault-password -vvvvvvvvvv"
+                }
         }
         stage('Health Checks') {
                 /* Health Checks are run for all branches */

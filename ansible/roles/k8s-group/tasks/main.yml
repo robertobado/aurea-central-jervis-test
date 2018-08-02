@@ -1,4 +1,14 @@
 ---
+- name: Set container_image_tag if not defined
+  set_fact:
+    container_image_tag: "{{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].tag_suffix }}"
+  when: container_image_tag is not defined
+
+- name: Set container hostname if not defined
+  set_fact:
+    container_name: "{{ environment_name }}-{{ project }}-{{ service_name }}"
+  when: container_name is not defined
+
 - name: Run k8s object deployment tasks
   include_tasks: object.yml
   when: inventory_hostname == 'k8s-object-host'

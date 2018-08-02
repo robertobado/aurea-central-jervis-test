@@ -120,6 +120,8 @@
   gather_facts: no
   roles:
     - container-update
+    - artifact-publish
+    - artifact-promote
 
 - name: Aurea Central Jervis VMWare deploy
   strategy: free

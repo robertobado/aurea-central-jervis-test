@@ -1,13 +1,18 @@
 ---
-- name: Defining container hostname (stage-project-container_id)
+- name: Set container_image_tag if not defined
   set_fact:
-    container_name: "{{ environment_name }}-{{ project }}-{{ service_name }}"
-  when: container_name is not defined
+    service_vars.container_image_tag: "{{ container_image_tag | default (hostvars['localhost'].version_tag }}{{ hostvars['localhost'].tag_suffix) }}"
+  when: service_vars.container_image_tag is not defined
 
 - name: Defining container hostname (stage-project-container_id)
   set_fact:
-    container_hostname: "{{ container_name | regex_replace('_', '-') }}"
-  when: container_hostname is not defined
+    service_vars.container_name: "{{ container_name | default ( environment_name + "-" + project + "-" + service_name ) }}"
+  when: service_vars.container_name is not defined
+
+- name: Defining container hostname from container_name ( {{ service_vars.container_name }} )
+  set_fact:
+    service_vars.container_hostname: "{{ container_hostname | default (service_vars.container_name | regex_replace('_', '-')) }}"
+  when: service_vars.container_hostname is not defined
 
 - name: Include default deployment definition
   include_vars:

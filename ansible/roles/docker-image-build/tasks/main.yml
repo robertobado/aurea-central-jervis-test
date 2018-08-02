@@ -3,7 +3,7 @@
     registry: "{{ docker_registry_url }}"
     username: "{{ docker_registry_username }}"
     password: "{{ docker_registry_password }}"
-    docker_host: "tcp://dlb1.aureacentral.com:2375"
+    docker_host: "tcp://docker-build.aureacentral.com:2375"
   delegate_to: localhost
   delegate_facts: true
   when: docker_registry_username is defined and docker_registry_password is defined
@@ -18,7 +18,9 @@
      force: yes
      push: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.push | default('yes')}}"
      dockerfile: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.dockerfile | default(omit)}}"
-     docker_host: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.docker_host | default('tcp://dlb1.aureacentral.com:2375')}}"
+     docker_host: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.docker_host | default('tcp://docker-build.aureacentral.com:2375')}}"
+     buildargs: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.buildargs | default(omit)}}"
+     timeout: "{{ hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image.timeout | default(omit)}}"
   delegate_to: localhost
   delegate_facts: true
   when: hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first] is defined and hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].docker_image is defined

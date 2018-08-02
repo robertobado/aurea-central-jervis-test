@@ -111,6 +111,8 @@
   gather_facts: no
   roles:
     - docker-image-build
+    - artifact-publish
+    - artifact-promote
 
 - name: Aurea Central Jervis Docker Containers
   strategy: free

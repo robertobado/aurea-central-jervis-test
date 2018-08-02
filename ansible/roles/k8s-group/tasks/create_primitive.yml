@@ -4,7 +4,7 @@
     container_name: "{{ environment_name }}-{{ project }}-{{ service_name }}"
   when: container_name is not defined
 
-- name: Defining container hostname (stage-project-container_id)
+- name: Defining container hostname {{ container_name }}
   set_fact:
     container_hostname: "{{ container_name | regex_replace('_', '-') }}"
   when: container_hostname is not defined

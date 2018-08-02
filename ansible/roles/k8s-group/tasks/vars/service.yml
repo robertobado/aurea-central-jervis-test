@@ -2,11 +2,11 @@ kind: Service
 apiVersion: v1
 metadata:
   namespace: "{{ namespace }}"
-  name: "{{ container_hostname }}"
+  name: "{{ service_vars.container_hostname }}"
   labels:
-    app_name: "{{ container_hostname }}"
+    app_name: "{{ service_vars.container_hostname }}"
 spec:
   type: ClusterIP
   selector:
-    app_name: "{{ container_hostname }}"
+    app_name: "{{ service_vars.container_hostname }}"
 

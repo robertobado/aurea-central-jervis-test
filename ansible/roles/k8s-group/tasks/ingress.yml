@@ -4,5 +4,6 @@
   vars:
     type: 'ingress'
     service_name: "{{ item.key }}"
+    service_vars_current: "{{ item.value.vars | default( {} ) }}"
     definition: "{{ item.value.definition }}"
-  with_dict: "{{ definitions }}"
+  with_dict: "{{ hostvars[inventory_hostname.split('@') | last].definitions }}"

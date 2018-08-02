@@ -2,16 +2,16 @@ kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
   namespace: "{{ namespace }}"
-  name: "{{ container_hostname }}"
+  name: "{{ service_vars.container_hostname }}"
   labels:
-    name: "{{ container_hostname }}"
+    name: "{{ service_vars.container_hostname }}"
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        name: "{{ container_hostname }}"
-        app_name: "{{ container_hostname }}"
+        name: "{{ service_vars.container_hostname }}"
+        app_name: "{{ service_vars.container_hostname }}"
     spec:
 # todo: figure out why the policy "Always" is not working
 #      restartPolicy: "{{ restart_policy }}" 
@@ -19,9 +19,9 @@ spec:
         kubernetes.io/hostname: "{{ k8s_hostname if environment_name == 'prod' else null | default(omit) }}"
         central-stage: "{{ 'prod' if environment_name == 'prod' else 'staging' }}"
       containers:
-        - name: "{{ container_hostname }}"
+        - name: "{{ service_vars.container_hostname }}"
           imagePullPolicy: "{{ image_pull_policy }}"
-          image: "{{ container_base_image }}:{{ container_image_tag }}"
+          image: "{{ container_base_image }}:{{ service_vars.container_image_tag }}"
           resources:
             limits: 
               cpu: "{{ resources_limits_cpu }}"

@@ -2,6 +2,6 @@ kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
   namespace: "{{ namespace }}"
-  name: "{{ container_hostname }}"
+  name: "{{ service_vars.container_hostname }}"
   labels:
-    name: "{{ container_hostname }}"
+    name: "{{ service_vars.container_hostname }}"

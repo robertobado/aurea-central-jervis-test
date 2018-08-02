@@ -1,7 +1,11 @@
 - name: "Publishing nexus artifacts"
   include_tasks: publish-nexus.yml
-  tags: artifact-publish
+  tags: 
+    - artifact-publish
+    - docker-image-build
 
 - name: "Publishing s3 artifacts"
   include_tasks: publish-s3.yml
-  tags: artifact-publish
+  tags: 
+    - artifact-publish
+    - docker-image-build

@@ -3,10 +3,10 @@
   set_fact:
     service_vars: "{{ service_vars_current }}"
 
-- name: Set container_image_tag_backward if defined (backward compatibility)
-  set_fact:
-    container_image_tag_backward: "{{ container_image_tag }}"
-  when: type == 'deployment' and container_image_tag is defined
+#- name: Set container_image_tag_backward if defined (backward compatibility)
+#  set_fact:
+#    container_image_tag_backward: "{{ container_image_tag }}"
+#  when: type == 'deployment' and container_image_tag is defined
 
 - name: Set container_image_tag if not defined (backward compatibility)
   set_fact:
@@ -99,8 +99,8 @@
 - name: Show replace result for "{{ type }}"
   debug: var=k8s_replace_result
 
-- name: Revert container_image_tag if container_image_tag_backward defined (backward compatibility)
-  set_fact:
-    container_image_tag: "{{ container_image_tag_backward }}"
-    container_image_tag_backward: ""
-  when: type == 'deployment' and container_image_tag_backward is defined and container_image_tag_backward != ""
+#- name: Revert container_image_tag if container_image_tag_backward defined (backward compatibility)
+#  set_fact:
+#    container_image_tag: "{{ container_image_tag_backward }}"
+#    container_image_tag_backward: ""
+#  when: type == 'deployment' and container_image_tag_backward is defined and container_image_tag_backward != ""

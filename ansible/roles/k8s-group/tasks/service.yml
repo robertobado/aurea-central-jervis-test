@@ -4,6 +4,6 @@
   vars:
     type: 'service'
     service_name: "{{ item.key }}"
-    service_vars_current: "{{ item.vars | default( {} ) }}"
+    service_vars_current: "{{ item.value.vars | default( {} ) }}"
     definition: "{{ item.value.definition }}"
   with_dict: "{{ definitions }}"

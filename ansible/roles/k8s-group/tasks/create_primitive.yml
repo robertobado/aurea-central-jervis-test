@@ -1,11 +1,10 @@
 ---
 - name: DEBUG!
-  debug: var=service_vars
+  debug: var=service_vars_current
 
-- name: Set container_image_tag if not defined
+- name: Redefine service_vars (cannot redefine parent var)
   set_fact:
-    service_vars2: "{{ service_vars | combine({ 'container_image_tag': container_image_tag }, recursive=True) }}"
-  when: service_vars.container_image_tag is not defined
+    service_vars: service_vars_current
 
 - name: Set container_image_tag if not defined
   set_fact:
@@ -14,9 +13,6 @@
 
 - name: DEBUG!
   debug: var=service_vars
-
-- name: DEBUG!
-  debug: var=service_vars2
 
 - name: Set default container name if not defined (stage-project-container_id)
   set_fact:

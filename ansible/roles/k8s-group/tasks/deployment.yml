@@ -4,6 +4,6 @@
   vars:
     type: 'deployment'
     service_name: "{{ item.key }}"
-    service_vars: "{{ item.vars | default( {} ) }}"
+    service_vars_current: "{{ item.vars | default( {} ) }}"
     definition: "{{ item.value.definition }}"
   with_dict: "{{ definitions }}"

@@ -90,6 +90,18 @@
   roles:
     - agent-build-inventory
 
+- name: Aurea Central Jervis Artifact Publishing
+  strategy: free
+  hosts:
+    - docker-service
+    - ec2-service
+    - k8s-group
+    - vmware-group
+  tags: artifact-publish
+  gather_facts: no
+  roles:
+    - artifact-publish
+
 - name: Aurea Central Jervis Docker Images
   strategy: free
   hosts:
@@ -215,12 +227,14 @@
     - docker-service
     - ec2-service
     - k8s-group
+    - vmware-group
   tags: promote-packages
   vars:
     - jervis: "{{ hostvars['localhost'].jervis }}"
   gather_facts: no
   roles:
     - docker-image-promote
+    - artifact-promote
 
 - name: Checking if we are going to destroy...
   tasks:

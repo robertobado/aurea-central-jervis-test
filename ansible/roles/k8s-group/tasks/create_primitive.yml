@@ -4,7 +4,7 @@
 
 - name: Redefine service_vars (cannot redefine parent var)
   set_fact:
-    service_vars: service_vars_current
+    service_vars: "{{ service_vars_current }}"
 
 - name: Set container_image_tag if not defined
   set_fact:

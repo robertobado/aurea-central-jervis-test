@@ -1,9 +1,8 @@
 ---
-
-- name: Set container_image_tag_backward if defined (backward compatibility)
+- name: Set default container_image_tag if not defined
   set_fact:
-    container_image_tag_backward: "{{ container_image_tag }}"
-  when: container_image_tag is defined
+    container_image_tag: "{{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].tag_suffix }}"
+  when: container_image_tag is not defined
 
 - name: Create kubernetes deployment
   include_tasks: create_primitive.yml

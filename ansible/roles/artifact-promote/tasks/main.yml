@@ -5,7 +5,6 @@
     loop_var: artifact
   tags: 
     - artifact-promote
-    - docker-image-build
 
 - name: "Promoting s3 artifacts"
   include_tasks: promote-s3.yml
@@ -14,4 +13,3 @@
     loop_var: artifact
   tags: 
     - artifact-promote
-    - docker-image-build

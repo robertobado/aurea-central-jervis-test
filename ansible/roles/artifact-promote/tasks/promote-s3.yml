@@ -12,7 +12,7 @@
 
 - name: Evaluating if file or directory
   set_fact:
-    artifact_type: "{{ 'file' if list_result.s3_keys[0] == (artifact.src.split('/') | difference(artifact.src.split('/') | first) | join('/')) else 'directory' }}"
+    artifact_type: "{{ 'file' if list_result.s3_keys | length == 1 and list_result.s3_keys[0] == (artifact.src.split('/') | difference(artifact.src.split('/') | first) | join('/')) else 'directory' }}"
   delegate_to: localhost
   tags: artifact-promote
 

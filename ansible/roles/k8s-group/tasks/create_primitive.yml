@@ -8,10 +8,10 @@
 #    container_image_tag_backward: "{{ container_image_tag }}"
 #  when: type == 'deployment' and container_image_tag is defined
 
-#- name: Set container_image_tag if not defined (backward compatibility)
-#  set_fact:
-#    container_image_tag: "{{ container_image_tag_default }}"
-#  when: type == 'deployment' and container_image_tag is not defined
+- name: Set container_image_tag if not defined (backward compatibility)
+  set_fact:
+    container_image_tag: "{{ container_image_tag_default }}"
+  when: type == 'deployment' and container_image_tag is not defined
 
 #- name: Set container_image_tag if not defined
 #  set_fact:

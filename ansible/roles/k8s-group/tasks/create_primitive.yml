@@ -8,20 +8,20 @@
 #    container_image_tag_backward: "{{ container_image_tag }}"
 #  when: type == 'deployment' and container_image_tag is defined
 
-- name: Set container_image_tag if not defined (backward compatibility)
-  set_fact:
-    container_image_tag: "{{ container_image_tag_default }}"
+#- name: Set container_image_tag if not defined (backward compatibility)
+#  set_fact:
+#    container_image_tag: "{{ container_image_tag_default }}"
 #  when: type == 'deployment' and container_image_tag is not defined
 
-- name: Set container_image_tag if not defined
-  set_fact:
-    service_vars: "{{ service_vars | combine({ 'container_image_tag': container_image_tag }, recursive=True) }}"
-  when: type == 'deployment' and service_vars.container_image_tag is not defined
+#- name: Set container_image_tag if not defined
+#  set_fact:
+#    service_vars: "{{ service_vars | combine({ 'container_image_tag': container_image_tag }, recursive=True) }}"
+#  when: type == 'deployment' and service_vars.container_image_tag is not defined
 
-- name: Replace container_image_tag value (backward compatibility)
-  set_fact:
-    container_image_tag: "{{ service_vars.container_image_tag }}"
-  when: type == 'deployment'
+#- name: Replace container_image_tag value (backward compatibility)
+#  set_fact:
+#    container_image_tag: "{{ service_vars.container_image_tag }}"
+#  when: type == 'deployment'
 
 - name: Set default container name if not defined (stage-project-container_id)
   set_fact:

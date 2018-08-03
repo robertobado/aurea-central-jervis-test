@@ -31,20 +31,20 @@ pipeline {
                 /* Do not publish when branch is master or release */
                 when {
                   expression {
-                    return !("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'master' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'release')
+                        return !("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'master' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'release')
                     }
                 }
                 steps {
                   unstash 'artifacts'
-                    script {
-                        Map ansible_tasks = [failFast: true]
-                        env.JERVIS_YAMLS.tokenize(',').each{ String jervisFile ->
-                            ansible_tasks[jervisFile] = {
-                                sh "JERVIS_YAML=${jervisFile} ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags artifact-publish --vault-password-file=.ansible-vault-password -vvvvvvvvvvv"
-                            }
-                        }
-                        parallel(ansible_tasks)
+                  script {
+                    Map ansible_tasks = [failFast: true]
+                    env.JERVIS_YAMLS.tokenize(',').each{ String jervisFile ->
+                      ansible_tasks[jervisFile] = {
+                        sh "JERVIS_YAML=${jervisFile} ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags artifact-publish --vault-password-file=.ansible-vault-password -vvvvvvvvvvv"
+                      }
                     }
+                    parallel(ansible_tasks)
+                  }
                 }
         }
         stage('Build Docker Image') {

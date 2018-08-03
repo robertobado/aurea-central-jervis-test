@@ -2,7 +2,7 @@
   set_fact:
     dynamic_inventory: >
       {{ dynamic_inventory +
-        [ hostvars[inventory_hostname] | to_json | from_json | 
+        [ hostvars[inventory_hostname] | 
           combine({
             'name': service.name + '@'  + inventory_hostname,
             'service_name': service.name,

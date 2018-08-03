@@ -10,7 +10,7 @@
   register: list_result
   tags: artifact-promote
 
-- name:
+- name: Evaluating if file or directory
   set_fact:
     artifact_type: "{{ 'file' if list_result.s3_keys[0] == (artifact.src.split('/') | difference(artifact.src.split('/') | first) | join('/')) else 'directory' }}"
   delegate_to: localhost
@@ -36,27 +36,33 @@
   loop_control:
     loop_var: object_key
   tags: artifact-promote
-    
-- name: Publishing S3 artifacts directory
-  s3_sync:
-    aws_access_key: "{{ s3_access_key }}"
-    aws_secret_key: "{{ s3_secret_key }}"
-    bucket: "{{ artifact.target.split('/') | first }}"
-    key_prefix: "{{ artifact.target.split('/') | difference(artifact.target.split('/') | first) | join('/') }}"
-    file_root: "{{ tempfile_result.path }}"
-    region: "{{ artifact.region | default('us-east-1') }}"
-  delegate_to: localhost
-  when: artifact_type == 'directory'
-  tags: artifact-promote
 
-- name: Publishing S3 artifact file
+- name: Listing files to upload...
+  find:
+    paths: "{{ tempfile_result.path }}"
+    recurse: yes
+  delegate_to: localhost
+  register: list_result
+
+- name: Evaluating if file or directory
+  set_fact:
+    file_artifact: true
+    list_result:
+      matched: 1
+      files:
+        - path: "{{ lookup('env','WORKSPACE') }}/{{ artifact.src }}"
+  delegate_to: localhost
+  when: not list_result.matched
+
+- name: Promoting files to S3
   aws_s3:
     aws_access_key: "{{ s3_access_key }}"
     aws_secret_key: "{{ s3_secret_key }}"
-    bucket: "{{ artifact.src.split('/') | first }}"
-    object: "{{ artifact.target.split('/') | difference(artifact.target.split('/') | first) | join('/') }}"
+    bucket: "{{ artifact.target.split('/') | first }}"
+    object: "{{ artifact.target.split('/') | difference(artifact.target.split('/') | first) | join('/') ~ ( (file_artifact is defined | ternary('', artifact_file.path.split(tempfile_result.path) | last ))) }}"
+    src: "{{ artifact_file.path }}"
     mode: put
-    src: "{{ tempfile_result.path }}"
+  loop: "{{ list_result.files }}"
+  loop_control:
+    loop_var: artifact_file
   delegate_to: localhost
-  when: artifact_type == 'file'
-  tags: artifact-promote

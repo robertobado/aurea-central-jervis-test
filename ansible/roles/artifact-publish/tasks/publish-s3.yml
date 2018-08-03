@@ -1,12 +1,29 @@
-- name: Publishing S3 Artifacts
-  s3_sync:
+- name: Listing files to upload...
+  find:
+    paths: "{{ lookup('env','WORKSPACE') }}/{{ artifact.src }}"
+    recurse: yes
+  delegate_to: localhost
+  register: list_result
+
+- name: Evaluating if file or directory
+  set_fact:
+    file_artifact: true
+    list_result:
+      matched: 1
+      files:
+        - path: "{{ lookup('env','WORKSPACE') }}/{{ artifact.src }}"
+  delegate_to: localhost
+  when: not list_result.matched
+
+- name: Publishing files to S3
+  aws_s3:
     aws_access_key: "{{ s3_access_key }}"
     aws_secret_key: "{{ s3_secret_key }}"
     bucket: "{{ artifact.target.split('/') | first }}"
-    key_prefix: "{{ artifact.target.split('/') | difference(artifact.target.split('/') | first) | join('/') }}"
-    file_root: "{{ lookup('env','WORKSPACE') ~ '/' ~ artifact.src }}"
-    region: "{{ artifact.region | default('us-east-1') }}"
-  delegate_to: localhost
-  loop: "{{ (hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].s3 | default({ 'publish': {} })).publish[environment_name] | default([]) }}"
+    object: "{{ artifact.target.split('/') | difference(artifact.target.split('/') | first) | join('/') ~ ( (file_artifact is defined | ternary('', artifact_file.path.split(artifact.src) | last ))) }}"
+    src: "{{ artifact_file.path }}"
+    mode: put
+  loop: "{{ list_result.files }}"
   loop_control:
-    loop_var: artifact
+    loop_var: artifact_file
+  delegate_to: localhost

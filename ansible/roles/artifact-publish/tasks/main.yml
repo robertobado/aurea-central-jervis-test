@@ -6,6 +6,9 @@
 
 - name: "Publishing s3 artifacts"
   include_tasks: publish-s3.yml
+  loop: "{{ (hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].s3 | default({ 'publish': {} })).publish[environment_name] | default([]) }}"
+  loop_control:
+    loop_var: artifact
   tags: 
     - artifact-publish
     - docker-image-build

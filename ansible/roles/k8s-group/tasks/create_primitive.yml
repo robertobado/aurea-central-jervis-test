@@ -6,12 +6,12 @@
 - name: Set container_image_tag_backward if defined (backward compatibility)
   set_fact:
     container_image_tag_backward: "{{ container_image_tag }}"
-  when: container_image_tag is defined
+  when: type == 'deployment' and container_image_tag is defined
 
 - name: Set container_image_tag if not defined (backward compatibility)
   set_fact:
     container_image_tag: "{{ container_image_tag_default }}"
-  when: container_image_tag is not defined
+  when: type == 'deployment' and container_image_tag is not defined
 
 - name: Set container_image_tag if not defined
   set_fact:
@@ -21,6 +21,7 @@
 - name: Replace container_image_tag value (backward compatibility)
   set_fact:
     container_image_tag: "{{ service_vars.container_image_tag }}"
+  when: type == 'deployment'
 
 - name: Set default container name if not defined (stage-project-container_id)
   set_fact:
@@ -102,4 +103,4 @@
   set_fact:
     container_image_tag: "{{ container_image_tag_backward }}"
     container_image_tag_backward: ""
-  when: container_image_tag_backward is defined and container_image_tag_backward != ""
+  when: type == 'deployment' and container_image_tag_backward is defined and container_image_tag_backward != ""

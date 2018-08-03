@@ -30,7 +30,7 @@
     bucket: "{{ artifact.src.split('/') | first }}"
     object: "{{ object_key }}"
     mode: get
-    dest: "{{ tempfile_result.path }}/{{ object_key.split((artifact.src.split('/') | difference(artifact.src.split('/') | first) | join('/'))) | last }}"
+    dest: "{{ tempfile_result.path }}"
   delegate_to: localhost
   loop: "{{ list_result.s3_keys }}"
   loop_control:
@@ -50,7 +50,7 @@
     list_result:
       matched: 1
       files:
-        - path: "{{ lookup('env','WORKSPACE') }}/{{ artifact.src }}"
+        - path: "{{ tempfile_result.path }}"
   delegate_to: localhost
   when: not list_result.matched
 

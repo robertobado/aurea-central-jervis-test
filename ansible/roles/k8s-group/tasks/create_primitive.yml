@@ -66,6 +66,9 @@
     inline_data: "{{ rawDefinition }}"
   register: k8s_result
 
+- name: debug service_vars
+  debug: var=service_vars
+
 - name: Show create result for "{{ type }}"
   debug: var=k8s_result
 

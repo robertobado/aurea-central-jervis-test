@@ -1,8 +1,7 @@
 ---
-- name: Set container_image_tag if not defined
+- name: Set default container_image_tag
   set_fact:
-    container_image_tag: "{{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].tag_suffix }}"
-  when: container_image_tag is not defined
+    container_image_tag_default: "{{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].tag_suffix }}"
 
 - name: Run k8s object deployment tasks
   include_tasks: object.yml

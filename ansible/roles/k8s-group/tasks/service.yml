@@ -1,7 +1,4 @@
 ---
-- name: Show kubernetes definitions
-  debug: var=hostvars[inventory_hostname.split('@') | last].definitions
-
 - name: Create kubernetes services
   include_tasks: create_primitive.yml
   vars:

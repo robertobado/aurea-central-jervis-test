@@ -28,6 +28,8 @@
     service_vars: "{{ service_vars | combine({ 'container_hostname': container_hostname }, recursive=True) }}"
   when: service_vars.container_hostname is not defined
   
+- debug: var=service_vars
+
 - name: Include default deployment definition
   include_vars:
     # load vars from (deployment|service|ingress).yml

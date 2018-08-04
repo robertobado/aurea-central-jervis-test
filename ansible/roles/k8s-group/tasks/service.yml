@@ -1,6 +1,6 @@
 ---
 - name: Show kubernetes definitions
-  debug: var=definitions
+  debug: var=hostvars[inventory_hostname.split('@') | last].definitions
 
 - name: Create kubernetes services
   include_tasks: create_primitive.yml
@@ -9,4 +9,4 @@
     service_name: "{{ item.key }}"
     service_vars_current: "{{ item.value.vars | default( {} ) }}"
     definition: "{{ item.value.definition }}"
-  loop: "{{ definitions |dict2items }}"
+  loop: "{{ hostvars[inventory_hostname.split('@') | last].definitions }}"

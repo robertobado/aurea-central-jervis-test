@@ -34,6 +34,9 @@ pipeline {
                         return !("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'master' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'release')
                     }
                 }
+                environment {
+                  ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
+                }
                 steps {
                   unstash 'artifacts'
                   script {

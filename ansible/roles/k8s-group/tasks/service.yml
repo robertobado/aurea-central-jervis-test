@@ -1,4 +1,7 @@
 ---
+- name: Show kubernetes definitions
+  debug: var=definitions
+
 - name: Create kubernetes services
   include_tasks: create_primitive.yml
   vars:
@@ -6,4 +9,4 @@
     service_name: "{{ item.key }}"
     service_vars_current: "{{ item.value.vars | default( {} ) }}"
     definition: "{{ item.value.definition }}"
-  with_dict: "{{ definitions }}"
+  with_list: "{{ definitions }}"

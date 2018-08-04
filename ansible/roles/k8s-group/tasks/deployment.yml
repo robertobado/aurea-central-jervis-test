@@ -4,6 +4,9 @@
     container_image_tag: "{{ hostvars['localhost'].version_tag }}{{ hostvars['localhost'].tag_suffix }}"
   when: container_image_tag is not defined
 
+- name: Show kubernetes definitions
+  debug: var=definitions
+
 - name: Create kubernetes deployment
   include_tasks: create_primitive.yml
   vars:
@@ -11,4 +14,4 @@
     service_name: "{{ item.key }}"
     service_vars_current: "{{ item.value.vars | default( {} ) }}"
     definition: "{{ item.value.definition }}"
-  with_dict: "{{ definitions }}"
+  with_list: "{{ definitions }}"

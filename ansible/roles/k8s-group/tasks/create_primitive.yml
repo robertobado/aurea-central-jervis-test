@@ -3,9 +3,6 @@
   set_fact:
     service_vars: "{{ service_vars_current }}"
 
-- debug: var=service_vars_current
-- debug: var=service_vars
-
 - name: Set container_image_tag if not defined
   set_fact:
     service_vars: "{{ service_vars | combine({ 'container_image_tag': container_image_tag }, recursive=True) }}"
@@ -24,14 +21,11 @@
 - name: Set default container hostname from container_name ( {{ service_vars.container_name }} ) if not defined
   set_fact:
     container_hostname: "{{ service_vars.container_name | regex_replace('_', '-') }}"
-  when: container_hostname is not defined and service_vars.container_hostname is not defined
 
 - name: Defining container hostname from container_name ( {{ service_vars.container_name }} )
   set_fact:
     service_vars: "{{ service_vars | combine({ 'container_hostname': container_hostname }, recursive=True) }}"
   when: service_vars.container_hostname is not defined
-  
-- debug: var=service_vars
 
 - name: Include default deployment definition
   include_vars:

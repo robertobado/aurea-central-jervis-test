@@ -1,13 +1,13 @@
 #!groovy
 /*
 TODO: 
-1. Refactor code in steps section into a function to improve readability and maintenance 
-2. Investigate why ANSIBLE_VAULT_PASSWORD is per stage and not global
+1. Refactor code in steps section into a function to improve readability and maintenance
 */
 
 pipeline {
     environment {
         JERVIS_PLAYBOOK = 'aurea-central-jervis/ansible/jervis.yml'
+        ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
     }
     agent {
         label 'stable && docker && linux && ansible'
@@ -23,6 +23,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'github-user-and-token', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
                     sh 'git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git && git submodule update --init && cd aurea-central-jervis && git checkout $CENTRAL_JERVIS_BRANCH'
                 }
+                sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                 println("branch first tag = ")
                 println("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase())
             }
@@ -34,12 +35,8 @@ pipeline {
                     return !("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'master' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'release')
                     }
                 }
-                environment {
-                  ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
                   unstash 'artifacts'
-                  sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                   sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags docker-image-build --vault-password-file=.ansible-vault-password'
                 }
         }
@@ -49,11 +46,7 @@ pipeline {
                         return ("$DEPLOYMENT_TARGET" == 'docker')
                     }
                 }
-                environment {
-                  ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
-                  sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                   sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags docker-service-deploy --vault-password-file=.ansible-vault-password'
                 }
         }
@@ -63,11 +56,7 @@ pipeline {
                         return ("$DEPLOYMENT_TARGET" == 'ec2')
                     }
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags ec2-instance,ec2-service-deploy --vault-password-file=.ansible-vault-password'
                 }
         }
@@ -77,21 +66,13 @@ pipeline {
                         return ("$DEPLOYMENT_TARGET" == 'k8s')
                     }
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags k8s-deploy --vault-password-file=.ansible-vault-password'
                 }
         }
         stage('Health Checks') {
                 /* Health Checks are run for all branches */
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags health-check --vault-password-file=.ansible-vault-password'
                 }
         }
@@ -102,11 +83,7 @@ pipeline {
                         return ("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'qa' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'regression')
                     }
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags smoke-test --vault-password-file=.ansible-vault-password'
                 }
         }
@@ -117,11 +94,7 @@ pipeline {
                         return ("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'qa' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'regression')
                     }
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags regression-test --vault-password-file=.ansible-vault-password'
                 }
         }
@@ -132,11 +105,7 @@ pipeline {
                         return ("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'qa' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'regression')
                     }
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags performance-test --vault-password-file=.ansible-vault-password'
                 }
         }
@@ -147,11 +116,7 @@ pipeline {
                         return ("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'qa' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'regression')
                     }
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags load-test --vault-password-file=.ansible-vault-password'
                 }
         }
@@ -162,11 +127,7 @@ pipeline {
                         return ("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'qa' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'regression')
                     }
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags security-test --vault-password-file=.ansible-vault-password'
                 }
         }
@@ -177,11 +138,7 @@ pipeline {
                         return ("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'release' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'qa' )
                     }
                 }
-                environment {
-                    ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
-                }
                 steps {
-                    sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                     sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags promote-packages --vault-password-file=.ansible-vault-password'
                 }
         }

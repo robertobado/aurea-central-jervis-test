@@ -26,9 +26,19 @@
     list_result:
       matched: 1
       files:
-        - path: "{{ tempfile_result.path | default(lookup('env','WORKSPACE') ~ '/' ~ artifact.src) }}"
+        - path: "{{ tempfile_result.path }}"
   delegate_to: localhost
-  when: artifact.src is not defined or not list_result.matched
+  when: artifact.template is defined
+
+- name: Evaluating if file or directory
+  set_fact:
+    file_artifact: true
+    list_result:
+      matched: 1
+      files:
+        - path: "{{ lookup('env','WORKSPACE') ~ '/' ~ artifact.src }}"
+  delegate_to: localhost
+  when: artifact.src is defined or not list_result.matched
 
 - name: Removing target bucket
   aws_s3:

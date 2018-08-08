@@ -29,6 +29,22 @@
   delegate_to: localhost
   when: not list_result.matched
 
+- name: Removing target bucket
+  aws_s3:
+    aws_access_key: "{{ s3_access_key }}"
+    aws_secret_key: "{{ s3_secret_key }}"
+    bucket: "{{ artifact.target.split('/') | first }}"
+    mode: delete
+  when: artifact.clear_bucket | default(false)
+
+- name: Recreating target bucket
+  aws_s3:
+    aws_access_key: "{{ s3_access_key }}"
+    aws_secret_key: "{{ s3_secret_key }}"
+    bucket: "{{ artifact.target.split('/') | first }}"
+    mode: create
+  when: artifact.clear_bucket | default(false)
+
 - name: Publishing files to S3
   aws_s3:
     aws_access_key: "{{ s3_access_key }}"

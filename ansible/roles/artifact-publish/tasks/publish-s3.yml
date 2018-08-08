@@ -1,6 +1,20 @@
+- name: "Creating temporary file"
+  tempfile:
+    state: "file"
+  register: tempfile_result
+  delegate_to: localhost
+  when: artifact.template is defined
+
+- name: "Templating configurable artifacts"
+  template:
+    src: "{{ lookup('env','WORKSPACE') ~ '/' ~ artifact.template }}"
+    dest: "{{ tempfile_result.path }}"
+  delegate_to: localhost
+  when: artifact.template is defined
+
 - name: Listing files to upload...
   find:
-    paths: "{{ lookup('env','WORKSPACE') }}/{{ artifact.src }}"
+    paths: "{{ tempfile_result.path | default(lookup('env','WORKSPACE') ~ '/' ~ artifact.src) }}"
     recurse: yes
   delegate_to: localhost
   register: list_result
@@ -11,7 +25,7 @@
     list_result:
       matched: 1
       files:
-        - path: "{{ lookup('env','WORKSPACE') }}/{{ artifact.src }}"
+        - path: "{{ tempfile_result.path | default(lookup('env','WORKSPACE') ~ '/' ~ artifact.src) }}"
   delegate_to: localhost
   when: not list_result.matched
 

@@ -28,12 +28,6 @@ pipeline {
             }
         }
         stage('Publish Artifacts') {
-                /* Do not publish when branch is master or release */
-                when {
-                  expression {
-                    return !("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'master' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'release')
-                    }
-                }
                 steps {
                   unstash 'artifacts'
                     script {
@@ -213,12 +207,6 @@ pipeline {
                 }
         }
         stage('Promote Packages') {
-                /* Promote Packages only runs when branch is qa or release */
-                when {
-                    expression {
-                        return ("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'qa' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'release')
-                    }
-                }
                 steps {
                     script {
                         Map ansible_tasks = [failFast: true]

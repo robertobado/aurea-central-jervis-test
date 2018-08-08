@@ -7,7 +7,7 @@
     force_basic_auth: yes
     status_code: 404
   delegate_to: localhost
-  loop: "{{ (hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].nexus | default({ 'publish': {} })).publish[environment_name] | default([])}}"
+  loop: "{{ (jervis.services[service.key].nexus | default({ 'publish': {} })).publish[environment_name] | default([])}}"
   loop_control:
     loop_var: artifact
   when: not (artifact.overwrite | default(false))
@@ -15,7 +15,7 @@
 - name: Publishing Nexus Artifacts
   shell: "curl -k -X PUT -v --upload-file {{ lookup('env','WORKSPACE') ~ '/' ~ artifact.src }} -u '{{ nexus_username }}:{{ nexus_password }}' 'https://nexus.devfactory.com/repository/{{ artifact.target }}'"
   delegate_to: localhost
-  loop: "{{ (hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].nexus | default({ 'publish': {} })).publish[environment_name] | default([])}}"
+  loop: "{{ (jervis.services[service.key].nexus | default({ 'publish': {} })).publish[environment_name] | default([])}}"
   loop_control:
     loop_var: artifact
-  when: hostvars[inventory_hostname.split('@') | last].jervis.services[inventory_hostname.split('@') | first].nexus is defined
+  when: jervis.services[service.key].nexus is defined

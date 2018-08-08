@@ -29,9 +29,9 @@
     # define key from branch_environment_map which is corresponding to the current BRANCH_NAME
     # if key is not found then set default value = 'feature'
     branch_environment_key: "{{ 'feature' if branch_environment_map[ _env_branch_name ] is not defined else _env_branch_name }}"
-
   hosts:
     - all
+    - localhost
   tags: always
   gather_facts: no
   roles:
@@ -93,10 +93,7 @@
 - name: Aurea Central Jervis Artifact Publishing
   strategy: free
   hosts:
-    - docker-service
-    - ec2-service
-    - k8s-group
-    - vmware-group
+    - localhost
   tags: artifact-publish
   gather_facts: no
   roles:
@@ -224,13 +221,8 @@
 - name: Aurea Central Jervis Promote Packages
   strategy: free
   hosts:
-    - docker-service
-    - ec2-service
-    - k8s-group
-    - vmware-group
+    - localhost
   tags: promote-packages
-  vars:
-    - jervis: "{{ hostvars['localhost'].jervis }}"
   gather_facts: no
   roles:
     - docker-image-promote

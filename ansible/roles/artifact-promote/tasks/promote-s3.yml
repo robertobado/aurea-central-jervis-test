@@ -7,22 +7,30 @@
     mode: list
   delegate_to: localhost
   register: list_result
+  when: artifact.src is defined
   tags: artifact-promote
 
 - name: Evaluating if file or directory
   set_fact:
-    artifact_type: "{{ 'file' if list_result.s3_keys | length == 1 and list_result.s3_keys[0] == (artifact.src.split('/') | difference(artifact.src.split('/') | first) | join('/')) else 'directory' }}"
+    artifact_type: "{{ 'file' if artifact.template is defined or artifact.src is defined and list_result.s3_keys | length == 1 and list_result.s3_keys[0] == (artifact.src.split('/') | difference(artifact.src.split('/') | first) | join('/')) else 'directory' }}"
   delegate_to: localhost
   tags: artifact-promote
 
-- name: "Creating temporary file for {{ artifact.src }}"
+- name: "Creating temporary file"
   tempfile:
     state: "{{ artifact_type }}"
   register: tempfile_result
   delegate_to: localhost
   tags: artifact-promote
 
-- name: "Downloading S3 artifact {{ artifact.src }}"
+- name: "Creating temporary nexus file"
+  tempfile:
+    state: "file"
+  register: tempnexus_result
+  delegate_to: localhost
+  tags: artifact-promote
+
+- name: "Downloading S3 artifact"
   aws_s3:
     aws_access_key: "{{ s3_access_key }}"
     aws_secret_key: "{{ s3_secret_key }}"
@@ -31,9 +39,37 @@
     mode: get
     dest: "{{ tempfile_result.path }}"
   delegate_to: localhost
-  loop: "{{ list_result.s3_keys }}"
+  loop: "{{ list_result.s3_keys | default([])}}"
   loop_control:
     loop_var: object_key
+  when: artifact.src is defined
+  tags: artifact-promote
+
+- name: "Templating configurable artifacts"
+  template:
+    src: "{{ lookup('env','WORKSPACE') ~ '/' ~ artifact.template }}"
+    dest: "{{ tempfile_result.path }}"
+  delegate_to: localhost
+  when: artifact.template is defined
+  tags: artifact-promote
+
+- name: "Downloading Nexus artifact"
+  get_url:
+    url:  "https://nexus.devfactory.com/repository/{{ artifact.nexus }}"
+    url_username: "{{ nexus_username }}"
+    url_password: "{{ nexus_password }}"
+    dest: "{{ tempnexus_result.path }}"
+    force: yes
+  delegate_to: localhost
+  when: artifact.nexus is defined
+  tags: artifact-promote
+
+- name: "Extracting Nexus artifact"
+  unarchive:
+    src: "{{ tempnexus_result.path }}"
+    dest: "{{ tempfile_result.path }}"
+  delegate_to: localhost
+  when: artifact.nexus is defined
   tags: artifact-promote
 
 - name: Listing files to upload...
@@ -42,6 +78,7 @@
     recurse: yes
   delegate_to: localhost
   register: list_result
+  tags: artifact-promote
 
 - name: Evaluating if file or directory
   set_fact:
@@ -52,6 +89,25 @@
         - path: "{{ tempfile_result.path }}"
   delegate_to: localhost
   when: not list_result.matched
+  tags: artifact-promote
+
+- name: Removing target bucket
+  aws_s3:
+    aws_access_key: "{{ s3_access_key }}"
+    aws_secret_key: "{{ s3_secret_key }}"
+    bucket: "{{ artifact.target.split('/') | first }}"
+    mode: delete
+  when: artifact.clear_bucket | default(false)
+  tags: artifact-promote
+
+- name: Recreating target bucket
+  aws_s3:
+    aws_access_key: "{{ s3_access_key }}"
+    aws_secret_key: "{{ s3_secret_key }}"
+    bucket: "{{ artifact.target.split('/') | first }}"
+    mode: create
+  when: artifact.clear_bucket | default(false)
+  tags: artifact-promote
 
 - name: Promoting files to S3
   aws_s3:
@@ -65,3 +121,4 @@
   loop_control:
     loop_var: artifact_file
   delegate_to: localhost
+  tags: artifact-promote

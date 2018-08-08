@@ -46,6 +46,7 @@
     ansible_winrm_kerberos_hostname_override: "{{ dynamic_instance.ansible_winrm_kerberos_hostname_override | default(omit) }}"
     ansible_winrm_credssp_disable_tlsv1_2: "{{ dynamic_instance.ansible_winrm_credssp_disable_tlsv1_2 | default(omit) }}"
     version_tag: "{{ version_tag | default(omit) }}"
+    jervis: "{{ jervis | default(hostvars['localhost'].jervis) }}"
   loop: "{{ hostvars.values() | selectattr('dynamic_inventory','defined') | map(attribute='dynamic_inventory') | flatten }}"
   loop_control:
     loop_var: dynamic_instance

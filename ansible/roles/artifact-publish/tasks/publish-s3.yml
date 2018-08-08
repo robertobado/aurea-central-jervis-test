@@ -38,7 +38,7 @@
       files:
         - path: "{{ lookup('env','WORKSPACE') ~ '/' ~ artifact.src }}"
   delegate_to: localhost
-  when: artifact.src is defined or not list_result.matched
+  when: artifact.src is defined and not list_result.matched
 
 - name: Removing target bucket
   aws_s3:

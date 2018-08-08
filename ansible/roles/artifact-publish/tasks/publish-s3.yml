@@ -61,7 +61,7 @@
     aws_access_key: "{{ s3_access_key }}"
     aws_secret_key: "{{ s3_secret_key }}"
     bucket: "{{ artifact.target.split('/') | first }}"
-    object: "{{ artifact.target.split('/') | difference(artifact.target.split('/') | first) | join('/') ~ ( (file_artifact is defined | ternary('', artifact_file.path.split(artifact.src) | last ))) }}"
+    object: "{{ artifact.target.split('/') | difference(artifact.target.split('/') | first) | join('/') ~ ( (file_artifact is defined | ternary('', artifact_file.path.split(artifact.src | default(tempfile_result.path) )) | last ))) }}"
     src: "{{ artifact_file.path }}"
     mode: put
   loop: "{{ list_result.files }}"

@@ -14,10 +14,11 @@
 
 - name: Listing files to upload...
   find:
-    paths: "{{ (lookup('env','WORKSPACE') ~ '/' ~ artifact.src) | default(tempfile_result.path) }}"
+    paths: "{{ lookup('env','WORKSPACE') ~ '/' ~ artifact.src }}"
     recurse: yes
   delegate_to: localhost
   register: list_result
+  when: artifact.src is defined
 
 - name: Evaluating if file or directory
   set_fact:
@@ -27,7 +28,7 @@
       files:
         - path: "{{ tempfile_result.path | (default(lookup('env','WORKSPACE') ~ '/' ~ artifact.src)) }}"
   delegate_to: localhost
-  when: not list_result.matched
+  when: artifact.src is not defined or not list_result.matched
 
 - name: Removing target bucket
   aws_s3:

@@ -14,7 +14,7 @@
 
 - name: Listing files to upload...
   find:
-    paths: "{{ tempfile_result.path | default((lookup('env','WORKSPACE') ~ '/' ~ artifact.src)) }}"
+    paths: "{{ (lookup('env','WORKSPACE') ~ '/' ~ artifact.src) | default(tempfile_result.path) }}"
     recurse: yes
   delegate_to: localhost
   register: list_result

@@ -8,5 +8,6 @@
   loop: "{{ (jervis.services[service.key].s3 | default({ 'publish': {} })).publish[environment_name] | default([]) }}"
   loop_control:
     loop_var: artifact
+  when: jervis.services[service.key].s3 is defined and jervis.services[service.key].s3.publish is defined
   tags: 
     - artifact-publish

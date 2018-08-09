@@ -1,0 +1,17 @@
+- name: "Promoting nexus artifacts"
+  include_tasks: promote-nexus.yml
+  loop: "{{ (jervis.services[service.key].nexus | default({ 'promote': {} })).promote[environment_name] | default([])}}"
+  loop_control:
+    loop_var: artifact
+  when: jervis.services[service.key].nexus is defined and jervis.services[service.key].nexus.promote is defined
+  tags: 
+    - artifact-promote
+
+- name: "Promoting s3 artifacts"
+  include_tasks: promote-s3.yml
+  loop: "{{ (jervis.services[service.key].s3 | default({ 'promote': {} })).promote[environment_name] | default([])}}"
+  loop_control:
+    loop_var: artifact
+  when: jervis.services[service.key].s3 is defined and jervis.services[service.key].s3.promote is defined
+  tags: 
+    - artifact-promote

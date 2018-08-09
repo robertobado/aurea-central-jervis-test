@@ -1,0 +1,13 @@
+- name: "Publishing nexus artifacts"
+  include_tasks: publish-nexus.yml
+  tags: 
+    - artifact-publish
+
+- name: "Publishing s3 artifacts"
+  include_tasks: publish-s3.yml
+  loop: "{{ (jervis.services[service.key].s3 | default({ 'publish': {} })).publish[environment_name] | default([]) }}"
+  loop_control:
+    loop_var: artifact
+  when: jervis.services[service.key].s3 is defined and jervis.services[service.key].s3.publish is defined
+  tags: 
+    - artifact-publish

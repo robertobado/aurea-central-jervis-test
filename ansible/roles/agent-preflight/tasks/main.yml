@@ -2,7 +2,7 @@
   include_vars:
     file: "{{ lookup('env', 'WORKSPACE') }}/{{ lookup('env', 'JERVIS_YAML') }}"
     name: jervis
-  connection: local
+  delegate_to: localhost
 - name: Pausing local deployments
   pause:
     seconds: 1
@@ -32,7 +32,6 @@
     chdir: "{{ lookup('env', 'WORKSPACE') }}"
   register: version_tag_describe_result
   delegate_to: localhost
-  delegate_facts: true
   check_mode: false
 - name: "Converting version"
   set_fact:
@@ -40,10 +39,8 @@
     tag_suffix: "{{ branch_environment_map[ branch_environment_key ].tag_suffix | default('-UNSTABLE') }}"
     promote_tag_suffix: "{{ branch_environment_map[ branch_environment_key ].promote_tag_suffix | default('-DEVEL') }}"
   delegate_to: localhost
-  delegate_facts: true
-- name: "Using git hash for development)"
-  when: environment_name == 'dev'
+- name: "Using git hash for development"
   set_fact:
     version_tag: "{{ lookup('env', 'GIT_COMMIT')[:7] }}"
   delegate_to: localhost
-  delegate_facts: true
+  when: hostvars['localhost'].environment_name == 'dev'

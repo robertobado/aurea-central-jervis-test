@@ -1,9 +1,24 @@
+- name: "Creating temporary file"
+  tempfile:
+    state: "file"
+  register: tempfile_result
+  delegate_to: localhost
+  when: artifact.template is defined
+
+- name: "Templating configurable artifacts"
+  template:
+    src: "{{ lookup('env','WORKSPACE') ~ '/' ~ artifact.template }}"
+    dest: "{{ tempfile_result.path }}"
+  delegate_to: localhost
+  when: artifact.template is defined
+
 - name: Listing files to upload...
   find:
-    paths: "{{ lookup('env','WORKSPACE') }}/{{ artifact.src }}"
+    paths: "{{ lookup('env','WORKSPACE') ~ '/' ~ artifact.src }}"
     recurse: yes
   delegate_to: localhost
   register: list_result
+  when: artifact.src is defined
 
 - name: Evaluating if file or directory
   set_fact:
@@ -11,16 +26,42 @@
     list_result:
       matched: 1
       files:
-        - path: "{{ lookup('env','WORKSPACE') }}/{{ artifact.src }}"
+        - path: "{{ tempfile_result.path }}"
   delegate_to: localhost
-  when: not list_result.matched
+  when: artifact.template is defined
+
+- name: Evaluating if file or directory
+  set_fact:
+    file_artifact: true
+    list_result:
+      matched: 1
+      files:
+        - path: "{{ lookup('env','WORKSPACE') ~ '/' ~ artifact.src }}"
+  delegate_to: localhost
+  when: artifact.src is defined and not list_result.matched
+
+- name: Removing target bucket
+  aws_s3:
+    aws_access_key: "{{ s3_access_key }}"
+    aws_secret_key: "{{ s3_secret_key }}"
+    bucket: "{{ artifact.target.split('/') | first }}"
+    mode: delete
+  when: artifact.clear_bucket | default(false)
+
+- name: Recreating target bucket
+  aws_s3:
+    aws_access_key: "{{ s3_access_key }}"
+    aws_secret_key: "{{ s3_secret_key }}"
+    bucket: "{{ artifact.target.split('/') | first }}"
+    mode: create
+  when: artifact.clear_bucket | default(false)
 
 - name: Publishing files to S3
   aws_s3:
     aws_access_key: "{{ s3_access_key }}"
     aws_secret_key: "{{ s3_secret_key }}"
     bucket: "{{ artifact.target.split('/') | first }}"
-    object: "{{ artifact.target.split('/') | difference(artifact.target.split('/') | first) | join('/') ~ ( (file_artifact is defined | ternary('', artifact_file.path.split(artifact.src) | last ))) }}"
+    object: "{{ artifact.target.split('/') | difference(artifact.target.split('/') | first) | join('/') ~ ( (file_artifact is defined | ternary('', artifact_file.path.split(artifact.src | default(tempfile_result.path)) | last ))) }}"
     src: "{{ artifact_file.path }}"
     mode: put
   loop: "{{ list_result.files }}"

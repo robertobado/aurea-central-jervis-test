@@ -13,7 +13,7 @@
   when: not (artifact.overwrite | default(false))
 
 - name: Publishing Nexus Artifacts
-  shell: "curl -k -X PUT -v --upload-file {{ lookup('env','WORKSPACE') ~ '/' ~ artifact.src }} -u '{{ nexus_username }}:{{ nexus_password }}' 'https://nexus.devfactory.com/repository/{{ artifact.target }}'"
+  shell: "curl -fkSL -X PUT -v --upload-file {{ lookup('env','WORKSPACE') ~ '/' ~ artifact.src }} -u '{{ nexus_username }}:{{ nexus_password }}' 'https://nexus.devfactory.com/repository/{{ artifact.target }}'"
   delegate_to: localhost
   loop: "{{ (jervis.services[service.key].nexus | default({ 'publish': {} })).publish[environment_name] | default([])}}"
   loop_control:

@@ -117,6 +117,7 @@
     object: "{{ artifact.target.split('/') | difference(artifact.target.split('/') | first) | join('/') ~ ( (file_artifact is defined | ternary('', artifact_file.path.split(tempfile_result.path) | last ))) }}"
     src: "{{ artifact_file.path }}"
     mode: put
+    permission: "{{ artifact.permission | default(omit) }}"
   loop: "{{ list_result.files }}"
   loop_control:
     loop_var: artifact_file

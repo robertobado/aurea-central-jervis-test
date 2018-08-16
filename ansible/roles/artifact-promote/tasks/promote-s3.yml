@@ -109,6 +109,14 @@
   when: artifact.clear_bucket | default(false)
   tags: artifact-promote
 
+- name: Setting up bucket as S3
+  s3_website:
+    aws_access_key: "{{ s3_access_key }}"
+    aws_secret_key: "{{ s3_secret_key }}"
+    name: "{{ artifact.target.split('/') | first }}"
+  when: artifact.website | default(false)
+  tags: artifact-promote
+
 - name: Promoting files to S3
   aws_s3:
     aws_access_key: "{{ s3_access_key }}"

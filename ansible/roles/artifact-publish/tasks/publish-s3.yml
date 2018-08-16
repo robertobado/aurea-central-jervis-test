@@ -54,6 +54,7 @@
     aws_secret_key: "{{ s3_secret_key }}"
     bucket: "{{ artifact.target.split('/') | first }}"
     mode: create
+    region: "{{ artifact.region | default('us-east-1') }}"
   when: artifact.clear_bucket | default(false)
 
 - name: Setting up bucket as S3 website
@@ -62,6 +63,7 @@
     aws_secret_key: "{{ s3_secret_key }}"
     name: "{{ artifact.target.split('/') | first }}"
     state: present
+    region: "{{ artifact.region | default('us-east-1') }}"
   when: artifact.website | default(false)
 
 - name: Publishing files to S3

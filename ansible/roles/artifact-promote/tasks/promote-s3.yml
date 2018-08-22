@@ -106,7 +106,18 @@
     aws_secret_key: "{{ s3_secret_key }}"
     bucket: "{{ artifact.target.split('/') | first }}"
     mode: create
+    region: "{{ artifact.region | default('us-east-1') }}"
   when: artifact.clear_bucket | default(false)
+  tags: artifact-promote
+
+- name: Setting up bucket as S3 website
+  s3_website:
+    aws_access_key: "{{ s3_access_key }}"
+    aws_secret_key: "{{ s3_secret_key }}"
+    name: "{{ artifact.target.split('/') | first }}"
+    state: present
+    region: "{{ artifact.region | default('us-east-1') }}"
+  when: artifact.website | default(false)
   tags: artifact-promote
 
 - name: Promoting files to S3

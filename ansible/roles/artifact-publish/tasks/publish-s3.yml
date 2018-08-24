@@ -1,9 +1,22 @@
+
+- name: Evaluating if file or directory
+  set_fact:
+    artifact_type: "{{ 'file' if artifact.template is defined or artifact.src is defined and list_result.s3_keys | length == 1 and list_result.s3_keys[0] == (artifact.src.split('/') | difference(artifact.src.split('/') | first) | join('/')) else 'directory' }}"
+  delegate_to: localhost
+
 - name: "Creating temporary file"
   tempfile:
-    state: "file"
+    state: "{{ artifact_type }}"
   register: tempfile_result
   delegate_to: localhost
   when: artifact.template is defined
+
+- name: "Creating temporary nexus file"
+  tempfile:
+    state: "file"
+  register: tempnexus_result
+  delegate_to: localhost
+  when: artifact.nexus is defined
 
 - name: "Templating configurable artifacts"
   template:
@@ -12,6 +25,23 @@
   delegate_to: localhost
   when: artifact.template is defined
 
+- name: "Downloading Nexus artifact"
+  get_url:
+    url:  "https://nexus.devfactory.com/repository/{{ artifact.nexus }}"
+    url_username: "{{ nexus_username }}"
+    url_password: "{{ nexus_password }}"
+    dest: "{{ tempnexus_result.path }}"
+    force: yes
+  delegate_to: localhost
+  when: artifact.nexus is defined
+
+- name: "Extracting Nexus artifact"
+  unarchive:
+    src: "{{ tempnexus_result.path }}"
+    dest: "{{ tempfile_result.path }}"
+  delegate_to: localhost
+  when: artifact.nexus is defined
+
 - name: Listing files to upload...
   find:
     paths: "{{ lookup('env','WORKSPACE') ~ '/' ~ artifact.src }}"
@@ -19,6 +49,14 @@
   delegate_to: localhost
   register: list_result
   when: artifact.src is defined
+
+- name: Listing files to upload...
+  find:
+    paths: "{{ tempfile_result.path }}"
+    recurse: yes
+  delegate_to: localhost
+  register: list_result
+  when: artifact.nexus is defined
 
 - name: Evaluating if file or directory
   set_fact:

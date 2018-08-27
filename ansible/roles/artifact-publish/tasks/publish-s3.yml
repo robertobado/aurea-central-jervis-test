@@ -9,7 +9,7 @@
     state: "{{ artifact_type }}"
   register: tempfile_result
   delegate_to: localhost
-  when: artifact.template is defined
+  when: artifact.template is defined or artifact.nexus is defined
 
 - name: "Creating temporary nexus file"
   tempfile:

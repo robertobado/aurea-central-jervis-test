@@ -29,9 +29,19 @@ pipeline {
                 sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
             }
         }
-        stage('Publish Artifacts') {
+        stage('Unstash artifacts') {
+                when {
+                  expression {
+                    return !("${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'master' || "${BRANCH_NAME.tokenize('/')[0]}".toLowerCase() == 'release')
+                    }
+                }
                 steps {
                   unstash 'artifacts'
+                }
+        }
+            
+        stage('Publish Artifacts') {
+                steps {
                   script {
                     Map ansible_tasks = [failFast: true]
                     env.JERVIS_YAMLS.tokenize(',').each{ String jervisFile ->
@@ -51,7 +61,6 @@ pipeline {
                     }
                 }
                 steps {
-                  unstash 'artifacts'
                   sh 'ansible-playbook $JERVIS_PLAYBOOK -i ${INVENTORY_NAME} --tags docker-image-build --vault-password-file=.ansible-vault-password -vvvvvvvvvv'
                 }
         }

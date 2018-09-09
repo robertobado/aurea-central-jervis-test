@@ -1,7 +1,7 @@
 ---
 - name: Output inventory_hostname
-    debug: 
-      msg: "{{ inventory_hostname }}"
+  debug: 
+    msg: "{{ inventory_hostname }}"
   
 - name: Run k8s object deployment tasks
   include_tasks: object.yml

@@ -6,7 +6,7 @@
 - name: Set container_image_tag if not defined
   set_fact:
     service_vars: "{{ service_vars | combine({ 'container_image_tag': container_image_tag }, recursive=True) }}"
-  when: type == 'deployment' and service_vars.container_image_tag is not defined
+  when: (type == 'deployment' or type == 'statefulset') and service_vars.container_image_tag is not defined
 
 - name: Set default container name if not defined (stage-project-container_id)
   set_fact:
@@ -75,7 +75,7 @@
     service_token: "{{ api_key }}"
     inline_data: "{{ rawDefinition }}"
   register: k8s_replace_result
-  when: type == 'deployment'
+  when: type == 'deployment' or type == 'statefulset'
 
 - name: Show replace result for "{{ type }}"
   debug: var=k8s_replace_result

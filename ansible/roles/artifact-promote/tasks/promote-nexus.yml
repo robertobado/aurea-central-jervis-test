@@ -1,6 +1,6 @@
 - name: "Testing if we will overwrite {{ artifact.target }}"
   uri:
-    url: "https://nexus.devfactory.com/repository/{{ artifact.target }}"
+    url: "{{ nexus_base_url | default('https://nexus.devfactory.com/repository') }}/{{ artifact.target }}"
     user: "{{ nexus_username }}"
     password: "{{ nexus_password }}"
     method: HEAD
@@ -18,7 +18,7 @@
 
 - name: "Downloading Nexus artifact {{ artifact.src }}"
   get_url:
-    url:  "https://nexus.devfactory.com/repository/{{ artifact.src }}"
+    url:  "{{ nexus_base_url | default('https://nexus.devfactory.com/repository') }}/{{ artifact.src }}"
     url_username: "{{ nexus_username }}"
     url_password: "{{ nexus_password }}"
     dest: "{{ tempfile_result.path }}"
@@ -27,6 +27,6 @@
   tags: artifact-promote
     
 - name: "Publishing promoted Nexus artifact {{ artifact.target }}"
-  shell: "curl -fkSL -X PUT -v --upload-file {{ tempfile_result.path }} -u '{{ nexus_username }}:{{ nexus_password }}' 'https://nexus.devfactory.com/repository/{{ artifact.target }}'"
+  shell: "curl -fkSL -X PUT -v --upload-file {{ tempfile_result.path }} -u '{{ nexus_username }}:{{ nexus_password }}' '{{ nexus_base_url | default('https://nexus.devfactory.com/repository') }}/{{ artifact.target }}'"
   delegate_to: localhost
   tags: artifact-promote

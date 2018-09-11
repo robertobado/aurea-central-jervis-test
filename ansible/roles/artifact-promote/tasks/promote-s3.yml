@@ -55,7 +55,7 @@
 
 - name: "Downloading Nexus artifact"
   get_url:
-    url:  "https://nexus.devfactory.com/repository/{{ artifact.nexus }}"
+    url:  "{{ nexus_base_url | default('https://nexus.devfactory.com/repository') }}/{{ artifact.nexus }}"
     url_username: "{{ nexus_username }}"
     url_password: "{{ nexus_password }}"
     dest: "{{ tempnexus_result.path }}"

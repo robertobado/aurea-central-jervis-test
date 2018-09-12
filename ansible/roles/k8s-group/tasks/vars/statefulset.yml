@@ -1,0 +1,30 @@
+kind: StatefulSet
+apiVersion: apps/v1beta1
+metadata:
+  namespace: "{{ namespace }}"
+  name: "{{ service_vars.container_hostname }}"
+  labels:
+    name: "{{ service_vars.container_hostname }}"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: "{{ service_vars.container_hostname }}"
+        app_name: "{{ service_vars.container_hostname }}"
+    spec:
+# todo: figure out why the policy "Always" is not working
+#      restartPolicy: "{{ restart_policy }}" 
+      nodeSelector:
+        kubernetes.io/hostname: "{{ k8s_hostname if environment_name == 'prod' else null | default(omit) }}"
+      containers:
+        - name: "{{ service_vars.container_hostname }}"
+          imagePullPolicy: "{{ image_pull_policy }}"
+          image: "{{ container_base_image }}:{{ service_vars.container_image_tag }}"
+          resources:
+            limits: 
+              cpu: "{{ resources_limits_cpu }}"
+              memory: "{{ resources_limits_memory }}"
+            requests:
+              cpu: "{{ resources_requests_cpu }}"
+              memory: "{{ resources_requests_memory }}"

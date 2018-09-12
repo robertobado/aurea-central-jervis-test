@@ -1,6 +1,6 @@
 - name: Testing if we will overwrite something we shouldn't
   uri:
-    url: "https://nexus.devfactory.com/repository/{{ artifact.target }}"
+    url: "{{ nexus_base_url | default('https://nexus.devfactory.com/repository') }}/{{ artifact.target }}"
     user: "{{ nexus_username }}"
     password: "{{ nexus_password }}"
     method: HEAD
@@ -13,7 +13,7 @@
   when: not (artifact.overwrite | default(false))
 
 - name: Publishing Nexus Artifacts
-  shell: "curl -fkSL -X PUT -v --upload-file {{ lookup('env','WORKSPACE') ~ '/' ~ artifact.src }} -u '{{ nexus_username }}:{{ nexus_password }}' 'https://nexus.devfactory.com/repository/{{ artifact.target }}'"
+  shell: "curl -fkSL -X PUT -v --upload-file {{ lookup('env','WORKSPACE') ~ '/' ~ artifact.src }} -u '{{ nexus_username }}:{{ nexus_password }}' '{{ nexus_base_url | default('https://nexus.devfactory.com/repository') }}/{{ artifact.target }}'"
   delegate_to: localhost
   loop: "{{ (jervis.services[service.key].nexus | default({ 'publish': {} })).publish[environment_name] | default([])}}"
   loop_control:

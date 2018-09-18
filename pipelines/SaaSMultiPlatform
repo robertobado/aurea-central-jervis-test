@@ -22,7 +22,7 @@ pipeline {
                 extensions: [[$class: 'LocalBranch', localBranch: env.BRANCH_NAME]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-user-and-token', url: env.GIT_URL]]])
 
                 withCredentials([usernamePassword(credentialsId: 'github-user-and-token', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
-                    sh 'git clone https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git'
+                    sh 'rm -rf aurea-central-jervis; git clone https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git'
                 }
                 sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
             }

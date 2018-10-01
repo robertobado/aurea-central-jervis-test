@@ -62,5 +62,5 @@ jenkins:
 #  stability: stable
   sudo: sudo
   pipeline_jenkinsfile: SaaS
-  collect:
-    artifacts: *.log
+  #collect:
+    #artifacts: *.log

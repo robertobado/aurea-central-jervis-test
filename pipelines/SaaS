@@ -10,7 +10,7 @@ pipeline {
         ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
     }
     agent {
-        label 'stable && docker && linux && ansible'
+        label 'vuejs-app && stable && docker && linux && ansible'
     }
     stages {
         stage('Checkout SCM') {

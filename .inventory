@@ -13,7 +13,7 @@ docker-host:                                                                    
  
 dl6.aureacentral.com:
   vars:                                                                                             # Group variables for all containers in this host
-    ansible_host: dl6.aureacentral.com
+    ansible_host: dlb1.aureacentral.com
     labels:
       SERVICE_NAME: prod_central_vuejs
       SERVICE_TAGS: trilogy.expose-v2,trilogy.http,trilogy.endpoint=vuejs.aureacentral.com

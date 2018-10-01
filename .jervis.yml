@@ -19,10 +19,10 @@ notifications:
   slack:
     # Configure the Jenkins integration for each channel
     # https://my.slack.com/services/new/jenkins-ci
-    rooms:
-      - channel: "devfactorydev:VkVhrfzU7Lx7dFZWxJtzC4ku:#jervis_builds"
-        on_success: never
-        on_failure: always
+    #rooms:
+     # - channel: "devfactorydev:VkVhrfzU7Lx7dFZWxJtzC4ku:#jervis_builds"
+      #  on_success: never
+       # on_failure: always
 
 env:
   global:

@@ -49,3 +49,5 @@ jenkins:
 branches:
   only:
   - master
+  - qa
+  - develop

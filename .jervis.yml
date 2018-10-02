@@ -40,7 +40,8 @@ jenkins:
 
 script: 
   - echo "Hello World."
-  - echo docker build -t ${VUEJS_APP_IMAGE_BASE_URL}:${GIT_COMMIT} .
+  - echo docker build -t ${VUEJS_APP_IMAGE_BASE_URL} .
+  #- echo docker build -t ${VUEJS_APP_IMAGE_BASE_URL}:${GIT_COMMIT} .
 
 jenkins:
   stash:

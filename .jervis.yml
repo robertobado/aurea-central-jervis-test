@@ -26,7 +26,7 @@ notifications:
 
 env:
   global:
-    - JERVIS_SERVER_IMAGE_BASE_URL=registry2.swarm.devfactory.com/aurea/central/jervis/server
+    - VUEJS_APP_IMAGE_BASE_URL=registry2.swarm.devfactory.com/aurea/central/jervis/spring-boot-vuejs-app
     - DOCKER_HOST=tcp://docker-build.aureacentral.com:2375
 # Note that you can give a list of agents here.
 docker-agents:
@@ -40,7 +40,7 @@ jenkins:
 
 script: 
   - echo "Hello World."
-  - echo docker build -t ${JERVIS_SERVER_IMAGE_BASE_URL}:${GIT_COMMIT} .jervis_files/docker
+  - echo docker build -t ${VUEJS_APP_IMAGE_BASE_URL}:${GIT_COMMIT} .
 
 jenkins:
   pipeline_jenkinsfile: aurea-central-jervis/pipelines/SaaS

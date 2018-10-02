@@ -6,14 +6,23 @@
 
 language: shell
 
+# variables are accessible from pipeline
+variables:
+  - MY_VAR=xyz
+  - DEPLOYMENT_TARGET=docker
+
 env:
   global:
-    - JERVIS_SERVER_IMAGE_BASE_URL=registry2.swarm.devfactory.com/aurea/central/jervis/server
+    - VUEJS_APP_IMAGE_BASE_URL=registry2.swarm.devfactory.com/aurea/central/jervis/server/spring-boot-vuejs-app
     - DOCKER_HOST=tcp://dlb1.aureacentral.com:2375
-
+    
+docker-agents:
+  - docker-image: rowanto/docker-java8-mvn-nodejs-npm
+    labels: vuejs-app
+    
 script: 
   - echo "Hello World."
-  - echo docker build -t ${JERVIS_SERVER_IMAGE_BASE_URL}:${GIT_COMMIT} .jervis_files/docker
+  - echo docker build -t ${VUEJS_APP_IMAGE_BASE_URL}:${GIT_COMMIT} .
 
 jenkins:
   pipeline_jenkinsfile: aurea-central-jervis/pipelines/SaaS
@@ -22,6 +31,7 @@ jenkins:
 branches:
   only:
   - master
+  - qa
   - develop
   - release
   - hotfix

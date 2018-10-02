@@ -16,8 +16,7 @@ jenkins:
     allowEmpty: true
     name: 'artifacts'
   pipeline_jenkinsfile: aurea-central-jervis/pipelines/SaaSMultiPlatform    # Type of pipeline
-  collect:
-    artifacts: 'target/*.jar'
+  collect: []
     
 env:
   global:

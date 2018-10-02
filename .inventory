@@ -28,7 +28,7 @@ dlb1.aureacentral.com:
       cpu_shares: 2048
       network_mode: bridge
       services:
-        - name: vuejs
+        - name: vuejs-app
       ports:
         - ::8080                                                                                    # Ports can be random, but more stable environments need a fixed port per host/environment
         - ::8088

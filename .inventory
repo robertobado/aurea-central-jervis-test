@@ -1,0 +1,37 @@
+all:                                                                                                # Common group variables for all hosts
+  vars:
+    company: aurea
+    project: jervis
+    team: ms.cf
+    product: central
+    maintainer:
+      skype: v1_pankaj
+ 
+docker-host:                                                                                        # Main host group that will be targeted by the playbook
+  children:
+    dlb1.aureacentral.com                                                                            # Each Central Docker host must be declared as a sub-group inside docker-host group
+ 
+dlb1.aureacentral.com:
+  vars:                                                                                             # Group variables for all containers in this host
+    ansible_host: dlb1.aureacentral.com
+    labels:
+      SERVICE_NAME: prod_central_vuejs
+      SERVICE_TAGS: trilogy.expose-v2,trilogy.http,trilogy.endpoint=vuejs.aureacentral.com
+  hosts:                                                                                            # Inside central docker host group, each host entry is actually a container
+    jervis-vuejs:                                                                                # Params to be used by the Ansible Docker module
+      image: 'registry2.swarm.devfactory.com/aurea/central/jervis/spring-boot-vuejs-app'
+      memory: 4G
+      recreate: yes
+      pull: yes
+      cpu_period: 100000
+      cpu_quota: 300000
+      cpu_shares: 2048
+      network_mode: bridge
+      services:
+        - name: vuejs
+      ports:
+        - ::8080                                                                                    # Ports can be random, but more stable environments need a fixed port per host/environment
+        - ::8088
+      exposed_ports:                                               
+        - ::8080
+        - ::8088

@@ -44,7 +44,7 @@ script:
   #- echo docker build -t ${VUEJS_APP_IMAGE_BASE_URL}:${GIT_COMMIT} .
 
 jenkins:
-  pipeline_jenkinsfile: aurea-central-jervis/pipelines/SaaS    # Type of pipeline
+  pipeline_jenkinsfile: aurea-central-jervis-test/pipelines/SaaS    # Type of pipeline
   collect: []
   
 services:

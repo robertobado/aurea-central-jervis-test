@@ -10,7 +10,15 @@ language: shell
 variables:
   - MY_VAR=xyz
   - DEPLOYMENT_TARGET=docker
-
+  
+jenkins:
+  stash:
+    allowEmpty: true
+    name: 'artifacts'
+  pipeline_jenkinsfile: aurea-central-jervis/pipelines/SaaSMultiPlatform    # Type of pipeline
+  collect:
+    artifacts: 'target/*.jar'
+    
 env:
   global:
     - VUEJS_APP_IMAGE_BASE_URL=registry2.swarm.devfactory.com/aurea/central/jervis/server/spring-boot-vuejs-app
@@ -24,10 +32,6 @@ script:
   - echo "Hello World."
   - echo docker build -t ${VUEJS_APP_IMAGE_BASE_URL}:${GIT_COMMIT} .
 
-jenkins:
-  pipeline_jenkinsfile: aurea-central-jervis/pipelines/SaaS
-  collect: []
-  
 branches:
   only:
   - master

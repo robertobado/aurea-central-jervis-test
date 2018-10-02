@@ -43,9 +43,19 @@ script:
   - echo docker build -t ${VUEJS_APP_IMAGE_BASE_URL}:${GIT_COMMIT} .
 
 jenkins:
-  pipeline_jenkinsfile: aurea-central-jervis/pipelines/SaaS
+  stash:
+    allowEmpty: true
+    name: 'artifacts'
+  pipeline_jenkinsfile: aurea-central-jervis/pipelines/SaaS    # Type of pipeline
   collect: []
   
+services:
+  vuejs-app:                                                                                    #   Identifier for the docker image
+    docker_image:                      
+     path: .                                                                                    #   Location of the Dockerfile. Default is root folder of the project
+     name: registry2.swarm.devfactory.com/aurea/central/jervis/server/spring-boot-vuejs-app    #   Name of the image. Needs to include the registry URL.
+                                                                                               #
+                                                                                               
 branches:
   only:
   - master

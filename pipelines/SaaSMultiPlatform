@@ -11,7 +11,7 @@ pipeline {
         COMPOSE_FORCE_WINDOWS_HOST = 1
     }
     agent {
-        label 'table && docker && linux && ansible'
+        label 'stable && docker && linux && ansible'
     }
     stages {
         stage('Checkout SCM') {

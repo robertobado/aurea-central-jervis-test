@@ -6,7 +6,7 @@ TODO:
 
 pipeline {
     environment {
-        JERVIS_PLAYBOOK = 'aurea-central-jervis/ansible/jervis.yml'
+        JERVIS_PLAYBOOK = 'aurea-central-jervis-test/ansible/jervis.yml'
         ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
     }
     agent {

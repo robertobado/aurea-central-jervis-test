@@ -6,7 +6,7 @@ TODO:
 
 pipeline {
     environment {
-        JERVIS_PLAYBOOK = 'aurea-central-jervis-test/ansible/jervis.yml'
+        JERVIS_PLAYBOOK = 'aurea-central-jervis/ansible/jervis.yml'
         ANSIBLE_VAULT_PASSWORD = credentials('ansible-vault-password')
     }
     agent {
@@ -18,10 +18,10 @@ pipeline {
                 // Default Git checkout done by Jervis is not compatible with aLine.
                 // Please refer: https://jira.devfactory.com/browse/FIRE-14613
                 checkout([$class: 'GitSCM', branches: [[name: env.BRANCH_NAME]], doGenerateSubmoduleConfigurations: false,
-                extensions: [[$class: 'LocalBranch', localBranch: env.BRANCH_NAME]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-user-with-token-as-password', url: env.GIT_URL]]])
+                extensions: [[$class: 'LocalBranch', localBranch: env.BRANCH_NAME]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-user-and-token', url: env.GIT_URL]]])
 
-                withCredentials([usernamePassword(credentialsId: 'github-user-with-token-as-password', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
-                    sh 'git submodule add https://$USERID:$PASSWORD@github.com/v1pankaj/aurea-central-jervis-test.git && git submodule update --init && cd aurea-central-jervis-test && git checkout $CENTRAL_JERVIS_BRANCH'
+                withCredentials([usernamePassword(credentialsId: 'github-user-and-token', usernameVariable: 'USERID', passwordVariable: 'PASSWORD')]) {
+                    sh 'git submodule add https://$USERID:$PASSWORD@github.com/trilogy-group/aurea-central-jervis.git && git submodule update --init && cd aurea-central-jervis && git checkout $CENTRAL_JERVIS_BRANCH'
                 }
                 sh 'echo "$ANSIBLE_VAULT_PASSWORD" > .ansible-vault-password'
                 println("branch first tag = ")

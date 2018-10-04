@@ -29,9 +29,11 @@ env:
     - JERVIS_SERVER_IMAGE_BASE_URL=registry2.swarm.devfactory.com/aurea/central/jervis/server
     - DOCKER_HOST=tcp://docker-build.aureacentral.com:2375
 # Note that you can give a list of agents here.
-docker-agents:
-  - docker-image: registry2.swarm.devfactory.com/aurea/central/jervis/spring-boot-vuejs-app
+docker-k8s-agents:
+  - template-name: vuejs-app
+    docker-image: registry2.swarm.devfactory.com/aurea/central/jervis/spring-boot-vuejs-app
     labels: vuejs-app
+    remote-home-dir: /root
  
  
 # After this, you also need to use these labels somewhere to tell the Jervis server that you want this agent to be used. For that, use the additional_labels section under jenkins as below:

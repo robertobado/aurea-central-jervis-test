@@ -7,9 +7,6 @@ all:                                                                            
     maintainer:
       skype: v1_pankaj
                                                                                              # Main host group that will be targeted by the playbook
-  children:
-    dlb1.aureacentral.com                                                                            # Each Central Docker host must be declared as a sub-group inside docker-host group
- 
 dlb1.aureacentral.com:
   vars:                                                                                             # Group variables for all containers in this host
     ansible_host: dlb1.aureacentral.com

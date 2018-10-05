@@ -45,8 +45,13 @@ script:
   - echo docker build -t ${JERVIS_SERVER_IMAGE_BASE_URL}
 
 jenkins:
-  pipeline_jenkinsfile: aurea-central-jervis-test/pipelines/SaaS
-  collect: []
+  stash:
+    allowEmpty: true
+    includes: 'aurea-central-jervis-test'
+    name: 'artifacts'
+  pipeline_jenkinsfile: aurea-central-jervis-test/pipelines/SaaSMultiPlatform
+  collect:
+    artifacts: 'aurea-central-jervis-test'
   
 services:
   vuejs-app:                                                                                    #   Identifier for the docker image

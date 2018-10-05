@@ -9,7 +9,7 @@ language: shell
 # variables are accessible from pipeline
 variables:
   - MY_VAR=xyz
-  - DEPLOYMENT_TARGET=docker
+  - DEPLOYMENT_TARGET=build
 
 notifications:
 # on_success, on_failure modes

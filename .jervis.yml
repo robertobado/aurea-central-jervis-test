@@ -34,10 +34,8 @@ env:
 # After this, you also need to use these labels somewhere to tell the Jervis server that you want this agent to be used. For that, use the additional_labels section under jenkins as below:
 
 script: 
-  - echo "Hello World."
+  - echo "Building Docker Image..."
   - docker build -t ${VUEJS_APP_IMAGE_BASE_URL} .
-  - echo ls -lrt .
-  - echo ls -lrt aurea-central-jervis-test/pipelines
   #- echo docker build -t ${VUEJS_APP_IMAGE_BASE_URL}:${GIT_COMMIT} .
 
 jenkins:

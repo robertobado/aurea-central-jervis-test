@@ -42,15 +42,16 @@ script:
 jenkins:
   stash:
     allowEmpty: true
-    includes: '${WORKSPACE}/aurea-central-jervis-test/**/*'
+    includes: '**/aurea-central-jervis-test/*'
     name: 'artifacts'
   additional_labels: docker-k8s-microservices
   pipeline_jenkinsfile: aurea-central-jervis-test/pipelines/SaaSMultiPlatform    # Type of pipeline
+  collect: 'artifacts'
   
 services:
   docker-k8s-microservices:                                                                                    #   Identifier for the docker image
     docker_image:                      
-     path: .                                                                                    #   Location of the Dockerfile. Default is root folder of the project
+     path: '**/aurea-central-jervis-test/'                                                                                    #   Location of the Dockerfile. Default is root folder of the project
      name: registry2.swarm.devfactory.com/aurea/central/jervis/server/spring-boot-vuejs-app    #   Name of the image. Needs to include the registry URL.
                                                                                                #
                                                                                                

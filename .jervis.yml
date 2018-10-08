@@ -35,6 +35,7 @@ env:
 
 script: 
   - echo "Building Docker Image..."
+  - echo "Path = ${WORKSPACE}/aurea-central-jervis-test"
   - docker build -t ${VUEJS_APP_IMAGE_BASE_URL} .
   #- echo docker build -t ${VUEJS_APP_IMAGE_BASE_URL}:${GIT_COMMIT} .
 

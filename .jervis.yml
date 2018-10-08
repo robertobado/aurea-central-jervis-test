@@ -36,23 +36,23 @@ env:
 script: 
   - echo "Building Docker Image..."
   - echo "Path = ${WORKSPACE}/aurea-central-jervis-test"
-  - docker build -t ${VUEJS_APP_IMAGE_BASE_URL} .
+  #- docker build -t ${VUEJS_APP_IMAGE_BASE_URL} .
   #- echo docker build -t ${VUEJS_APP_IMAGE_BASE_URL}:${GIT_COMMIT} .
 
 jenkins:
   stash:
     allowEmpty: true
-    includes: '${WORKSPACE}/aurea-central-jervis-test/Dockerfile'
+    includes: '${WORKSPACE}/aurea-central-jervis-test/'
     name: 'artifacts'
   additional_labels: docker-k8s-microservices
   pipeline_jenkinsfile: aurea-central-jervis-test/pipelines/SaaSMultiPlatform    # Type of pipeline
-  collect: 'artifacts'
+  collect:
+    artifacts: 'Dockerfile'
   
 services:
-  unstash: 'artifacts'
   docker-k8s-microservices:                                                                                    #   Identifier for the docker image
     docker_image:                      
-     path: '${WORKSPACE}/aurea-central-jervis-test'                                                                                    #   Location of the Dockerfile. Default is root folder of the project
+     path: .                                                                                    #   Location of the Dockerfile. Default is root folder of the project
      name: registry2.swarm.devfactory.com/aurea/central/jervis/server/spring-boot-vuejs-app    #   Name of the image. Needs to include the registry URL.
                                                                                                #
                                                                                                

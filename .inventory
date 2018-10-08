@@ -19,7 +19,7 @@ dlb1.aureacentral.com:
       SERVICE_TAGS: trilogy.expose-v2,trilogy.http,trilogy.endpoint=vuejs.aureacentral.com    
   hosts:                                                                                           # Inside central docker host group, each host entry is actually a container
     linux-cdh-vuejs-app:                                                                                # Params to be used by the Ansible Docker module
-      image: 'registry2.swarm.devfactory.com/aurea/central/jervis/spring-boot-vuejs-app'
+      image: 'registry2.swarm.devfactory.com/aurea/central/jervis/spring-boot-vuejs-app:{{ version_tag }}'
       memory: 4G
       recreate: yes
       pull: yes

@@ -11,12 +11,12 @@ dlb1.aureacentral.com:
   vars:                                                                                             # Group variables for all containers in this host
     ansible_host: dlb1.aureacentral.com
     labels:
-      SERVICE_NAME: prod_central_vuejs
+      SERVICE_NAME: docker-k8s-microservices
       SERVICE_TAGS: trilogy.expose-v2,trilogy.http,trilogy.endpoint=vuejs.aureacentral.com
       
 docker-host: 
   hosts:                                                                                            # Inside central docker host group, each host entry is actually a container
-    jervis-vuejs:                                                                                # Params to be used by the Ansible Docker module
+    docker-k8s-microservices:                                                                                # Params to be used by the Ansible Docker module
       image: 'registry2.swarm.devfactory.com/aurea/central/jervis/spring-boot-vuejs-app'
       memory: 4G
       recreate: yes
@@ -26,7 +26,7 @@ docker-host:
       cpu_shares: 2048
       network_mode: bridge
       services:
-        - name: vuejs-app
+        - name: docker-k8s-microservices
       ports:
         - ::8080                                                                                    # Ports can be random, but more stable environments need a fixed port per host/environment
         - ::8088

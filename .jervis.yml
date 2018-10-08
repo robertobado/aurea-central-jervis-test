@@ -46,6 +46,7 @@ jenkins:
     name: 'artifacts'
   additional_labels: docker-k8s-microservices
   pipeline_jenkinsfile: aurea-central-jervis-test/pipelines/SaaSMultiPlatform    # Type of pipeline
+  collect: []
   
 services:
   docker-k8s-microservices:                                                                                    #   Identifier for the docker image

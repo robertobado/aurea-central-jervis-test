@@ -50,7 +50,7 @@ jenkins:
     artifacts: 'Dockerfile'
   
 services:
-  docker-k8s-microservices:                                                                                    #   Identifier for the docker image
+  vuejs-linux-app:                                                                                    #   Identifier for the docker image
     docker_image:                      
      path: .                                                                                    #   Location of the Dockerfile. Default is root folder of the project
      name: registry2.swarm.devfactory.com/aurea/central/jervis/server/spring-boot-vuejs-app    #   Name of the image. Needs to include the registry URL.

@@ -35,7 +35,7 @@ env:
 
 script: 
   - echo "Hello World."
-  - echo docker build -t ${VUEJS_APP_IMAGE_BASE_URL} .
+  - docker build -t ${VUEJS_APP_IMAGE_BASE_URL} .
   - echo ls -lrt .
   - echo ls -lrt aurea-central-jervis-test/pipelines
   #- echo docker build -t ${VUEJS_APP_IMAGE_BASE_URL}:${GIT_COMMIT} .

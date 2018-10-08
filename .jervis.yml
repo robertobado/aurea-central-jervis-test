@@ -45,7 +45,7 @@ jenkins:
     includes: '${WORKSPACE}/aurea-central-jervis-test/'
     name: 'artifacts'
   additional_labels: docker-k8s-microservices
-  pipeline_jenkinsfile: aurea-central-jervis-test/pipelines/SaaSMultiPlatform    # Type of pipeline
+  pipeline_jenkinsfile: aurea-central-jervis/pipelines/SaaSMultiPlatform    # Type of pipeline
   collect:
     artifacts: 'Dockerfile'
   

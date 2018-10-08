@@ -15,7 +15,7 @@ dlb1.aureacentral.com:
   vars:
     ansible_host: dlb1.aureacentral.com
     labels:
-      SERVICE_NAME: docker-k8s-microservices
+      SERVICE_NAME: vuejs-linux-app
       SERVICE_TAGS: trilogy.expose-v2,trilogy.http,trilogy.endpoint=vuejs.aureacentral.com    
   hosts:                                                                                           # Inside central docker host group, each host entry is actually a container
     linux-cdh-vuejs-app:                                                                                # Params to be used by the Ansible Docker module
@@ -28,7 +28,7 @@ dlb1.aureacentral.com:
       cpu_shares: 2048
       network_mode: bridge
       services:
-        - name: docker-k8s-microservices
+        - name: vuejs-linux-app
       ports:
         - ::8080                                                                                    # Ports can be random, but more stable environments need a fixed port per host/environment
         - ::8088
